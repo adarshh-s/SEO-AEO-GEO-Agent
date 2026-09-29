@@ -1,0 +1,12 @@
+{
+  "email.verify.subject": "Confirm your email for {product}",
+  "email.verify.body": "Hi {name},\n\nConfirm your email address by opening this link:\n{link}\n\nThe link expires in 3 days. If you didn't create a {product} account, you can ignore this email.",
+  "email.reset.subject": "Reset your {product} password",
+  "email.reset.body": "Hi {name},\n\nSomeone asked to reset your {product} password. To choose a new one, open this link:\n{link}\n\nThe link expires in 1 hour and works once. If it wasn't you, ignore this email; your password stays the same.",
+  "email.invite.subject": "{inviter} invited you to {org} on {product}",
+  "email.invite.body": "Hi,\n\n{inviter} invited you to join {org} on {product} as {role}.\n\nAccept the invitation:\n{link}\n\nThe invitation expires in 7 days.",
+  "role.owner": "owner",
+  "role.admin": "admin",
+  "role.member": "member",
+  "role.viewer": "viewer"
+}

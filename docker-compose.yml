@@ -1,0 +1,92 @@
+# Local development stack. `docker compose up` → web :5173, api :8000, mailpit :8025, minio :9001
+name: quardlink
+
+x-python-env: &python-env
+  env_file:
+    - path: .env
+      required: false
+  environment:
+    DATABASE_URL: postgresql+psycopg://app:app@postgres:5432/app
+    REDIS_URL: redis://redis:6379/0
+    SMTP_HOST: mailpit
+    SMTP_PORT: "1025"
+    EMAIL_PROVIDER: ${EMAIL_PROVIDER:-smtp}
+    SEED_DEMO: ${SEED_DEMO:-true}
+    S3_ENDPOINT_URL: http://minio:9000
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: app
+      POSTGRES_PASSWORD: app
+      POSTGRES_DB: app
+    ports: ["5432:5432"]
+    volumes: [pgdata:/var/lib/postgresql/data]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U app -d app"]
+      interval: 3s
+      retries: 20
+
+  redis:
+    image: redis:7-alpine
+    ports: ["6379:6379"]
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 3s
+      retries: 20
+
+  api:
+    build: { context: ., dockerfile: infra/docker/api.Dockerfile, target: dev }
+    <<: *python-env
+    command: sh -c "alembic -c apps/api/alembic.ini upgrade head && python -m app_api.seed && uvicorn app_api.main:app --host 0.0.0.0 --port 8000 --reload --reload-dir apps/api --reload-dir packages/core"
+    ports: ["8000:8000"]
+    volumes: [./apps:/repo/apps, ./packages:/repo/packages, ./config:/repo/config]
+    depends_on:
+      postgres: { condition: service_healthy }
+      redis: { condition: service_healthy }
+
+  worker:
+    build: { context: ., dockerfile: infra/docker/worker.Dockerfile, target: dev }
+    <<: *python-env
+    command: celery -A app_worker.celery_app worker -Q default,crawl,tracking,agents,deploy --pool=prefork --concurrency=2 --loglevel=INFO
+    volumes: [./apps:/repo/apps, ./packages:/repo/packages, ./config:/repo/config]
+    depends_on:
+      postgres: { condition: service_healthy }
+      redis: { condition: service_healthy }
+
+  beat:
+    build: { context: ., dockerfile: infra/docker/worker.Dockerfile, target: dev }
+    <<: *python-env
+    command: celery -A app_worker.celery_app beat --loglevel=INFO --schedule=/tmp/celerybeat-schedule
+    volumes: [./apps:/repo/apps, ./packages:/repo/packages, ./config:/repo/config]
+    depends_on:
+      redis: { condition: service_healthy }
+
+  web:
+    image: node:24-alpine
+    working_dir: /repo
+    command: sh -c "corepack enable && pnpm install --frozen-lockfile && pnpm --filter web dev --host 0.0.0.0"
+    environment:
+      VITE_API_URL: ${VITE_API_URL:-http://localhost:8000}
+    ports: ["5173:5173"]
+    volumes: [./:/repo, web_node_modules:/repo/node_modules]
+    depends_on: [api]
+
+  mailpit:
+    image: axllent/mailpit:latest
+    ports: ["8025:8025", "1025:1025"]
+
+  minio:
+    image: minio/minio:latest
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: minio
+      MINIO_ROOT_PASSWORD: minio-password
+    ports: ["9000:9000", "9001:9001"]
+    volumes: [miniodata:/data]
+
+volumes:
+  pgdata:
+  miniodata:
+  web_node_modules:

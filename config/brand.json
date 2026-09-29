@@ -1,0 +1,32 @@
+{
+  "_comment": "Single source of product naming. Edit here, then run `python scripts/brand_sync.py` to regenerate brand constants for every app. Hosts/domains are NOT here: they come from env (APP_URL, API_URL, CDN_URL). Keys listed in _frozen_after_launch become painful to change once published (npm, wp.org, Shopify, live customer snippets).",
+  "product_name": "QuardLink",
+  "brand_slug": "quardlink",
+  "company_name": "QuardLink",
+  "snippet_global": "QuardLink",
+  "snippet_filename": "agent.js",
+  "verification_meta_name": "quardlink-verification",
+  "dns_txt_prefix": "quardlink-verification=",
+  "wp_plugin_slug": "quardlink",
+  "npm_scope": "@quardlink",
+  "sdk_package": "@quardlink/sdk",
+  "crawler_user_agent_token": "QuardLinkBot",
+  "api_key_prefix": "ql",
+  "site_key_prefix": "qls",
+  "email_from_name": "QuardLink",
+  "colors": {
+    "primary": "#2563eb",
+    "primary_foreground": "#ffffff"
+  },
+  "_frozen_after_launch": [
+    "snippet_global",
+    "snippet_filename",
+    "verification_meta_name",
+    "dns_txt_prefix",
+    "wp_plugin_slug",
+    "npm_scope",
+    "sdk_package",
+    "api_key_prefix",
+    "site_key_prefix"
+  ]
+}

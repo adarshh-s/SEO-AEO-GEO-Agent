@@ -1,0 +1,55 @@
+[project]
+name = "quardlink-monorepo"
+version = "0.1.0"
+requires-python = ">=3.12,<3.13"
+dependencies = []
+
+[tool.uv]
+package = false
+
+[tool.uv.workspace]
+members = ["packages/core", "apps/api", "apps/worker"]
+
+[tool.uv.sources]
+app-core = { workspace = true }
+app-api = { workspace = true }
+app-worker = { workspace = true }
+
+[dependency-groups]
+dev = [
+    "app-core",
+    "app-api",
+    "app-worker",
+    "pytest>=8.3",
+    "pytest-cov>=6.0",
+    "ruff>=0.12",
+    "black>=25.1",
+    "fakeredis>=2.30",
+    "respx>=0.22",
+]
+
+[tool.black]
+line-length = 100
+target-version = ["py312"]
+extend-exclude = "vendor/"
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+extend-exclude = ["vendor"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP", "S", "SIM"]
+ignore = ["E501", "B008", "S101"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["app_core", "app_api", "app_worker", "conftest"]
+
+[tool.ruff.lint.per-file-ignores]
+"**/tests/**" = ["S105", "S106", "SIM117"]
+"**/alembic/versions/**" = ["E501"]
+
+[tool.pytest.ini_options]
+testpaths = ["apps/api/tests", "apps/worker/tests", "packages/core/tests"]
+addopts = "-q"
+filterwarnings = ["ignore:Using `httpx` with `starlette.testclient`"]
