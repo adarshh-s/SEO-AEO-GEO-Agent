@@ -1,6 +1,7 @@
-# CLAUDE.md — RankAgent (working name, rename freely)
+# CLAUDE.md — QuardLink (working name; all naming comes from config/brand.json)
 
-You are building **RankAgent**, a multi-tenant SaaS that helps businesses rank in
+You are building **QuardLink** (spec originally written as "RankAgent"; wherever
+this file says RankAgent, read the brand from `config/brand.json`), a multi-tenant SaaS that helps businesses rank in
 Google (SEO) and get mentioned/cited in AI answers (AEO/GEO: ChatGPT, Perplexity,
 Gemini, Claude, Google AI Overviews). Businesses sign up, connect their website,
 and the agent continuously **tracks → diagnoses → fixes → reports**.
@@ -128,7 +129,7 @@ Build all of this into the architecture from Phase 1. Don't add it later.
 | Page speed / Core Web Vitals | PageSpeed Insights + CrUX | `GOOGLE_API_KEY` |
 | Search Console (per customer, OAuth) | Google OAuth | `GOOGLE_OAUTH_CLIENT_ID`, `GOOGLE_OAUTH_CLIENT_SECRET` |
 | Platform connectors | Shopify, Wix, Webflow, Salla, Zid, GitHub app credentials | `SHOPIFY_*`, `WIX_*`, `WEBFLOW_*`, `SALLA_*`, `ZID_*`, `GITHUB_APP_*` |
-| Payments | Stripe + pluggable adapter (Moyasar/Tap for KSA later) | `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET` |
+| Payments | **Deferred to Phase 7.** Moyasar or Tap first (SAR, mada, Apple Pay), Stripe second. No payment code before Phase 7. | (added in Phase 7) |
 | Email | Resend or SMTP | `EMAIL_*` |
 | File storage | S3-compatible | `S3_*` |
 
@@ -353,6 +354,12 @@ selected, loading/empty/error states everywhere, tooltips for any SEO jargon.
 
 ## 12. Plans & quotas (placeholder values — configurable in DB)
 
+Plans are **assigned manually** until Phase 7: new orgs start on a **Trial**
+plan (limits configurable in DB), and a platform admin can set any org's plan
+from the admin panel. No checkout exists; the pricing page shows plans with a
+"Contact us" button. A `PaymentProvider` interface and a `subscriptions` table
+exist as placeholders with no provider implementation.
+
 | Plan | Sites | Keywords | AI prompts | AI engines | Languages per site | Check frequency | Audits/mo |
 |---|---|---|---|---|---|---|---|
 | Starter | 1 | 50 | 25 | 2 | 1 (+Arabic add-on) | weekly | 2 |
@@ -391,9 +398,15 @@ Search Console. Then Webflow and Wix connectors.
 scripts, PDF + email reports (EN default, AR optional), Salla and Zid connectors
 (if their APIs support it, per Phase 0 research).
 
-**Phase 6 — Billing & launch.** Stripe subscriptions + usage limits, payment
-adapter, landing/pricing/integrations pages, admin panel (orgs, usage, API costs),
-production Dockerfiles, deployment guide.
+**Phase 6 — Launch readiness.** Landing/pricing ("Contact us", no checkout)/
+integrations pages, admin panel (orgs, manual plan assignment, usage, API costs,
+cost-ceiling overrides), production Dockerfiles, deployment guide.
+
+**Phase 7 — Billing (only after everything else is tested and working).**
+Payment adapter with **Moyasar or Tap first** (SAR, mada, Apple Pay) and
+**Stripe as a second adapter**; subscriptions, checkout, billing webhooks
+(signature-verified), and wiring paid plans to the existing quota system.
+Until this phase: no Stripe/Moyasar/Tap code, no checkout, no billing webhooks.
 
 ---
 
@@ -427,3 +440,18 @@ production Dockerfiles, deployment guide.
    providers), on top of plan quotas: alert org admins and the platform operator
    at 80%; pause non-essential scheduled checks at 100%; platform admins can raise
    the limit per org.
+5. **Phase 0 review decisions (2026-09-29)** are recorded in `docs/decisions.md`.
+   Highlights: neutral internal package names (`app_core`, `app_api`,
+   `app_worker`); uv + pnpm workspaces; Postgres RLS as a second tenancy layer;
+   Western digits in the Arabic UI; frontend on Vercel, API/workers/Postgres/Redis
+   on Railway; every domain comes from env (`app.`/`api.`/`cdn.quardlink.com` in
+   prod, localhost locally); FAQPage schema only on opt-in; direct AI-engine APIs
+   first (engine interface ready for a DataForSEO LLM Scraper premium engine
+   later); Sentry only if `SENTRY_DSN` is set; Starter = ChatGPT + Gemini;
+   configurable retention (raw answers 13 mo, HTML snapshots 90 d, aggregates
+   forever); snippet content blocks off by default (schema/meta on); Shopify app
+   backend on FastAPI; Resend in prod with an SMTP option.
+6. **Payments deferred to Phase 7** (see §4, §12, §13). Manual plan assignment
+   until then.
+7. **No registrations exist yet** (QuardLink is a test name, entity not
+   registered). `docs/registrations-checklist.md` lists what each needs.

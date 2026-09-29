@@ -1,7 +1,7 @@
-# RankAgent architecture (Phase 0 proposal)
+# QuardLink architecture
 
-Status: proposal for review. Items marked **[D#]** depend on decisions in
-[decisions.md](decisions.md).
+Status: approved after Phase 0 review. **[D#]** tags refer to decisions in
+[decisions.md](decisions.md) (all resolved).
 
 ## 1. System overview
 
@@ -23,7 +23,7 @@ Status: proposal for review. Items marked **[D#]** depend on decisions in
                           │ Postgres16│   │ Redis │   │ S3 (PDFs, snapshots)   │
                           └───────────┘   └───────┘   └────────────────────────┘
                                         Celery Beat → schedules
-External: Anthropic · OpenAI · Perplexity · Gemini · DataForSEO · PSI/CrUX · GSC · Stripe · Resend
+External: Anthropic · OpenAI · Perplexity · Gemini · DataForSEO · PSI/CrUX · GSC · Resend  (payments: Phase 7)
 ```
 
 - **API** is stateless and never fetches customer URLs itself (see the
@@ -56,17 +56,17 @@ External: Anthropic · OpenAI · Perplexity · Gemini · DataForSEO · PSI/CrUX 
 │   │   │   └── locales/{en,ar}/*.json
 │   │   └── tests/                 # Vitest + RTL; e2e/ (Playwright)
 │   ├── api/
-│   │   ├── rankagent_api/         # package name comes from brand at scaffold time only
+│   │   ├── app_api/               # neutral internal name (D1)
 │   │   │   ├── main.py  settings.py  deps.py (auth, tenant context)
 │   │   │   ├── routers/           # auth, orgs, sites, keywords, prompts, checks, fixes,
-│   │   │   │                      # audits, reports, integrations, billing, admin, public_v1
+│   │   │   │                      # audits, reports, integrations, plans, admin, public_v1
 │   │   │   ├── services/          # business logic (quota, cost ceiling, verification…)
 │   │   │   ├── integrations/<platform>/   # PlatformConnector impls (wix, webflow, salla, zid, shopify, wordpress, github, gsc)
 │   │   │   └── providers/         # LLMProvider, SerpProvider, PaymentProvider, EmailProvider, StorageProvider
 │   │   ├── alembic/
 │   │   └── tests/
 │   └── worker/
-│       ├── rankagent_worker/
+│       ├── app_worker/
 │       │   ├── celery_app.py  beat.py
 │       │   ├── tasks/             # crawl, detect, rank, ai_visibility, score, diagnose,
 │       │   │                      # generate_fixes, deploy, audit, report, cost_rollup
@@ -74,7 +74,7 @@ External: Anthropic · OpenAI · Perplexity · Gemini · DataForSEO · PSI/CrUX 
 │       │   └── agents/prompts/    # adapted system prompts (with upstream attribution)
 │       └── tests/
 ├── packages/
-│   ├── core/                      # shared Python: SQLAlchemy models, Pydantic schemas, enums,
+│   ├── core/  (app_core)          # shared Python: SQLAlchemy models, Pydantic schemas, enums,
 │   │                              # brand loader, cost/quota primitives (used by api + worker)
 │   ├── snippet/                   # agent.js (TS, esbuild, <15 KB gz)
 │   ├── sdk-js/                    # npm: core client + /next /react /nuxt /astro entry points
@@ -98,20 +98,12 @@ JS tooling: `pnpm` workspace (`apps/web`, `packages/snippet`, `sdk-js`,
 
 ```json
 {
-  "product_name": "RankAgent",
-  "brand_slug": "rankagent",
-  "snippet_global": "RankAgent",
-  "verification_meta_name": "rankagent-verification",
-  "dns_txt_prefix": "rankagent-verification=",
-  "wp_plugin_slug": "rankagent",
-  "npm_scope": "@rankagent",
-  "sdk_package": "@rankagent/sdk",
-  "crawler_user_agent": "Mozilla/5.0 (compatible; RankAgentBot/1.0; +https://rankagent.example/bot)",
-  "cdn_host": "cdn.rankagent.example",
-  "api_host": "api.rankagent.example",
-  "app_host": "app.rankagent.example",
-  "support_email": "support@rankagent.example",
-  "colors": { "primary": "#…" }
+  "product_name": "QuardLink",
+  "brand_slug": "quardlink",
+  "snippet_global": "QuardLink",
+  "verification_meta_name": "quardlink-verification",
+  "...": "see config/brand.json"
+  // hosts are NOT in brand.json; they come from env (APP_URL, API_URL, CDN_URL)
 }
 ```
 
@@ -125,9 +117,8 @@ JS tooling: `pnpm` workspace (`apps/web`, `packages/snippet`, `sdk-js`,
   WP plugin slug, Shopify app handle, snippet global, verification meta name)
   are marked in the file with `"_frozen_after_launch"`. Rename before publishing
   them, which is the latest point the product name must be final. **[D1]**
-- Internal Python package directories (`rankagent_api`) don't need renaming;
-  they are invisible to customers. We'll use neutral names (`app_api`,
-  `app_worker`, `app_core`) to avoid confusion. **[D1]**
+- Internal Python packages use neutral names (`app_api`, `app_worker`,
+  `app_core`), so a rename never touches them. **[D1]**
 
 ## 4. Multi-tenancy
 
@@ -196,7 +187,7 @@ task wants paid call ──► CostGate.reserve(org, provider, est_cost, essenti
 - `PlatformConnector` (per platform): `capabilities()`, `verify_ownership()`,
   `read_current(target)`, `apply(fix) -> DeployResult(previous_state)`,
   `rollback(deploy)`, `health()`
-- `PaymentProvider`, `EmailProvider`, `StorageProvider`
+- `PaymentProvider` (interface only until Phase 7), `EmailProvider`, `StorageProvider`
 
 Every implementation has a fake used in tests and in `SEED_DEMO` mode.
 Model IDs come from env (`CLAUDE_MODEL_MAIN`, `CLAUDE_MODEL_FAST`,
@@ -260,8 +251,8 @@ reads the current state first (merge/replace, no duplicates), stores
   no slow hash needed), shown once.
 - Rate limits (Redis, sliding window): auth endpoints, public fixes endpoint
   (per site key + IP; responses cached at the CDN), events ingest.
-- Webhooks in: signature verification per provider (Stripe, Shopify HMAC, Wix
-  JWT, Salla/Zid per docs). Webhooks out: HMAC-SHA256 signature + timestamp,
+- Webhooks in: signature verification per provider (Shopify HMAC, Wix JWT,
+  Salla/Zid per docs; payment providers in Phase 7). Webhooks out: HMAC-SHA256 signature + timestamp,
   retries with backoff, and SSRF checks on customer webhook URLs (same
   `url_safety`, worker-side).
 - Idempotency: every task keyed (`site_id:type:period`), Celery `acks_late` +
@@ -272,7 +263,7 @@ reads the current state first (merge/replace, no duplicates), stores
 - Local: `docker compose up` → postgres, redis, api, worker (crawl +
   tracking queues), beat, web, mailpit (local email), minio (S3).
 - Prod: web on Vercel/Netlify; api/worker/beat as Docker images (a Playwright
-  base image for the crawl worker) on Railway/Render/Fly/VPS **[D10]**;
+  base image for the crawl worker) on Railway **[D10]**;
   managed Postgres + Redis.
 - Observability: structlog JSON logs with `org_id`/`site_id`/`task_id`,
-  Sentry (optional, **[D11]**), a per-org cost dashboard in admin.
+  Sentry (only if `SENTRY_DSN` is set, **[D11]**), a per-org cost dashboard in admin.

@@ -7,38 +7,29 @@
 | C2 | Salla/Zid: snippet + manual instructions is an acceptable launch fallback; full-integration requirements are documented in `docs/platforms/salla.md` / `zid.md`. |
 | C3 | Celery + Celery Beat on Redis. |
 | C4 | Per-org monthly $ ceiling on paid API calls: alert at 80% (org admins + operator), pause non-essential scheduled checks at 100%, platform admin can raise per org. |
+| D1 | Neutral internal package names (`app_core`, `app_api`, `app_worker`); only `config/brand.json` holds the brand. |
+| D2 | FAQ fixes are content blocks; `FAQPage` schema only when the user opts in. Never promise a FAQ rich result. |
+| D3 | Direct provider APIs first. `AnswerEngine` interface designed so a DataForSEO LLM Scraper premium engine can be added later; not built now. |
+| D4 | Competitor detection: DataForSEO first, LLM fallback. |
+| D5 | uv workspace (Python) + pnpm workspace (JS); no Turborepo/Nx. |
+| D6 | Postgres Row-Level Security as a second layer behind app-level `org_id` filtering. |
+| D7 | At 100% of ceiling pause non-essential work (scheduled rank/AI checks, scheduled audits, suggestion generation); essential work continues until a hard stop at 120%. |
+| D8 | Operator cost alerts go to `OPS_ALERT_EMAIL` = adarshs18400@gmail.com (env-configurable). |
+| D9 | Arabic UI uses Western digits (123) by default. |
+| D10 | Frontend on Vercel; API, workers, Postgres, Redis on Railway. Prod domains `app.quardlink.com`, `api.quardlink.com`, `cdn.quardlink.com` (not yet purchased). All domains come from env; localhost for local dev. |
+| D11 | Sentry optional, enabled only when `SENTRY_DSN` is set. |
+| D12 | Starter plan engines: ChatGPT (OpenAI) + Gemini. |
+| D13 | Retention, configurable: raw AI answers 13 months, HTML snapshots 90 days, aggregates forever. |
+| D14 | Per-plan cost ceilings set after measuring real costs in Phase 2 (placeholders until then). |
+| D15 | Snippet content blocks off by default and render only inside a customer-placed container. Schema and meta injection stay on. |
+| D16 | Shopify app backend on FastAPI (no Remix server); `packages/shopify-app` holds the theme app extension + thin embedded page. |
+| D17 | Brand/company name **QuardLink** (test name; legal entity not registered). No registrations are assumed to exist; see `docs/registrations-checklist.md`. |
+| D18 | Webflow schema: manual paste as primary (server-side), Custom Code API as the automatic client-side option, with the trade-off shown in the UI. *(Recommendation accepted by default; not explicitly answered.)* |
+| D19 | Resend in production, SMTP adapter as an option, Mailpit locally. |
+| D20 | **Payments deferred** to a final Phase 7. No payment code, checkout or billing webhooks until then. Plans assigned manually (new orgs → Trial plan with configurable limits; platform admin sets any org's plan). `PaymentProvider` interface + `subscriptions` table as placeholders only. Pricing page shows "Contact us". In Phase 7: Moyasar or Tap first (SAR, mada, Apple Pay), Stripe second. |
 
-## Open: needed before Phase 1
-| # | Question | Recommendation |
-|---|---|---|
-| D1 | **Internal naming.** Use neutral internal Python package names (`app_api`, `app_worker`, `app_core`) so only `brand.json` carries the brand? | Yes. |
-| D5 | **Tooling:** `uv` workspace for Python, `pnpm` workspace for JS, no Turborepo/Nx? | Yes. It's simple and fast, and we can add Turbo later if builds get slow. |
-| D6 | **Postgres Row-Level Security** as a second tenancy layer on top of app-level `org_id` filtering? | Yes. It's cheap to add in Phase 1 and hard to retrofit. |
-| D8 | **Operator alert address** for 80%/100% cost alerts and other "notify me" events (`OPS_ALERT_EMAIL`). Which email? | Your email, set via env. |
-| D9 | Arabic UI: Western digits (123) or Arabic-Indic (١٢٣)? | Western digits by default (common in KSA business software); per-user option later. |
-| D10 | **Deploy target** for API/workers, and a custom domain. Cookie auth across Vercel + API needs both on one parent domain (`app.x.com` + `api.x.com`). | Pick one host now (Railway or Fly.io) so docker-compose mirrors it; buy the domain before Phase 4 (Google OAuth verification needs it). |
-
-## Open: needed before Phase 2
-| # | Question | Recommendation |
-|---|---|---|
-| D2 | **FAQ fixes.** Google removed FAQ rich results for all sites on 2026-05-07. Keep "FAQ / Q&A block" as a *content* fix for AI answers but stop emitting `FAQPage` schema by default? | Yes. Emit FAQPage only if the user opts in, and never promise a rich result. |
-| D3 | **AI visibility data source.** The spec says call OpenAI/Perplexity/Gemini/Claude APIs directly. API answers can differ from what users see in the consumer ChatGPT/Gemini apps. DataForSEO also offers **LLM Responses** (API passthrough, base $0.0006 + tokens) and an **LLM Scraper** (answers scraped from the consumer UI). Add DataForSEO LLM Scraper as an optional "consumer ChatGPT" engine? *(paid service → needs your OK)* | Build direct APIs first (spec). Add the DataForSEO LLM Scraper engine in Phase 2 behind a flag if you approve the spend. |
-| D4 | **Competitor auto-detect** in onboarding: DataForSEO "competitors" data (paid, accurate) or LLM guess from site content (cheap, weaker)? | DataForSEO SERP overlap on 5–10 seed keywords, with LLM as fallback. |
-| D7 | **Essential vs non-essential** at 100% ceiling. Proposed: *paused* = scheduled rank/AI checks, scheduled audits, suggestion generation; *still allowed* = user-clicked diagnosis/fix generation, onboarding detection, deploy/rollback, with a hard stop at 120% of the ceiling. OK? | Yes. |
-| D11 | **Error monitoring**: Sentry (free tier is fine at first, but it's a paid service at scale)? | Yes, optional via `SENTRY_DSN`. |
-| D12 | **Starter plan's 2 AI engines**: which two? | ChatGPT (OpenAI) + Gemini. Google AI Overviews come from SERP data on all plans. |
-| D13 | **Data retention.** Raw AI answers and HTML snapshots are big. | Raw answers 13 months, HTML snapshots 90 days in S3, aggregates kept forever. |
-| D14 | **Default ceilings per plan** (placeholder): Starter $15/mo, Growth $60/mo, Business $200/mo of raw API cost? | Set after a Phase 2 cost measurement on demo data; placeholders until then. |
-
-## Open: needed before Phase 3–4 (flagging now because of lead time)
-| # | Question | Recommendation |
-|---|---|---|
-| D15 | **Snippet content blocks vs "no layout shift".** Injecting content with JS always shifts layout unless the customer reserves space. | Content blocks via snippet off by default. When enabled, they render only into a customer-placed container (and we tell them to size it). |
-| D16 | **Shopify app architecture.** Shopify's template is a Remix/Node app. Alternative: FastAPI handles OAuth + Admin GraphQL, and `packages/shopify-app` holds only the theme app extension + a thin embedded page (App Bridge) served from our web app. Avoids a second backend stack. | FastAPI-based. Verify App Store embedded-app requirements in Phase 4. |
-| D17 | **Start partner/verification paperwork early** (weeks of lead time): Google OAuth verification (Search Console scope), Shopify Partner, Wix/Webflow app registration, Salla/Zid partner accounts. Who owns the accounts (company legal entity)? | Register accounts now under the company entity; I'll write step lists. |
-| D18 | **Webflow schema delivery**: manual paste (server-side, best for AI) as primary, and the Custom Code API (client-side JS) as the automatic option? | Yes, and show the trade-off label in the UI. |
-| D19 | **Email provider**: Resend (paid past free tier) or plain SMTP? | Resend in prod, Mailpit locally, SMTP adapter available. |
-| D20 | **Payments region**: Stripe in USD first; Moyasar/Tap (SAR, mada) at launch or after? Affects Phase 6 only. | Stripe USD first, KSA adapter post-launch unless KSA customers need mada at launch. |
+## Open
+None blocking. New questions will be added here per phase.
 
 ## For your information (changes to spec assumptions, no action needed unless you disagree)
 - **Framer and Wix serve pre-rendered HTML** to crawlers. We won't label them
