@@ -1,0 +1,26 @@
+{
+  "keyword": {
+    "title": "Keyword",
+    "body": "A search people type into Google, like \"dentist in Riyadh\". We check where your website appears for it."
+  },
+  "aiPrompt": {
+    "title": "AI question",
+    "body": "A question a customer might ask ChatGPT, Gemini or another AI assistant. We check whether the answer mentions or links to you."
+  },
+  "competitor": {
+    "title": "Competitor",
+    "body": "A website that competes with you for the same customers. We compare your pages with theirs to find what's missing."
+  },
+  "verification": {
+    "title": "Ownership verification",
+    "body": "Proof that you control the website. We need it before we apply any change."
+  },
+  "seoScore": {
+    "title": "SEO visibility score",
+    "body": "A 0–100 score of how visible you are in Google for your tracked keywords. Higher positions count more."
+  },
+  "shareOfVoice": {
+    "title": "AI share of voice",
+    "body": "Out of all the times AI assistants mention you or your competitors, the share that mentions you."
+  }
+}

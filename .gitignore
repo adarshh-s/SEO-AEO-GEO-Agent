@@ -21,3 +21,9 @@ playwright-report/
 .DS_Store
 .idea/
 .vscode/
+
+# pnpm store created by the web container
+.pnpm-store/
+# build / test output
+apps/web/dist/
+openapi.json.tmp

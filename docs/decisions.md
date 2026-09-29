@@ -28,8 +28,13 @@
 | D19 | Resend in production, SMTP adapter as an option, Mailpit locally. |
 | D20 | **Payments deferred** to a final Phase 7. No payment code, checkout or billing webhooks until then. Plans assigned manually (new orgs → Trial plan with configurable limits; platform admin sets any org's plan). `PaymentProvider` interface + `subscriptions` table as placeholders only. Pricing page shows "Contact us". In Phase 7: Moyasar or Tap first (SAR, mada, Apple Pay), Stripe second. |
 
-## Open
-None blocking. New questions will be added here per phase.
+## Open (after Phase 1)
+| # | Question | Recommendation |
+|---|---|---|
+| Q1 | **"Contact us" address** on the pricing and plan pages (`VITE_CONTACT_EMAIL`, currently hello@example.com). | Your email until a company address exists. |
+| Q2 | **Trial plan defaults**: 1 site, 25 keywords, 10 AI prompts, ChatGPT + Gemini, weekly checks, 1 audit, 14 days, $5 cost ceiling. OK? | OK as a start; editable in DB/admin. |
+| Q3 | **What happens when a trial ends?** Not enforced yet. Needed before Phase 2 schedules. | Pause scheduled checks and keep read-only access; admin can extend or assign a plan. |
+| Q4 | **Email verification enforcement.** Unverified users can use everything today. | Require a verified email before connecting a website or approving/deploying fixes (Phase 3). |
 
 ## For your information (changes to spec assumptions, no action needed unless you disagree)
 - **Framer and Wix serve pre-rendered HTML** to crawlers. We won't label them

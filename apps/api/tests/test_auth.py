@@ -268,3 +268,12 @@ def test_open_redirect_is_blocked(app):
     assert _safe_next("//evil.com") == "/app"
     assert _safe_next("https://evil.com") == "/app"
     assert _safe_next("/app/sites") == "/app/sites"
+
+
+def test_google_start_without_configuration_redirects_to_login(app, monkeypatch):
+    from app_core.settings import get_settings
+
+    monkeypatch.setattr(get_settings(), "google_oauth_client_id", None)
+    r = make_client(app).get("/auth/google/start", follow_redirects=False)
+    assert r.status_code == 302
+    assert r.headers["location"] == "http://app.test/login?error=google_unavailable"

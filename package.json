@@ -1,0 +1,13 @@
+{
+  "name": "quardlink-monorepo",
+  "private": true,
+  "packageManager": "pnpm@10.13.1",
+  "engines": { "node": ">=22" },
+  "scripts": {
+    "brand:sync": "uv run python scripts/brand_sync.py",
+    "gen:api": "uv run python scripts/export_openapi.py && pnpm --filter web exec openapi-typescript ../../openapi.json -o src/lib/api-types.gen.ts",
+    "lint": "pnpm -r lint",
+    "typecheck": "pnpm -r typecheck",
+    "test": "pnpm -r test"
+  }
+}

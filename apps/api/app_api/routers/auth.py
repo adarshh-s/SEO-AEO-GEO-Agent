@@ -263,7 +263,7 @@ def _google_redirect_uri() -> str:
 def google_start(next: Annotated[str | None, Query(max_length=500)] = None) -> RedirectResponse:
     s = get_settings()
     if not s.google_oauth_client_id:
-        raise ApiError(503, "google_not_configured", "Google sign-in is not configured.")
+        return RedirectResponse(f"{s.app_url}/login?error=google_unavailable", status_code=302)
     state, nonce, verifier = new_token(), new_token(), new_token(48)
     challenge = base64.urlsafe_b64encode(hashlib.sha256(verifier.encode()).digest()).rstrip(b"=")
     params = {

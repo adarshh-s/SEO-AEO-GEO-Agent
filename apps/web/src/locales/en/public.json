@@ -1,0 +1,112 @@
+{
+  "nav": {
+    "pricing": "Pricing",
+    "integrations": "Integrations",
+    "openApp": "Open app",
+    "login": "Sign in",
+    "signup": "Get started",
+    "privacy": "Privacy",
+    "terms": "Terms"
+  },
+  "hero": {
+    "title": "Get found on Google and in AI answers",
+    "subtitle": "See your visibility score, why competitors show up instead of you, and the fixes to apply, whatever your website is built with.",
+    "cta": "Start free trial",
+    "disclaimer": "We measure, diagnose and help you improve. No one can guarantee rankings, and we don't."
+  },
+  "features": {
+    "track": {
+      "title": "Track",
+      "body": "Google rankings by country, city and device, in every language you choose."
+    },
+    "ai": {
+      "title": "AI visibility",
+      "body": "See whether ChatGPT, Gemini, Perplexity and Claude mention and cite you, and who they mention instead."
+    },
+    "fix": {
+      "title": "Fix",
+      "body": "Get concrete fixes, approve them, and apply them to your site automatically or with simple instructions."
+    }
+  },
+  "pricing": {
+    "title": "Plans",
+    "subtitle": "Every plan includes Google rank tracking, AI visibility tracking and fixes. Contact us to get started.",
+    "sites_one": "{{n}} website",
+    "sites_other": "{{n}} websites",
+    "keywords": "{{n}} keywords",
+    "prompts": "{{n}} AI questions",
+    "engines_one": "{{n}} AI assistant",
+    "engines_other": "{{n}} AI assistants",
+    "frequency": {
+      "weekly": "Weekly checks",
+      "twice_weekly": "Checks twice a week",
+      "daily": "Daily checks"
+    },
+    "audits": "{{n}} site audits per month",
+    "arabicAddon": "1 language (Arabic available as an add-on)",
+    "languages_one": "{{n}} language per website",
+    "languages_other": "{{n}} languages per website",
+    "contact": "Contact us",
+    "trial": "New accounts start with a free trial."
+  },
+  "integrations": {
+    "title": "Works with your website",
+    "subtitle": "No-code builders and custom-coded sites. We pick the best way to connect for each platform.",
+    "kinds": { "automatic": "Automatic", "paste": "One-time paste", "manual": "Manual" },
+    "methods": {
+      "wpPlugin": "WordPress plugin that applies fixes server-side.",
+      "shopifyApp": "Shopify app that updates SEO fields and structured data.",
+      "wixApp": "Wix connection that updates page SEO tags.",
+      "webflowApp": "Webflow app that updates page SEO fields and CMS items.",
+      "sdk": "npm SDK that loads approved fixes on your server.",
+      "api": "REST API and webhooks.",
+      "github": "Pull requests with fixes for your team to review.",
+      "edgeWorker": "Cloudflare worker that adds fixes at the edge.",
+      "snippet": "A one-line snippet pasted into your site's header settings.",
+      "manual": "Step-by-step instructions for each fix."
+    }
+  },
+  "legalDraft": "Draft for review. This text will be replaced by reviewed legal terms before launch.",
+  "privacy": {
+    "title": "Privacy Policy",
+    "sections": [
+      {
+        "h": "What we collect",
+        "p": "Account details you give us (name, email, company), the websites, keywords and questions you add, and data from services you connect (such as Google Search Console, with your permission)."
+      },
+      {
+        "h": "Website snippet and plugins",
+        "p": "Our snippet and plugins send cookieless page-view pings: the page address, the referring address, and whether the visit came from an AI assistant such as chatgpt.com, perplexity.ai or gemini.google.com. They do not use cookies and do not collect personal data about your visitors."
+      },
+      {
+        "h": "How we use data",
+        "p": "To measure and improve your visibility in search engines and AI answers, to run the service, and to contact you about your account."
+      },
+      {
+        "h": "Sharing",
+        "p": "We send your prompts and page content to the AI and search-data providers we use to run checks. We don't sell personal data."
+      },
+      {
+        "h": "Contact",
+        "p": "Questions about privacy? Email us at the address on our contact page."
+      }
+    ]
+  },
+  "terms": {
+    "title": "Terms of Service",
+    "sections": [
+      {
+        "h": "The service",
+        "p": "We measure how your website appears in search engines and AI answers, diagnose issues and suggest fixes. We do not guarantee rankings or mentions."
+      },
+      {
+        "h": "Your responsibilities",
+        "p": "Only add websites you own or are authorized to manage. You review and approve every change before we apply it."
+      },
+      {
+        "h": "Changes you approve",
+        "p": "Every change we apply can be rolled back. Content is never published without your explicit approval."
+      }
+    ]
+  }
+}

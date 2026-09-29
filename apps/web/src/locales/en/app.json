@@ -1,0 +1,72 @@
+{
+  "overview": {
+    "title": "Overview",
+    "description": "How visible you are in Google and in AI answers.",
+    "addSite": "Add website",
+    "sites": "Websites",
+    "fixesWaiting": "Fixes waiting for approval",
+    "trackingSoon": "You're tracking {{keywords}} keywords and {{prompts}} AI questions. Scores and trends will appear here once tracking runs."
+  },
+  "sections": {
+    "emptyTitle": "Nothing here yet",
+    "keywords": {
+      "title": "Keywords",
+      "description": "Your Google positions for each keyword.",
+      "empty": "Rankings will show up here after the first tracking run."
+    },
+    "aiVisibility": {
+      "title": "AI visibility",
+      "description": "Whether AI assistants mention and cite you.",
+      "empty": "AI answers will show up here after the first tracking run."
+    },
+    "fixes": {
+      "title": "Fixes",
+      "description": "Improvements to review, approve and apply.",
+      "empty": "Fixes will appear here once we've diagnosed your pages."
+    },
+    "audits": {
+      "title": "Audits",
+      "description": "Full website checks.",
+      "empty": "You haven't run an audit yet."
+    },
+    "reports": {
+      "title": "Reports",
+      "description": "Weekly summaries and PDF reports.",
+      "empty": "Your first report will appear after a week of tracking."
+    },
+    "integrations": {
+      "title": "Integrations",
+      "description": "Connect your website, Search Console and other tools.",
+      "empty": "Integrations are coming soon. Your snippet and verification tag are in the setup steps."
+    }
+  },
+  "sites": {
+    "title": "Websites",
+    "description": "The websites you track.",
+    "add": "Add website",
+    "emptyTitle": "No websites yet",
+    "emptyBody": "Add your first website to start tracking.",
+    "verified": "Verified",
+    "notVerified": "Not verified"
+  },
+  "site": {
+    "settingsTitle": "Website settings",
+    "languages": "Tracking languages",
+    "primary": "Primary",
+    "optional": "optional",
+    "brandEn": "Brand names (English)",
+    "brandAr": "Brand names (Arabic)",
+    "brandHint": "Separate spellings with commas.",
+    "competitors": "Competitors",
+    "keywordsTitle": "Keywords",
+    "keywordsDescription": "Searches we track in Google.",
+    "promptsTitle": "AI questions",
+    "promptsDescription": "Questions we ask AI assistants.",
+    "emptyList": "Nothing tracked yet.",
+    "paused": "Paused",
+    "pause": "Pause",
+    "resume": "Resume",
+    "keywordsPlaceholder": "Add a keyword",
+    "promptsPlaceholder": "Add a question"
+  }
+}

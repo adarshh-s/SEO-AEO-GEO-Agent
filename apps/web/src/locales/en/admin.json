@@ -1,0 +1,12 @@
+{
+  "title": "Platform admin",
+  "description": "Assign plans and add-ons manually. Payments are not connected yet.",
+  "columns": {
+    "org": "Organization",
+    "plan": "Plan",
+    "arabic": "Arabic add-on",
+    "members": "Members",
+    "sites": "Websites",
+    "created": "Created"
+  }
+}

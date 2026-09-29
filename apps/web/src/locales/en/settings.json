@@ -1,0 +1,39 @@
+{
+  "title": "Settings",
+  "tabs": { "profile": "Profile", "organization": "Organization", "team": "Team" },
+  "profile": {
+    "title": "Your profile",
+    "name": "Name",
+    "email": "Email",
+    "unverified": "Your email isn't confirmed yet. Check your inbox for the link.",
+    "languageTitle": "Interface language",
+    "languageDescription": "The language of menus, emails and reports. Saved to your account.",
+    "language": "Language"
+  },
+  "org": {
+    "title": "Organization",
+    "name": "Organization name",
+    "memberOf_one": "You belong to {{count}} organization.",
+    "memberOf_other": "You belong to {{count}} organizations."
+  },
+  "plan": {
+    "title": "Plan and usage",
+    "description": "What your plan includes and how much you use.",
+    "sites": "Websites",
+    "keywords": "Keywords",
+    "prompts": "AI questions",
+    "contact": "To change your plan, contact us:"
+  },
+  "team": {
+    "members": "Members",
+    "rolesHelp": "Owners and admins manage the team and websites. Members manage keywords and questions. Viewers can only look.",
+    "you": "you",
+    "role": "Role",
+    "invite": "Invite someone",
+    "invited": "Invitation sent.",
+    "email": "Email address",
+    "send": "Send invitation",
+    "expires": "Expires {{date}}",
+    "revoke": "Cancel"
+  }
+}

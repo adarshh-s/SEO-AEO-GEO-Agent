@@ -267,3 +267,22 @@ reads the current state first (merge/replace, no duplicates), stores
   managed Postgres + Redis.
 - Observability: structlog JSON logs with `org_id`/`site_id`/`task_id`,
   Sentry (only if `SENTRY_DSN` is set, **[D11]**), a per-org cost dashboard in admin.
+
+## 11. Implementation notes (Phase 1)
+
+- **Sync SQLAlchemy 2 + psycopg 3** in both API and workers (FastAPI runs sync endpoints in
+  its threadpool). One model/session layer shared with Celery, no async/sync duplication.
+- **RLS mechanics**: migrations run as the owner role; tenant request sessions switch to the
+  `app_tenant` role per transaction (`SET LOCAL ROLE`) and set `app.org_id` / `app.user_id`.
+  System sessions (auth, `/me`, platform admin, seeding, schedulers) stay on the owner role
+  and bypass RLS on purpose. A new org-owned table must get a policy in its migration, and
+  `tests/test_rls.py` fails otherwise. On Railway the default Postgres user can create roles;
+  if a managed Postgres forbids `CREATE ROLE`, create `app_tenant` once manually.
+- **CSRF**: the token is in an httpOnly cookie and returned in JSON by login/refresh/me; the SPA
+  keeps it in memory and echoes it in `X-CSRF-Token`. Works across `app.`/`api.` subdomains
+  without a shared-domain readable cookie.
+- **Frontend toolchain**: TypeScript pinned to 6.0.x because typescript-eslint doesn't
+  support 7.x yet. Tailwind v4 (CSS-first config). shadcn/ui-style components are written in
+  `components/ui` (same pattern as the shadcn CLI output).
+- **E2E** runs on dedicated ports (API 8100, web 5273) so it never hits another dev server.
+

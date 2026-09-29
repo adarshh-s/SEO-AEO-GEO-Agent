@@ -1,0 +1,129 @@
+{
+  "title": "Set up your website",
+  "subtitle": "A few quick steps. You can change everything later.",
+  "progress": "Setup progress",
+  "steps": {
+    "website": "Website",
+    "details": "Details",
+    "languages": "Languages",
+    "tracking": "Keywords & prompts",
+    "connect": "Connect",
+    "plan": "Plan"
+  },
+  "mockNotice": "Sample data: automatic detection and suggestions are not connected yet, so these values are examples. Please check and edit them.",
+  "website": {
+    "title": "What's your website?",
+    "description": "We'll look at it to detect the platform, your brand and your languages.",
+    "label": "Website address",
+    "analyze": "Analyze"
+  },
+  "details": {
+    "title": "Check your details",
+    "description": "Here's what we found for {{domain}}. Correct anything that's wrong.",
+    "name": "Website name",
+    "platform": "Built with",
+    "platformHint": "This decides how we connect and which fix instructions you get.",
+    "brand": "Brand name",
+    "brandHint": "How customers and AI assistants refer to you.",
+    "industry": "Industry",
+    "industryHint": "In a few words, e.g. \"dental clinic\".",
+    "industryPlaceholder": "e.g. dental clinic",
+    "country": "Country code",
+    "countryHint": "Two letters, e.g. SA or US.",
+    "city": "City",
+    "competitors": "Competitors",
+    "competitorsHint": "One website per line. We compare you with them."
+  },
+  "languages": {
+    "title": "Which languages should we track?",
+    "description": "We track rankings and AI answers in each language you choose.",
+    "english": "English",
+    "primary": "Primary",
+    "addArabic": "Add Arabic",
+    "optional": "Optional",
+    "arabicDetected": "We found Arabic content on your website. Add Arabic if you want to track it too.",
+    "arabicBrand": "Brand name in Arabic",
+    "arabicBrandHint": "Optional. Helps us spot mentions written in Arabic.",
+    "planNote": "Some plans include Arabic as an add-on. If your plan doesn't, we'll let you know."
+  },
+  "tracking": {
+    "keywordsTitle": "Keywords to track in Google",
+    "keywordsDescription": "Searches your customers type into Google.",
+    "promptsTitle": "Questions to ask AI assistants",
+    "promptsDescription": "Questions customers ask ChatGPT, Gemini and others.",
+    "addKeyword": "Add a keyword",
+    "addPrompt": "Add a question",
+    "create": "Save and continue",
+    "selected_one": "{{count}} selected.",
+    "selected_other": "{{count}} selected.",
+    "empty": "Nothing here yet. Add your own below."
+  },
+  "connect": {
+    "title": "Connect your website",
+    "description": "Best options for {{platform}}, recommended first. Connecting lets us apply approved fixes for you.",
+    "recommended": "Recommended",
+    "clientSide": "Visible to Google, not to most AI crawlers",
+    "snippetLimitation": "About the snippet: Google runs JavaScript, so changes added by the snippet generally work for Google. Many AI crawlers don't run JavaScript, so for AI visibility a server-side method (plugin, app, SDK, edge worker, pull request or manual paste) works better.",
+    "comingSoon": "Automatic connections are being built. For now you can finish setup and connect later from Integrations.",
+    "verifyTitle": "Verify ownership",
+    "verifyDescription": "Add this tag to your homepage's <head> (or use a DNS record or a connected app). We need it before applying any fix.",
+    "later": "Continue",
+    "kinds": {
+      "automatic": "Automatic",
+      "paste": "One-time paste",
+      "manual": "Manual"
+    },
+    "methods": {
+      "wpPlugin": {
+        "title": "WordPress plugin",
+        "body": "Install our plugin. It adds approved schema and meta tags server-side and works alongside Yoast or Rank Math."
+      },
+      "shopifyApp": {
+        "title": "Shopify app",
+        "body": "Install our app. It updates SEO titles and descriptions and adds structured data through your theme."
+      },
+      "wixApp": {
+        "title": "Wix app",
+        "body": "Connect with Wix to update page SEO tags and structured data directly."
+      },
+      "webflowApp": {
+        "title": "Webflow app",
+        "body": "Connect with Webflow to update page SEO fields and CMS items. You publish the changes."
+      },
+      "sdk": {
+        "title": "JavaScript SDK",
+        "body": "Install our npm package. It loads approved fixes on the server, e.g. in Next.js generateMetadata."
+      },
+      "api": {
+        "title": "REST API and webhooks",
+        "body": "Pull approved fixes into your own code and get notified when they change."
+      },
+      "github": {
+        "title": "GitHub pull requests",
+        "body": "Connect a repository and we open pull requests with fixes for your team to review."
+      },
+      "edgeWorker": {
+        "title": "Cloudflare edge worker",
+        "body": "If your site runs through Cloudflare, a small worker adds fixes to your HTML before it's sent."
+      },
+      "snippet": {
+        "title": "Snippet",
+        "body": "Paste this line once into your site's <head> (header code / custom code settings)."
+      },
+      "manual": {
+        "title": "Manual instructions",
+        "body": "Copy each fix yourself with step-by-step instructions for your platform."
+      }
+    }
+  },
+  "plan": {
+    "title": "Your plan",
+    "description": "You're on the plan below. You can start tracking right away.",
+    "trialDays_one": "{{count}}-day trial",
+    "trialDays_other": "{{count}}-day trial",
+    "limits": "Up to {{sites}} website(s), {{keywords}} keywords and {{prompts}} AI questions.",
+    "upgrade": "Need more? Contact us:",
+    "seePlans": "See plans",
+    "finish": "Go to dashboard"
+  }
+}

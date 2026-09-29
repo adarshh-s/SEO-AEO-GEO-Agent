@@ -1,12 +1,14 @@
 """Runtime configuration. Every value comes from env; see .env.example for docs."""
 
 from functools import lru_cache
-from typing import Literal
+from typing import Annotated, Literal
 
 from pydantic import Field, field_validator, model_validator
-from pydantic_settings import BaseSettings, SettingsConfigDict
+from pydantic_settings import BaseSettings, NoDecode, SettingsConfigDict
 
-DEV_JWT_SECRET = "change-me-local-only"  # noqa: S105 (rejected outside local/test)
+DEV_JWT_SECRET = (
+    "local-dev-only-jwt-secret-change-me-in-env"  # noqa: S105 (rejected outside local/test)
+)
 
 
 class Settings(BaseSettings):
@@ -18,7 +20,10 @@ class Settings(BaseSettings):
     app_url: str = "http://localhost:5173"
     api_url: str = "http://localhost:8000"
     cdn_url: str = "http://localhost:8000/cdn"
-    cors_origins: list[str] = Field(default_factory=lambda: ["http://localhost:5173"])
+    # Comma-separated in env (NoDecode: don't try to parse it as JSON first).
+    cors_origins: Annotated[list[str], NoDecode] = Field(
+        default_factory=lambda: ["http://localhost:5173"]
+    )
 
     # Data stores
     database_url: str = "postgresql+psycopg://app:app@localhost:5432/app"
