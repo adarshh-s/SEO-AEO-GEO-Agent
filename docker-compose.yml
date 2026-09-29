@@ -72,8 +72,9 @@ services:
     command: sh -c "corepack enable && pnpm install --frozen-lockfile && pnpm --filter web dev --host 0.0.0.0"
     environment:
       VITE_API_URL: ${VITE_API_URL:-http://localhost:8000}
+      npm_config_store_dir: /pnpm-store
     ports: ["${WEB_PORT:-5173}:5173"]
-    volumes: [./:/repo, web_node_modules:/repo/node_modules]
+    volumes: [./:/repo, web_node_modules:/repo/node_modules, pnpm_store:/pnpm-store]
     depends_on: [api]
 
   mailpit:
@@ -91,5 +92,6 @@ services:
 
 volumes:
   pgdata:
+  pnpm_store:
   miniodata:
   web_node_modules:
