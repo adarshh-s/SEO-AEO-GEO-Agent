@@ -1,0 +1,3 @@
+[submodule "vendor/claude-seo"]
+	path = vendor/claude-seo
+	url = https://github.com/AgriciDaniel/claude-seo.git
