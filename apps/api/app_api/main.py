@@ -9,7 +9,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
 from app_api.deps import CSRF_HEADER, ORG_HEADER
-from app_api.routers import admin, auth, health, onboarding, orgs, plans, sites
+from app_api.routers import admin, auth, health, onboarding, orgs, plans, sites, tracking
 from app_core.brand import PRODUCT_NAME
 from app_core.logging import configure_logging
 from app_core.settings import get_settings
@@ -38,7 +38,8 @@ def create_app() -> FastAPI:
     )
 
     @app.middleware("http")
-    async def request_context(request: Request, call_next):  # type: ignore[no-untyped-def]
+    # type: ignore[no-untyped-def]
+    async def request_context(request: Request, call_next):
         request_id = request.headers.get("x-request-id") or uuid.uuid4().hex
         structlog.contextvars.clear_contextvars()
         structlog.contextvars.bind_contextvars(request_id=request_id, path=request.url.path)
@@ -61,7 +62,7 @@ def create_app() -> FastAPI:
             },
         )
 
-    for module in (health, auth, orgs, sites, onboarding, plans, admin):
+    for module in (health, auth, orgs, sites, onboarding, plans, admin, tracking):
         app.include_router(module.router)
     return app
 

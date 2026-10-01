@@ -37,8 +37,7 @@ def open_tenant_session(org_id: uuid.UUID, user_id: uuid.UUID | None = None) -> 
         connection.execute(text(f"SET LOCAL ROLE {TENANT_ROLE}"))
         connection.execute(
             text(
-                "SELECT set_config('app.org_id', :org, true),"
-                " set_config('app.user_id', :usr, true)"
+                "SELECT set_config('app.org_id', :org, true), set_config('app.user_id', :usr, true)"
             ),
             {"org": str(org_id), "usr": str(user_id) if user_id else ""},
         )

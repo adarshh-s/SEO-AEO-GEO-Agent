@@ -37,9 +37,15 @@ app.conf.update(
             "task": "app_worker.tasks.maintenance.purge_expired_refresh_tokens",
             "schedule": 6 * 3600,
         },
+        "dispatch-scheduled-checks": {
+            "task": "app_worker.tasks.tracking.dispatch_scheduled_checks",
+            "schedule": 1800,  # every 30 minutes
+        },
     },
 )
-import app_worker.tasks.maintenance  # noqa: E402,F401  (register tasks)
+import app_worker.tasks.crawl  # noqa: E402,F401
+import app_worker.tasks.maintenance  # noqa: E402,F401
+import app_worker.tasks.tracking  # noqa: E402,F401
 
 
 @worker_process_init.connect

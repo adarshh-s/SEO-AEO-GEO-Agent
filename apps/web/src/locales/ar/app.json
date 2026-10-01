@@ -68,5 +68,52 @@
     "resume": "استئناف",
     "keywordsPlaceholder": "أضف كلمة مفتاحية",
     "promptsPlaceholder": "أضف سؤالًا"
+  },
+  "keywords": {
+    "title": "ترتيب الكلمات المفتاحية",
+    "description": "ترتيبك في Google وتغيرات المواضع وميزات الذكاء الاصطناعي لكلماتك المتابعة.",
+    "keyword": "الكلمة المفتاحية",
+    "position": "الموضع",
+    "change": "التغير",
+    "url": "رابط الصفحة",
+    "aiOverview": "نظرة الذكاء الاصطناعي",
+    "citesSite": "يستشهد بموقعك",
+    "notRanked": "غير مصنف (أكثر من 100)",
+    "checkAll": "فحص جميع الكلمات الآن",
+    "checkNow": "فحص الآن",
+    "checking": "جارٍ الفحص...",
+    "allLanguages": "جميع اللغات"
+  },
+  "aiVisibility": {
+    "title": "الظهور في الذكاء الاصطناعي",
+    "description": "مدى ذكر واستشهاد ChatGPT وGemini وPerplexity وClaude بعلامتك التجارية.",
+    "overallSoV": "حصة الصوت في الذكاء الاصطناعي",
+    "mentionRate": "معدل ذكر العلامة",
+    "citationRate": "معدل الاستشهاد بالموقع",
+    "leaderboard": "لوحة صدارة المنافسين",
+    "competitor": "المنافس",
+    "mentions": "مرات الذكر",
+    "share": "الحصة",
+    "prompt": "سؤال العميل",
+    "intent": "القصد",
+    "mentioned": "مذكور",
+    "notMentioned": "غير مذكور",
+    "cited": "مستشهد به",
+    "inspect": "معاينة",
+    "checkAll": "فحص جميع الأسئلة الآن",
+    "checkNow": "فحص الآن",
+    "rawAnswers": "الإجابات المسجلة",
+    "model": "النموذج",
+    "sentiment": "الانطباع",
+    "citedLinks": "الروابط المستشهد بها",
+    "noRuns": "لا توجد نتائج مسجلة بعد"
+  },
+  "overviewDetails": {
+    "engineBreakdown": "حصة محركات الذكاء الاصطناعي",
+    "monthlyUsage": "استهلاك الميزانية الشهري",
+    "ceilingWarning": "اقتربت من السقف الشهري ({{ratio}}%)",
+    "rankingWins": "أكبر المكاسب الأخيرة",
+    "rankingLosses": "أكبر التراجعات الأخيرة",
+    "noChanges": "لا توجد تغيرات في الترتيب مؤخراً"
   }
 }

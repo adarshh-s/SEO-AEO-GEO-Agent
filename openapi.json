@@ -2286,6 +2286,634 @@
           }
         }
       }
+    },
+    "/sites/{site_id}/rankings": {
+      "get": {
+        "tags": [
+          "tracking"
+        ],
+        "summary": "Get Rankings",
+        "operationId": "get_rankings_sites__site_id__rankings_get",
+        "parameters": [
+          {
+            "name": "site_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Site Id"
+            }
+          },
+          {
+            "name": "X-Org-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Org-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/RankedKeywordOut"
+                  },
+                  "title": "Response Get Rankings Sites  Site Id  Rankings Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/sites/{site_id}/keywords/{keyword_id}/check": {
+      "post": {
+        "tags": [
+          "tracking"
+        ],
+        "summary": "Trigger Keyword Check",
+        "operationId": "trigger_keyword_check_sites__site_id__keywords__keyword_id__check_post",
+        "parameters": [
+          {
+            "name": "site_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Site Id"
+            }
+          },
+          {
+            "name": "keyword_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Keyword Id"
+            }
+          },
+          {
+            "name": "X-Org-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Org-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Ok"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/sites/{site_id}/keywords/check-all": {
+      "post": {
+        "tags": [
+          "tracking"
+        ],
+        "summary": "Trigger All Keyword Checks",
+        "operationId": "trigger_all_keyword_checks_sites__site_id__keywords_check_all_post",
+        "parameters": [
+          {
+            "name": "site_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Site Id"
+            }
+          },
+          {
+            "name": "X-Org-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Org-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Ok"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/sites/{site_id}/ai-visibility": {
+      "get": {
+        "tags": [
+          "tracking"
+        ],
+        "summary": "Get Ai Visibility",
+        "operationId": "get_ai_visibility_sites__site_id__ai_visibility_get",
+        "parameters": [
+          {
+            "name": "site_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Site Id"
+            }
+          },
+          {
+            "name": "X-Org-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Org-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AiVisibilitySummaryOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/sites/{site_id}/prompts/{prompt_id}/runs": {
+      "get": {
+        "tags": [
+          "tracking"
+        ],
+        "summary": "Get Prompt Runs",
+        "operationId": "get_prompt_runs_sites__site_id__prompts__prompt_id__runs_get",
+        "parameters": [
+          {
+            "name": "site_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Site Id"
+            }
+          },
+          {
+            "name": "prompt_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Prompt Id"
+            }
+          },
+          {
+            "name": "X-Org-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Org-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AiCheckRunOut"
+                  },
+                  "title": "Response Get Prompt Runs Sites  Site Id  Prompts  Prompt Id  Runs Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/sites/{site_id}/prompts/{prompt_id}/check": {
+      "post": {
+        "tags": [
+          "tracking"
+        ],
+        "summary": "Trigger Prompt Check",
+        "operationId": "trigger_prompt_check_sites__site_id__prompts__prompt_id__check_post",
+        "parameters": [
+          {
+            "name": "site_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Site Id"
+            }
+          },
+          {
+            "name": "prompt_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Prompt Id"
+            }
+          },
+          {
+            "name": "X-Org-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Org-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Ok"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/sites/{site_id}/prompts/check-all": {
+      "post": {
+        "tags": [
+          "tracking"
+        ],
+        "summary": "Trigger All Prompt Checks",
+        "operationId": "trigger_all_prompt_checks_sites__site_id__prompts_check_all_post",
+        "parameters": [
+          {
+            "name": "site_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Site Id"
+            }
+          },
+          {
+            "name": "X-Org-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Org-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Ok"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/sites/{site_id}/crawl/latest": {
+      "get": {
+        "tags": [
+          "tracking"
+        ],
+        "summary": "Get Latest Crawl",
+        "operationId": "get_latest_crawl_sites__site_id__crawl_latest_get",
+        "parameters": [
+          {
+            "name": "site_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Site Id"
+            }
+          },
+          {
+            "name": "X-Org-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Org-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CrawlSnapshotOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/sites/{site_id}/crawl": {
+      "post": {
+        "tags": [
+          "tracking"
+        ],
+        "summary": "Trigger Site Crawl",
+        "operationId": "trigger_site_crawl_sites__site_id__crawl_post",
+        "parameters": [
+          {
+            "name": "site_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Site Id"
+            }
+          },
+          {
+            "name": "X-Org-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Org-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Ok"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/sites/{site_id}/overview": {
+      "get": {
+        "tags": [
+          "tracking"
+        ],
+        "summary": "Get Site Overview",
+        "operationId": "get_site_overview_sites__site_id__overview_get",
+        "parameters": [
+          {
+            "name": "site_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Site Id"
+            }
+          },
+          {
+            "name": "X-Org-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Org-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SiteOverviewOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -2578,6 +3206,135 @@
         ],
         "title": "AdminSetPlanIn"
       },
+      "AiCheckRunOut": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "engine": {
+            "type": "string",
+            "title": "Engine"
+          },
+          "model": {
+            "type": "string",
+            "title": "Model"
+          },
+          "run_index": {
+            "type": "integer",
+            "title": "Run Index"
+          },
+          "checked_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Checked At"
+          },
+          "raw_answer": {
+            "type": "string",
+            "title": "Raw Answer"
+          },
+          "brand_mentioned": {
+            "type": "boolean",
+            "title": "Brand Mentioned"
+          },
+          "mention_position": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Mention Position"
+          },
+          "site_cited": {
+            "type": "boolean",
+            "title": "Site Cited"
+          },
+          "cited_urls": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Cited Urls",
+            "default": []
+          },
+          "competitors_mentioned": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Competitors Mentioned",
+            "default": []
+          },
+          "sentiment": {
+            "type": "string",
+            "title": "Sentiment"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "engine",
+          "model",
+          "run_index",
+          "checked_at",
+          "raw_answer",
+          "brand_mentioned",
+          "site_cited",
+          "sentiment"
+        ],
+        "title": "AiCheckRunOut"
+      },
+      "AiVisibilitySummaryOut": {
+        "properties": {
+          "overall_share_of_voice": {
+            "type": "number",
+            "title": "Overall Share Of Voice"
+          },
+          "brand_mention_rate": {
+            "type": "number",
+            "title": "Brand Mention Rate"
+          },
+          "citation_rate": {
+            "type": "number",
+            "title": "Citation Rate"
+          },
+          "prompts": {
+            "items": {
+              "$ref": "#/components/schemas/PromptVisibilityOut"
+            },
+            "type": "array",
+            "title": "Prompts"
+          },
+          "competitor_leaderboard": {
+            "items": {
+              "$ref": "#/components/schemas/CompetitorShareOut"
+            },
+            "type": "array",
+            "title": "Competitor Leaderboard"
+          },
+          "per_engine": {
+            "additionalProperties": {
+              "type": "number"
+            },
+            "type": "object",
+            "title": "Per Engine"
+          }
+        },
+        "type": "object",
+        "required": [
+          "overall_share_of_voice",
+          "brand_mention_rate",
+          "citation_rate",
+          "prompts",
+          "competitor_leaderboard",
+          "per_engine"
+        ],
+        "title": "AiVisibilitySummaryOut"
+      },
       "AnalyzeIn": {
         "properties": {
           "url": {
@@ -2725,6 +3482,29 @@
         ],
         "title": "BulkResult"
       },
+      "CompetitorShareOut": {
+        "properties": {
+          "domain": {
+            "type": "string",
+            "title": "Domain"
+          },
+          "mentions": {
+            "type": "integer",
+            "title": "Mentions"
+          },
+          "share_pct": {
+            "type": "number",
+            "title": "Share Pct"
+          }
+        },
+        "type": "object",
+        "required": [
+          "domain",
+          "mentions",
+          "share_pct"
+        ],
+        "title": "CompetitorShareOut"
+      },
       "CompleteIn": {
         "properties": {
           "site": {
@@ -2753,6 +3533,98 @@
         ],
         "title": "CompleteIn"
       },
+      "CrawlSnapshotOut": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "site_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Site Id"
+          },
+          "url": {
+            "type": "string",
+            "title": "Url"
+          },
+          "http_status": {
+            "type": "integer",
+            "title": "Http Status"
+          },
+          "platform": {
+            "type": "string",
+            "title": "Platform"
+          },
+          "rendering": {
+            "type": "string",
+            "title": "Rendering"
+          },
+          "js_only_content_detected": {
+            "type": "boolean",
+            "title": "Js Only Content Detected"
+          },
+          "js_only_text": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Js Only Text"
+          },
+          "meta_title": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Meta Title"
+          },
+          "meta_description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Meta Description"
+          },
+          "ai_robots_allowed": {
+            "additionalProperties": {
+              "type": "boolean"
+            },
+            "type": "object",
+            "title": "Ai Robots Allowed",
+            "default": {}
+          },
+          "fetched_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Fetched At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "site_id",
+          "url",
+          "http_status",
+          "platform",
+          "rendering",
+          "js_only_content_detected",
+          "fetched_at"
+        ],
+        "title": "CrawlSnapshotOut"
+      },
       "EmailIn": {
         "properties": {
           "email": {
@@ -2766,6 +3638,29 @@
           "email"
         ],
         "title": "EmailIn"
+      },
+      "EngineStatus": {
+        "properties": {
+          "mentioned": {
+            "type": "boolean",
+            "title": "Mentioned"
+          },
+          "cited": {
+            "type": "boolean",
+            "title": "Cited"
+          },
+          "sentiment": {
+            "type": "string",
+            "title": "Sentiment",
+            "default": "neutral"
+          }
+        },
+        "type": "object",
+        "required": [
+          "mentioned",
+          "cited"
+        ],
+        "title": "EngineStatus"
       },
       "HTTPValidationError": {
         "properties": {
@@ -3457,6 +4352,250 @@
         ],
         "title": "PromptOut"
       },
+      "PromptVisibilityOut": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "prompt_text": {
+            "type": "string",
+            "title": "Prompt Text"
+          },
+          "language": {
+            "type": "string",
+            "title": "Language"
+          },
+          "country": {
+            "type": "string",
+            "title": "Country"
+          },
+          "intent": {
+            "type": "string",
+            "title": "Intent"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "brand_mentioned": {
+            "type": "boolean",
+            "title": "Brand Mentioned",
+            "default": false
+          },
+          "site_cited": {
+            "type": "boolean",
+            "title": "Site Cited",
+            "default": false
+          },
+          "engines_status": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/EngineStatus"
+            },
+            "type": "object",
+            "title": "Engines Status",
+            "default": {}
+          },
+          "last_checked_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Checked At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "prompt_text",
+          "language",
+          "country",
+          "intent",
+          "status"
+        ],
+        "title": "PromptVisibilityOut"
+      },
+      "RankedKeywordOut": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "keyword": {
+            "type": "string",
+            "title": "Keyword"
+          },
+          "language": {
+            "type": "string",
+            "title": "Language"
+          },
+          "country": {
+            "type": "string",
+            "title": "Country"
+          },
+          "city": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "City"
+          },
+          "device": {
+            "type": "string",
+            "title": "Device"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "position": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Position"
+          },
+          "previous_position": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Previous Position"
+          },
+          "position_change": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Position Change"
+          },
+          "url_ranked": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Url Ranked"
+          },
+          "serp_features": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Serp Features",
+            "default": []
+          },
+          "ai_overview_present": {
+            "type": "boolean",
+            "title": "Ai Overview Present",
+            "default": false
+          },
+          "ai_overview_cites_site": {
+            "type": "boolean",
+            "title": "Ai Overview Cites Site",
+            "default": false
+          },
+          "last_checked_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Checked At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "keyword",
+          "language",
+          "country",
+          "device",
+          "status"
+        ],
+        "title": "RankedKeywordOut"
+      },
+      "RankingWinLossOut": {
+        "properties": {
+          "keyword_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Keyword Id"
+          },
+          "keyword": {
+            "type": "string",
+            "title": "Keyword"
+          },
+          "language": {
+            "type": "string",
+            "title": "Language"
+          },
+          "current_position": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Current Position"
+          },
+          "previous_position": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Previous Position"
+          },
+          "change": {
+            "type": "integer",
+            "title": "Change"
+          }
+        },
+        "type": "object",
+        "required": [
+          "keyword_id",
+          "keyword",
+          "language",
+          "change"
+        ],
+        "title": "RankingWinLossOut"
+      },
       "Rendering": {
         "type": "string",
         "enum": [
@@ -3784,6 +4923,77 @@
           "created_at"
         ],
         "title": "SiteOut"
+      },
+      "SiteOverviewOut": {
+        "properties": {
+          "seo_score": {
+            "type": "number",
+            "title": "Seo Score"
+          },
+          "ai_share_of_voice": {
+            "type": "number",
+            "title": "Ai Share Of Voice"
+          },
+          "per_engine": {
+            "additionalProperties": {
+              "type": "number"
+            },
+            "type": "object",
+            "title": "Per Engine"
+          },
+          "fixes_waiting": {
+            "type": "integer",
+            "title": "Fixes Waiting"
+          },
+          "ranking_wins": {
+            "items": {
+              "$ref": "#/components/schemas/RankingWinLossOut"
+            },
+            "type": "array",
+            "title": "Ranking Wins"
+          },
+          "ranking_losses": {
+            "items": {
+              "$ref": "#/components/schemas/RankingWinLossOut"
+            },
+            "type": "array",
+            "title": "Ranking Losses"
+          },
+          "history": {
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "type": "array",
+            "title": "History"
+          },
+          "monthly_spend_usd": {
+            "type": "number",
+            "title": "Monthly Spend Usd"
+          },
+          "monthly_cost_ceiling_usd": {
+            "type": "number",
+            "title": "Monthly Cost Ceiling Usd"
+          },
+          "spend_ratio": {
+            "type": "number",
+            "title": "Spend Ratio"
+          }
+        },
+        "type": "object",
+        "required": [
+          "seo_score",
+          "ai_share_of_voice",
+          "per_engine",
+          "fixes_waiting",
+          "ranking_wins",
+          "ranking_losses",
+          "history",
+          "monthly_spend_usd",
+          "monthly_cost_ceiling_usd",
+          "spend_ratio"
+        ],
+        "title": "SiteOverviewOut"
       },
       "SiteUpdateIn": {
         "properties": {

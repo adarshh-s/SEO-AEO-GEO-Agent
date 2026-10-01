@@ -1,4 +1,4 @@
-import { Bot, FileSearch, FileText, BarChart3, Plug, Wrench } from "lucide-react";
+import { FileSearch, FileText, Plug, Wrench } from "lucide-react";
 import { createBrowserRouter, Navigate } from "react-router";
 import { AppShell } from "@/components/layout/app-shell";
 import { PublicLayout } from "@/components/layout/public-layout";
@@ -23,6 +23,8 @@ import {
 import { SettingsPage } from "@/features/settings/settings-page";
 import { SiteDetailPage } from "@/features/sites/site-detail-page";
 import { SitesPage } from "@/features/sites/sites-page";
+import { KeywordsPage } from "@/features/keywords/keywords-page";
+import { AiVisibilityPage } from "@/features/ai-visibility/ai-visibility-page";
 import { RedirectIfAuthed, RequireAuth, RequirePlatformAdmin } from "./guards";
 
 export const routes = [
@@ -59,8 +61,8 @@ export const routes = [
         children: [
           { index: true, element: <OverviewPage /> },
           { path: "onboarding", element: <OnboardingPage /> },
-          { path: "keywords", element: <PlaceholderPage section="keywords" icon={BarChart3} /> },
-          { path: "ai-visibility", element: <PlaceholderPage section="aiVisibility" icon={Bot} /> },
+          { path: "keywords", element: <KeywordsPage /> },
+          { path: "ai-visibility", element: <AiVisibilityPage /> },
           { path: "fixes", element: <PlaceholderPage section="fixes" icon={Wrench} /> },
           { path: "audits", element: <PlaceholderPage section="audits" icon={FileSearch} /> },
           { path: "reports", element: <PlaceholderPage section="reports" icon={FileText} /> },

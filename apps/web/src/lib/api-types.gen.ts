@@ -600,6 +600,176 @@ export interface paths {
     patch: operations["update_plan_admin_plans__plan_code__patch"];
     trace?: never;
   };
+  "/sites/{site_id}/rankings": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Get Rankings */
+    get: operations["get_rankings_sites__site_id__rankings_get"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/sites/{site_id}/keywords/{keyword_id}/check": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Trigger Keyword Check */
+    post: operations["trigger_keyword_check_sites__site_id__keywords__keyword_id__check_post"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/sites/{site_id}/keywords/check-all": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Trigger All Keyword Checks */
+    post: operations["trigger_all_keyword_checks_sites__site_id__keywords_check_all_post"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/sites/{site_id}/ai-visibility": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Get Ai Visibility */
+    get: operations["get_ai_visibility_sites__site_id__ai_visibility_get"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/sites/{site_id}/prompts/{prompt_id}/runs": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Get Prompt Runs */
+    get: operations["get_prompt_runs_sites__site_id__prompts__prompt_id__runs_get"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/sites/{site_id}/prompts/{prompt_id}/check": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Trigger Prompt Check */
+    post: operations["trigger_prompt_check_sites__site_id__prompts__prompt_id__check_post"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/sites/{site_id}/prompts/check-all": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Trigger All Prompt Checks */
+    post: operations["trigger_all_prompt_checks_sites__site_id__prompts_check_all_post"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/sites/{site_id}/crawl/latest": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Get Latest Crawl */
+    get: operations["get_latest_crawl_sites__site_id__crawl_latest_get"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/sites/{site_id}/crawl": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Trigger Site Crawl */
+    post: operations["trigger_site_crawl_sites__site_id__crawl_post"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/sites/{site_id}/overview": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Get Site Overview */
+    get: operations["get_site_overview_sites__site_id__overview_get"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -676,6 +846,62 @@ export interface components {
       /** Plan Code */
       plan_code: string;
     };
+    /** AiCheckRunOut */
+    AiCheckRunOut: {
+      /**
+       * Id
+       * Format: uuid
+       */
+      id: string;
+      /** Engine */
+      engine: string;
+      /** Model */
+      model: string;
+      /** Run Index */
+      run_index: number;
+      /**
+       * Checked At
+       * Format: date-time
+       */
+      checked_at: string;
+      /** Raw Answer */
+      raw_answer: string;
+      /** Brand Mentioned */
+      brand_mentioned: boolean;
+      /** Mention Position */
+      mention_position?: number | null;
+      /** Site Cited */
+      site_cited: boolean;
+      /**
+       * Cited Urls
+       * @default []
+       */
+      cited_urls: string[];
+      /**
+       * Competitors Mentioned
+       * @default []
+       */
+      competitors_mentioned: string[];
+      /** Sentiment */
+      sentiment: string;
+    };
+    /** AiVisibilitySummaryOut */
+    AiVisibilitySummaryOut: {
+      /** Overall Share Of Voice */
+      overall_share_of_voice: number;
+      /** Brand Mention Rate */
+      brand_mention_rate: number;
+      /** Citation Rate */
+      citation_rate: number;
+      /** Prompts */
+      prompts: components["schemas"]["PromptVisibilityOut"][];
+      /** Competitor Leaderboard */
+      competitor_leaderboard: components["schemas"]["CompetitorShareOut"][];
+      /** Per Engine */
+      per_engine: {
+        [key: string]: number;
+      };
+    };
     /** AnalyzeIn */
     AnalyzeIn: {
       /** Url */
@@ -721,6 +947,15 @@ export interface components {
       /** Skipped Duplicates */
       skipped_duplicates: number;
     };
+    /** CompetitorShareOut */
+    CompetitorShareOut: {
+      /** Domain */
+      domain: string;
+      /** Mentions */
+      mentions: number;
+      /** Share Pct */
+      share_pct: number;
+    };
     /** CompleteIn */
     CompleteIn: {
       site: components["schemas"]["SiteCreateIn"];
@@ -729,6 +964,47 @@ export interface components {
       /** Prompts */
       prompts?: components["schemas"]["PromptIn"][];
     };
+    /** CrawlSnapshotOut */
+    CrawlSnapshotOut: {
+      /**
+       * Id
+       * Format: uuid
+       */
+      id: string;
+      /**
+       * Site Id
+       * Format: uuid
+       */
+      site_id: string;
+      /** Url */
+      url: string;
+      /** Http Status */
+      http_status: number;
+      /** Platform */
+      platform: string;
+      /** Rendering */
+      rendering: string;
+      /** Js Only Content Detected */
+      js_only_content_detected: boolean;
+      /** Js Only Text */
+      js_only_text?: string | null;
+      /** Meta Title */
+      meta_title?: string | null;
+      /** Meta Description */
+      meta_description?: string | null;
+      /**
+       * Ai Robots Allowed
+       * @default {}
+       */
+      ai_robots_allowed: {
+        [key: string]: boolean;
+      };
+      /**
+       * Fetched At
+       * Format: date-time
+       */
+      fetched_at: string;
+    };
     /** EmailIn */
     EmailIn: {
       /**
@@ -736,6 +1012,18 @@ export interface components {
        * Format: email
        */
       email: string;
+    };
+    /** EngineStatus */
+    EngineStatus: {
+      /** Mentioned */
+      mentioned: boolean;
+      /** Cited */
+      cited: boolean;
+      /**
+       * Sentiment
+       * @default neutral
+       */
+      sentiment: string;
     };
     /** HTTPValidationError */
     HTTPValidationError: {
@@ -1036,6 +1324,106 @@ export interface components {
        */
       created_at: string;
     };
+    /** PromptVisibilityOut */
+    PromptVisibilityOut: {
+      /**
+       * Id
+       * Format: uuid
+       */
+      id: string;
+      /** Prompt Text */
+      prompt_text: string;
+      /** Language */
+      language: string;
+      /** Country */
+      country: string;
+      /** Intent */
+      intent: string;
+      /** Status */
+      status: string;
+      /**
+       * Brand Mentioned
+       * @default false
+       */
+      brand_mentioned: boolean;
+      /**
+       * Site Cited
+       * @default false
+       */
+      site_cited: boolean;
+      /**
+       * Engines Status
+       * @default {}
+       */
+      engines_status: {
+        [key: string]: components["schemas"]["EngineStatus"];
+      };
+      /** Last Checked At */
+      last_checked_at?: string | null;
+    };
+    /** RankedKeywordOut */
+    RankedKeywordOut: {
+      /**
+       * Id
+       * Format: uuid
+       */
+      id: string;
+      /** Keyword */
+      keyword: string;
+      /** Language */
+      language: string;
+      /** Country */
+      country: string;
+      /** City */
+      city?: string | null;
+      /** Device */
+      device: string;
+      /** Status */
+      status: string;
+      /** Position */
+      position?: number | null;
+      /** Previous Position */
+      previous_position?: number | null;
+      /** Position Change */
+      position_change?: number | null;
+      /** Url Ranked */
+      url_ranked?: string | null;
+      /**
+       * Serp Features
+       * @default []
+       */
+      serp_features: string[];
+      /**
+       * Ai Overview Present
+       * @default false
+       */
+      ai_overview_present: boolean;
+      /**
+       * Ai Overview Cites Site
+       * @default false
+       */
+      ai_overview_cites_site: boolean;
+      /** Last Checked At */
+      last_checked_at?: string | null;
+    };
+    /** RankingWinLossOut */
+    RankingWinLossOut: {
+      /**
+       * Keyword Id
+       * Format: uuid
+       */
+      keyword_id: string;
+      /** Keyword */
+      keyword: string;
+      /** Language */
+      language: string;
+      /** Current Position */
+      current_position?: number | null;
+      /** Previous Position */
+      previous_position?: number | null;
+      /** Change */
+      change: number;
+    };
     /**
      * Rendering
      * @enum {string}
@@ -1153,6 +1541,33 @@ export interface components {
        * Format: date-time
        */
       created_at: string;
+    };
+    /** SiteOverviewOut */
+    SiteOverviewOut: {
+      /** Seo Score */
+      seo_score: number;
+      /** Ai Share Of Voice */
+      ai_share_of_voice: number;
+      /** Per Engine */
+      per_engine: {
+        [key: string]: number;
+      };
+      /** Fixes Waiting */
+      fixes_waiting: number;
+      /** Ranking Wins */
+      ranking_wins: components["schemas"]["RankingWinLossOut"][];
+      /** Ranking Losses */
+      ranking_losses: components["schemas"]["RankingWinLossOut"][];
+      /** History */
+      history: {
+        [key: string]: unknown;
+      }[];
+      /** Monthly Spend Usd */
+      monthly_spend_usd: number;
+      /** Monthly Cost Ceiling Usd */
+      monthly_cost_ceiling_usd: number;
+      /** Spend Ratio */
+      spend_ratio: number;
     };
     /** SiteUpdateIn */
     SiteUpdateIn: {
@@ -2703,6 +3118,339 @@ export interface operations {
         };
         content: {
           "application/json": components["schemas"]["PlanOut"];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  get_rankings_sites__site_id__rankings_get: {
+    parameters: {
+      query?: never;
+      header?: {
+        "X-Org-Id"?: string | null;
+      };
+      path: {
+        site_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["RankedKeywordOut"][];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  trigger_keyword_check_sites__site_id__keywords__keyword_id__check_post: {
+    parameters: {
+      query?: never;
+      header?: {
+        "X-Org-Id"?: string | null;
+      };
+      path: {
+        site_id: string;
+        keyword_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Ok"];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  trigger_all_keyword_checks_sites__site_id__keywords_check_all_post: {
+    parameters: {
+      query?: never;
+      header?: {
+        "X-Org-Id"?: string | null;
+      };
+      path: {
+        site_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Ok"];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  get_ai_visibility_sites__site_id__ai_visibility_get: {
+    parameters: {
+      query?: never;
+      header?: {
+        "X-Org-Id"?: string | null;
+      };
+      path: {
+        site_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["AiVisibilitySummaryOut"];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  get_prompt_runs_sites__site_id__prompts__prompt_id__runs_get: {
+    parameters: {
+      query?: never;
+      header?: {
+        "X-Org-Id"?: string | null;
+      };
+      path: {
+        site_id: string;
+        prompt_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["AiCheckRunOut"][];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  trigger_prompt_check_sites__site_id__prompts__prompt_id__check_post: {
+    parameters: {
+      query?: never;
+      header?: {
+        "X-Org-Id"?: string | null;
+      };
+      path: {
+        site_id: string;
+        prompt_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Ok"];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  trigger_all_prompt_checks_sites__site_id__prompts_check_all_post: {
+    parameters: {
+      query?: never;
+      header?: {
+        "X-Org-Id"?: string | null;
+      };
+      path: {
+        site_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Ok"];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  get_latest_crawl_sites__site_id__crawl_latest_get: {
+    parameters: {
+      query?: never;
+      header?: {
+        "X-Org-Id"?: string | null;
+      };
+      path: {
+        site_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["CrawlSnapshotOut"];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  trigger_site_crawl_sites__site_id__crawl_post: {
+    parameters: {
+      query?: never;
+      header?: {
+        "X-Org-Id"?: string | null;
+      };
+      path: {
+        site_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Ok"];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  get_site_overview_sites__site_id__overview_get: {
+    parameters: {
+      query?: never;
+      header?: {
+        "X-Org-Id"?: string | null;
+      };
+      path: {
+        site_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["SiteOverviewOut"];
         };
       };
       /** @description Validation Error */

@@ -49,6 +49,11 @@ SAMPLE_BODIES = {
     ("PUT", "/admin/orgs/{org_id}/plan"): {"plan_code": "business"},
     ("PATCH", "/admin/orgs/{org_id}"): {"addons": {"arabic": True}},
     ("PATCH", "/admin/plans/{plan_code}"): {"max_sites": 99},
+    ("POST", "/sites/{site_id}/keywords/{keyword_id}/check"): {},
+    ("POST", "/sites/{site_id}/keywords/check-all"): {},
+    ("POST", "/sites/{site_id}/prompts/{prompt_id}/check"): {},
+    ("POST", "/sites/{site_id}/prompts/check-all"): {},
+    ("POST", "/sites/{site_id}/crawl"): {},
 }
 
 
@@ -152,9 +157,9 @@ def test_org_b_cannot_reach_org_a_data(app, world):
         for path, has_foreign_id in variants:
             r = _call(b.client, method, path, template)
             if has_foreign_id:
-                assert (
-                    r.status_code == 404
-                ), f"{method} {path}: expected 404, got {r.status_code} {r.text}"
+                assert r.status_code == 404, (
+                    f"{method} {path}: expected 404, got {r.status_code} {r.text}"
+                )
             else:
                 assert r.status_code < 500, f"{method} {path}: {r.status_code}"
             for s in secrets:

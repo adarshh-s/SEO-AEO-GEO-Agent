@@ -50,6 +50,11 @@ def database() -> Iterator[None]:
 
 
 TABLES_TO_RESET = [
+    "usage_counters",
+    "visibility_scores",
+    "ai_checks",
+    "rank_checks",
+    "crawl_snapshots",
     "audit_log",
     "refresh_tokens",
     "invitations",
@@ -77,6 +82,24 @@ def clean_db(database: None) -> Iterator[None]:
 @pytest.fixture
 def redis() -> fakeredis.FakeRedis:
     return fakeredis.FakeRedis(decode_responses=True)
+
+
+@pytest.fixture(autouse=True)
+def mock_celery(monkeypatch):
+    import celery
+
+    sent = []
+
+    def _fake_send_task(self, name, args=None, kwargs=None, **opts):
+        sent.append((name, args or [], kwargs or {}, opts))
+
+        class FakeAsyncResult:
+            id = "fake-task-id"
+
+        return FakeAsyncResult()
+
+    monkeypatch.setattr(celery.Celery, "send_task", _fake_send_task)
+    return sent
 
 
 @pytest.fixture

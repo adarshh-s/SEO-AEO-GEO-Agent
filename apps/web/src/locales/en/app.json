@@ -68,5 +68,52 @@
     "resume": "Resume",
     "keywordsPlaceholder": "Add a keyword",
     "promptsPlaceholder": "Add a question"
+  },
+  "keywords": {
+    "title": "Keyword Rankings",
+    "description": "Google positions, rank changes, and AI Overviews for your tracked keywords.",
+    "keyword": "Keyword",
+    "position": "Position",
+    "change": "Change",
+    "url": "Ranking URL",
+    "aiOverview": "AI Overview",
+    "citesSite": "Cites your site",
+    "notRanked": "Not ranked (100+)",
+    "checkAll": "Check all rankings",
+    "checkNow": "Check now",
+    "checking": "Checking...",
+    "allLanguages": "All languages"
+  },
+  "aiVisibility": {
+    "title": "AI Visibility",
+    "description": "How prominently ChatGPT, Gemini, Perplexity, and Claude mention and cite your brand.",
+    "overallSoV": "AI Share of Voice",
+    "mentionRate": "Brand Mention Rate",
+    "citationRate": "Citation Rate",
+    "leaderboard": "Competitor Leaderboard",
+    "competitor": "Competitor",
+    "mentions": "Mentions",
+    "share": "Share",
+    "prompt": "Customer Question",
+    "intent": "Intent",
+    "mentioned": "Mentioned",
+    "notMentioned": "Not mentioned",
+    "cited": "Cited",
+    "inspect": "Inspect",
+    "checkAll": "Check all AI questions",
+    "checkNow": "Check now",
+    "rawAnswers": "Recorded AI Answers",
+    "model": "Model",
+    "sentiment": "Sentiment",
+    "citedLinks": "Cited Links",
+    "noRuns": "No runs recorded yet"
+  },
+  "overviewDetails": {
+    "engineBreakdown": "AI Engines Share",
+    "monthlyUsage": "Monthly API Spend",
+    "ceilingWarning": "Approaching monthly limit ({{ratio}}%)",
+    "rankingWins": "Recent Ranking Gains",
+    "rankingLosses": "Recent Ranking Drops",
+    "noChanges": "No recent rank changes"
   }
 }

@@ -11,6 +11,7 @@ const badgeVariants = cva(
         muted: "bg-muted text-muted-foreground",
         success: "bg-green-100 text-green-800",
         warning: "bg-amber-100 text-amber-800",
+        outline: "border border-border text-foreground",
       },
     },
     defaultVariants: { variant: "default" },

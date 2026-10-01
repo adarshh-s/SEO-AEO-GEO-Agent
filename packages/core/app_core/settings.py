@@ -6,9 +6,7 @@ from typing import Annotated, Literal
 from pydantic import Field, field_validator, model_validator
 from pydantic_settings import BaseSettings, NoDecode, SettingsConfigDict
 
-DEV_JWT_SECRET = (
-    "local-dev-only-jwt-secret-change-me-in-env"  # noqa: S105 (rejected outside local/test)
-)
+DEV_JWT_SECRET = "local-dev-only-jwt-secret-change-me-in-env"  # noqa: S105 (rejected outside local/test)
 
 
 class Settings(BaseSettings):

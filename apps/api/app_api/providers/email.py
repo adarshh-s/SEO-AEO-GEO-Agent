@@ -43,7 +43,7 @@ class SmtpEmailProvider:
 
     def send(self, email: Email) -> None:
         msg = EmailMessage()
-        msg["From"] = f'{BRAND["email_from_name"]} <{self.s.email_from_address}>'
+        msg["From"] = f"{BRAND['email_from_name']} <{self.s.email_from_address}>"
         msg["To"] = email.to
         msg["Subject"] = email.subject
         msg.set_content(email.text)
@@ -64,7 +64,7 @@ class ResendEmailProvider:
             "https://api.resend.com/emails",
             headers={"Authorization": f"Bearer {self.s.resend_api_key}"},
             json={
-                "from": f'{BRAND["email_from_name"]} <{self.s.email_from_address}>',
+                "from": f"{BRAND['email_from_name']} <{self.s.email_from_address}>",
                 "to": [email.to],
                 "subject": email.subject,
                 "text": email.text,

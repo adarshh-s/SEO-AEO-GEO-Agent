@@ -118,3 +118,110 @@ export async function saveUiLanguage(lang: string): Promise<UserOut> {
   useSession.getState().setUser(user);
   return user;
 }
+
+export function useRankings(siteId: string | undefined) {
+  const org = useOrgKey();
+  return useQuery({
+    queryKey: ["rankings", org, siteId],
+    queryFn: () => api<import("./api-types").RankedKeywordOut[]>(`/sites/${siteId}/rankings`),
+    enabled: !!org && !!siteId,
+  });
+}
+
+export function useAiVisibility(siteId: string | undefined) {
+  const org = useOrgKey();
+  return useQuery({
+    queryKey: ["ai-visibility", org, siteId],
+    queryFn: () =>
+      api<
+        | import("./api-types").AiVisibilitySummaryOut[]
+        | import("./api-types").AiVisibilitySummaryOut
+      >(`/sites/${siteId}/ai-visibility`),
+    enabled: !!org && !!siteId,
+  });
+}
+
+export function usePromptRuns(siteId: string | undefined, promptId: string | undefined) {
+  const org = useOrgKey();
+  return useQuery({
+    queryKey: ["prompt-runs", org, siteId, promptId],
+    queryFn: () =>
+      api<import("./api-types").AiCheckRunOut[]>(`/sites/${siteId}/prompts/${promptId}/runs`),
+    enabled: !!org && !!siteId && !!promptId,
+  });
+}
+
+export function useLatestCrawl(siteId: string | undefined) {
+  const org = useOrgKey();
+  return useQuery({
+    queryKey: ["crawl-latest", org, siteId],
+    queryFn: () => api<import("./api-types").CrawlSnapshotOut>(`/sites/${siteId}/crawl/latest`),
+    enabled: !!org && !!siteId,
+  });
+}
+
+export function useSiteOverview(siteId: string | undefined) {
+  const org = useOrgKey();
+  return useQuery({
+    queryKey: ["overview", org, siteId],
+    queryFn: () => api<import("./api-types").SiteOverviewOut>(`/sites/${siteId}/overview`),
+    enabled: !!org && !!siteId,
+  });
+}
+
+export function useTriggerKeywordCheck(siteId: string) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (keywordId: string) =>
+      api(`/sites/${siteId}/keywords/${keywordId}/check`, { method: "POST" }),
+    onSuccess: () => {
+      void qc.invalidateQueries({ queryKey: ["rankings"] });
+      void qc.invalidateQueries({ queryKey: ["overview"] });
+    },
+  });
+}
+
+export function useTriggerAllKeywordChecks(siteId: string) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: () => api(`/sites/${siteId}/keywords/check-all`, { method: "POST" }),
+    onSuccess: () => {
+      void qc.invalidateQueries({ queryKey: ["rankings"] });
+      void qc.invalidateQueries({ queryKey: ["overview"] });
+    },
+  });
+}
+
+export function useTriggerPromptCheck(siteId: string) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (promptId: string) =>
+      api(`/sites/${siteId}/prompts/${promptId}/check`, { method: "POST" }),
+    onSuccess: () => {
+      void qc.invalidateQueries({ queryKey: ["ai-visibility"] });
+      void qc.invalidateQueries({ queryKey: ["overview"] });
+    },
+  });
+}
+
+export function useTriggerAllPromptChecks(siteId: string) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: () => api(`/sites/${siteId}/prompts/check-all`, { method: "POST" }),
+    onSuccess: () => {
+      void qc.invalidateQueries({ queryKey: ["ai-visibility"] });
+      void qc.invalidateQueries({ queryKey: ["overview"] });
+    },
+  });
+}
+
+export function useTriggerCrawl(siteId: string) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: () => api(`/sites/${siteId}/crawl`, { method: "POST" }),
+    onSuccess: () => {
+      void qc.invalidateQueries({ queryKey: ["crawl-latest"] });
+      void qc.invalidateQueries({ queryKey: ["site"] });
+    },
+  });
+}

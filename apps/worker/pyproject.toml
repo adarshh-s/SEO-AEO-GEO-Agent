@@ -7,6 +7,8 @@ dependencies = [
     "app-core",
     "celery[redis]>=5.4",
     "sentry-sdk[celery]>=2.19",
+    "requests>=2.31",
+    "beautifulsoup4>=4.12",
 ]
 
 [build-system]
