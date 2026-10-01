@@ -1,10 +1,10 @@
-import { FileSearch, FileText } from "lucide-react";
 import { createBrowserRouter, Navigate } from "react-router";
 import { AppShell } from "@/components/layout/app-shell";
 import { PublicLayout } from "@/components/layout/public-layout";
 import { AdminPage } from "@/features/admin/admin-page";
 import { OverviewPage } from "@/features/app/overview-page";
-import { PlaceholderPage } from "@/features/app/placeholder-page";
+import { AuditsPage } from "@/features/audits/audits-page";
+import { ReportsPage } from "@/features/reports/reports-page";
 import { LoginPage } from "@/features/auth/login-page";
 import { SignupPage } from "@/features/auth/signup-page";
 import {
@@ -66,8 +66,8 @@ export const routes = [
           { path: "keywords", element: <KeywordsPage /> },
           { path: "ai-visibility", element: <AiVisibilityPage /> },
           { path: "fixes", element: <FixesPage /> },
-          { path: "audits", element: <PlaceholderPage section="audits" icon={FileSearch} /> },
-          { path: "reports", element: <PlaceholderPage section="reports" icon={FileText} /> },
+          { path: "audits", element: <AuditsPage /> },
+          { path: "reports", element: <ReportsPage /> },
           { path: "integrations", element: <AppIntegrationsPage /> },
           { path: "sites", element: <SitesPage /> },
           { path: "sites/:siteId", element: <SiteDetailPage /> },

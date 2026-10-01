@@ -11,6 +11,7 @@ from fastapi.responses import JSONResponse
 from app_api.deps import CSRF_HEADER, ORG_HEADER
 from app_api.routers import (
     admin,
+    audits,
     auth,
     diagnose,
     fixes,
@@ -20,6 +21,7 @@ from app_api.routers import (
     orgs,
     plans,
     public,
+    reports,
     sites,
     tracking,
     verification,
@@ -89,6 +91,8 @@ def create_app() -> FastAPI:
         diagnose,
         verification,
         integrations,
+        audits,
+        reports,
         public,
     ):
         app.include_router(module.router)

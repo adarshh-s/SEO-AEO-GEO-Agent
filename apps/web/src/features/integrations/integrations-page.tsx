@@ -82,6 +82,13 @@ export function IntegrationsPage() {
 
   const [gscProperty, setGscProperty] = useState("");
 
+  const [sallaMerchantId, setSallaMerchantId] = useState("");
+  const [sallaToken, setSallaToken] = useState("");
+
+  const [zidStoreId, setZidStoreId] = useState("");
+  const [zidAccessToken, setZidAccessToken] = useState("");
+  const [zidManagerToken, setZidManagerToken] = useState("");
+
   const [testResult, setTestResult] = useState<{ ok: boolean; message: string } | null>(null);
 
   // API Keys & Webhooks queries
@@ -174,6 +181,14 @@ export function IntegrationsPage() {
     } else if (provider === "github") {
       config = { repo_owner: ghOwner, repo_name: ghRepo, base_branch: ghBranch || "main" };
       credentials = { token: ghToken };
+    } else if (provider === "salla") {
+      config = { mode: sallaToken ? "app" : "snippet" };
+      credentials = sallaToken ? { access_token: sallaToken, merchant_id: sallaMerchantId } : {};
+    } else if (provider === "zid") {
+      config = { mode: zidAccessToken ? "app" : "snippet" };
+      credentials = zidAccessToken
+        ? { access_token: zidAccessToken, manager_token: zidManagerToken, store_id: zidStoreId }
+        : {};
     }
 
     createIntegration.mutate(
@@ -383,6 +398,8 @@ export function IntegrationsPage() {
             {[
               { id: "wordpress", label: "WordPress" },
               { id: "shopify", label: "Shopify" },
+              { id: "salla", label: "Salla (سلة)" },
+              { id: "zid", label: "Zid (زد)" },
               { id: "nextjs", label: "Next.js / SDK" },
               { id: "github", label: "GitHub" },
               { id: "cloudflare", label: "Cloudflare" },
@@ -791,6 +808,279 @@ export default function Page() {
                     </div>
                   </div>
                 )}
+              </div>
+            </div>
+          )}
+
+          {/* Salla Tab */}
+          {deepPlatformTab === "salla" && (
+            <div className="space-y-4">
+              <div className="flex flex-col gap-1">
+                <div className="flex items-center gap-2">
+                  <h4 className="text-sm font-semibold">Salla (سلة) E-Commerce Connector</h4>
+                  <Badge variant="outline" className="text-[10px] font-bold">
+                    Dual Mode
+                  </Badge>
+                </div>
+                <p className="text-muted-foreground text-xs leading-relaxed">
+                  Support both direct Partner App API automation (when approved) and immediate Theme
+                  Snippet + step-by-step product SEO optimization.
+                </p>
+              </div>
+
+              {/* Mode 1: App API Credentials */}
+              <div className="border-border bg-muted/20 space-y-3 rounded-lg border p-4">
+                <div className="flex items-center justify-between">
+                  <h5 className="text-xs font-semibold">Option A: Salla Partner API Integration</h5>
+                  <Badge variant="muted" className="text-[10px]">
+                    Direct API
+                  </Badge>
+                </div>
+                <div className="grid gap-3 sm:grid-cols-2">
+                  <div className="space-y-1">
+                    <label className="text-muted-foreground text-xs font-medium">Merchant ID</label>
+                    <Input
+                      placeholder="e.g. 12345678"
+                      value={sallaMerchantId}
+                      onChange={(e) => setSallaMerchantId(e.target.value)}
+                      className="text-xs"
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <label className="text-muted-foreground text-xs font-medium">
+                      Access Token
+                    </label>
+                    <Input
+                      type="password"
+                      placeholder="Bearer token from Salla Partner Portal"
+                      value={sallaToken}
+                      onChange={(e) => setSallaToken(e.target.value)}
+                      className="text-xs"
+                    />
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-between pt-2">
+                  <Button
+                    size="sm"
+                    onClick={() => handleSaveIntegration("salla")}
+                    disabled={createIntegration.isPending}
+                    className="h-8 text-xs"
+                  >
+                    {t("integrations.saveConfig")}
+                  </Button>
+                  {activeIntegration && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleTestIntegration(activeIntegration.id)}
+                      disabled={testIntegration.isPending}
+                      className="h-8 text-xs"
+                    >
+                      {t("integrations.testConnection")}
+                    </Button>
+                  )}
+                </div>
+              </div>
+
+              {/* Mode 2: Twilight Theme Custom Snippet */}
+              <div className="border-border bg-muted/20 space-y-3 rounded-lg border p-4">
+                <div className="flex items-center justify-between">
+                  <h5 className="text-xs font-semibold">
+                    Option B: Salla Twilight Snippet & SEO Guide (Ready Now)
+                  </h5>
+                  <Badge
+                    variant="outline"
+                    className="border-emerald-300 text-[10px] text-emerald-600"
+                  >
+                    No App Review Required
+                  </Badge>
+                </div>
+                <p className="text-muted-foreground text-xs leading-relaxed">
+                  Inject the tracking and verification script into your Salla store via{" "}
+                  <strong>Store Settings → Store Options → Custom Code (Header Scripts)</strong>:
+                </p>
+                <div className="relative">
+                  <pre className="border-border bg-muted/60 overflow-auto rounded-md border p-3 font-mono text-xs select-all">
+                    {`<!-- QuardLink SEO & AI Visibility Tag -->
+<meta name="quardlink-verification" content="${siteId ?? "SITE_KEY"}" />
+<script defer src="https://quardlink.com/agent.js" data-site-key="${siteId ?? "SITE_KEY"}" data-platform="salla"></script>
+<!-- End QuardLink Tag -->`}
+                  </pre>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="absolute end-2 top-2 h-7 text-xs"
+                    onClick={() =>
+                      handleCopy(
+                        "salla-snippet",
+                        `<!-- QuardLink SEO & AI Visibility Tag -->\n<meta name="quardlink-verification" content="${siteId ?? "SITE_KEY"}" />\n<script defer src="https://quardlink.com/agent.js" data-site-key="${siteId ?? "SITE_KEY"}" data-platform="salla"></script>\n<!-- End QuardLink Tag -->`,
+                      )
+                    }
+                  >
+                    {copiedKey === "salla-snippet" ? (
+                      <Check className="h-3 w-3 text-emerald-600" />
+                    ) : (
+                      <Copy className="h-3 w-3" />
+                    )}
+                  </Button>
+                </div>
+                <div className="text-muted-foreground space-y-1 border-t pt-2 text-[11px]">
+                  <p className="text-foreground font-semibold">Salla Optimization Steps:</p>
+                  <ol className="list-inside list-decimal space-y-0.5">
+                    <li>Paste the snippet in Salla Twilight Custom Code Header.</li>
+                    <li>
+                      Update product titles & meta descriptions in Products → SEO tab using
+                      QuardLink recommendations.
+                    </li>
+                    <li>
+                      Dynamic schema for FAQs and AI citations will automatically activate on your
+                      store.
+                    </li>
+                  </ol>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Zid Tab */}
+          {deepPlatformTab === "zid" && (
+            <div className="space-y-4">
+              <div className="flex flex-col gap-1">
+                <div className="flex items-center gap-2">
+                  <h4 className="text-sm font-semibold">Zid (زد) E-Commerce Connector</h4>
+                  <Badge variant="outline" className="text-[10px] font-bold">
+                    Dual Mode
+                  </Badge>
+                </div>
+                <p className="text-muted-foreground text-xs leading-relaxed">
+                  Connect your Zid store via direct Manager API or embed the storefront custom
+                  script tag for instantaneous indexing and AI referral tracking.
+                </p>
+              </div>
+
+              {/* Mode 1: Zid API Credentials */}
+              <div className="border-border bg-muted/20 space-y-3 rounded-lg border p-4">
+                <div className="flex items-center justify-between">
+                  <h5 className="text-xs font-semibold">Option A: Zid Partner API Integration</h5>
+                  <Badge variant="muted" className="text-[10px]">
+                    Manager API
+                  </Badge>
+                </div>
+                <div className="grid gap-3 sm:grid-cols-3">
+                  <div className="space-y-1">
+                    <label className="text-muted-foreground text-xs font-medium">Store ID</label>
+                    <Input
+                      placeholder="e.g. 54321"
+                      value={zidStoreId}
+                      onChange={(e) => setZidStoreId(e.target.value)}
+                      className="text-xs"
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <label className="text-muted-foreground text-xs font-medium">
+                      Access Token
+                    </label>
+                    <Input
+                      type="password"
+                      placeholder="OAuth Access Token"
+                      value={zidAccessToken}
+                      onChange={(e) => setZidAccessToken(e.target.value)}
+                      className="text-xs"
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <label className="text-muted-foreground text-xs font-medium">
+                      Manager Token
+                    </label>
+                    <Input
+                      type="password"
+                      placeholder="Manager Secret Token"
+                      value={zidManagerToken}
+                      onChange={(e) => setZidManagerToken(e.target.value)}
+                      className="text-xs"
+                    />
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-between pt-2">
+                  <Button
+                    size="sm"
+                    onClick={() => handleSaveIntegration("zid")}
+                    disabled={createIntegration.isPending}
+                    className="h-8 text-xs"
+                  >
+                    {t("integrations.saveConfig")}
+                  </Button>
+                  {activeIntegration && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleTestIntegration(activeIntegration.id)}
+                      disabled={testIntegration.isPending}
+                      className="h-8 text-xs"
+                    >
+                      {t("integrations.testConnection")}
+                    </Button>
+                  )}
+                </div>
+              </div>
+
+              {/* Mode 2: Zid Storefront Custom Scripts */}
+              <div className="border-border bg-muted/20 space-y-3 rounded-lg border p-4">
+                <div className="flex items-center justify-between">
+                  <h5 className="text-xs font-semibold">
+                    Option B: Zid Storefront Script & SEO Guide (Ready Now)
+                  </h5>
+                  <Badge
+                    variant="outline"
+                    className="border-emerald-300 text-[10px] text-emerald-600"
+                  >
+                    Instant Setup
+                  </Badge>
+                </div>
+                <p className="text-muted-foreground text-xs leading-relaxed">
+                  Add this snippet to your store via{" "}
+                  <strong>Store Settings → Custom Scripts → &lt;head&gt;</strong>:
+                </p>
+                <div className="relative">
+                  <pre className="border-border bg-muted/60 overflow-auto rounded-md border p-3 font-mono text-xs select-all">
+                    {`<!-- QuardLink SEO & AI Visibility Tag -->
+<meta name="quardlink-verification" content="${siteId ?? "SITE_KEY"}" />
+<script defer src="https://quardlink.com/agent.js" data-site-key="${siteId ?? "SITE_KEY"}" data-platform="zid"></script>
+<!-- End QuardLink Tag -->`}
+                  </pre>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="absolute end-2 top-2 h-7 text-xs"
+                    onClick={() =>
+                      handleCopy(
+                        "zid-snippet",
+                        `<!-- QuardLink SEO & AI Visibility Tag -->\n<meta name="quardlink-verification" content="${siteId ?? "SITE_KEY"}" />\n<script defer src="https://quardlink.com/agent.js" data-site-key="${siteId ?? "SITE_KEY"}" data-platform="zid"></script>\n<!-- End QuardLink Tag -->`,
+                      )
+                    }
+                  >
+                    {copiedKey === "zid-snippet" ? (
+                      <Check className="h-3 w-3 text-emerald-600" />
+                    ) : (
+                      <Copy className="h-3 w-3" />
+                    )}
+                  </Button>
+                </div>
+                <div className="text-muted-foreground space-y-1 border-t pt-2 text-[11px]">
+                  <p className="text-foreground font-semibold">Zid Store Optimization Steps:</p>
+                  <ol className="list-inside list-decimal space-y-0.5">
+                    <li>Paste the snippet into Zid Custom Scripts &lt;head&gt;.</li>
+                    <li>
+                      Update your product & category SEO details via Products → Edit → SEO fields.
+                    </li>
+                    <li>
+                      AEO and Schema enhancements are automatically delivered to your visitors and
+                      crawlers.
+                    </li>
+                  </ol>
+                </div>
               </div>
             </div>
           )}

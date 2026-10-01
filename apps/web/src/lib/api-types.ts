@@ -94,3 +94,68 @@ export interface GscPerformanceOut {
     [key: string]: unknown;
   }>;
 }
+
+export interface AuditIssueOut {
+  id: string;
+  category: "technical" | "content" | "ai_readiness" | "performance" | string;
+  title: string;
+  title_ar?: string | null;
+  severity: "critical" | "warning" | "info" | string;
+  description: string;
+  description_ar?: string | null;
+  recommendation: string;
+  recommendation_ar?: string | null;
+  affected_urls: string[];
+  passed: boolean;
+}
+
+export interface AuditOut {
+  id: string;
+  site_id: string;
+  org_id: string;
+  status: "pending" | "running" | "completed" | "failed" | string;
+  score: number;
+  category_scores: {
+    technical?: number;
+    content?: number;
+    ai_readiness?: number;
+    performance?: number;
+    [key: string]: number | undefined;
+  };
+  issues: AuditIssueOut[];
+  summary: string;
+  summary_ar?: string | null;
+  pages_crawled: number;
+  started_at?: string | null;
+  completed_at?: string | null;
+  error_message?: string | null;
+  created_at: string;
+}
+
+export interface AuditTriggerIn {
+  page_limit?: number;
+}
+
+export interface ReportOut {
+  id: string;
+  site_id: string;
+  org_id: string;
+  audit_id?: string | null;
+  report_type: string;
+  title: string;
+  language: string;
+  status: string;
+  metrics_summary: Record<string, unknown>;
+  created_at: string;
+}
+
+export interface ReportCreateIn {
+  audit_id?: string | null;
+  language?: string;
+}
+
+export interface DigestSendTestOut {
+  ok: boolean;
+  message: string;
+  recipient: string;
+}

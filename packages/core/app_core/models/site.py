@@ -11,7 +11,7 @@ from sqlalchemy import (
     UniqueConstraint,
 )
 from sqlalchemy.dialects.postgresql import ARRAY, JSONB, UUID
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app_core.db import Base
 from app_core.enums import Platform, Rendering
@@ -56,6 +56,9 @@ class Site(UUIDPk, OrgOwned, Timestamps, Base):
     created_by: Mapped[uuid.UUID | None] = mapped_column(
         UUID(as_uuid=True), ForeignKey("users.id", ondelete="SET NULL")
     )
+
+    audits = relationship("Audit", back_populates="site", cascade="all, delete-orphan")
+    reports = relationship("Report", back_populates="site", cascade="all, delete-orphan")
 
     @property
     def languages(self) -> list[str]:

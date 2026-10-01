@@ -1,11 +1,13 @@
 """Import every model so Base.metadata is complete (Alembic, tests)."""
 
+from app_core.models.audit import Audit
 from app_core.models.audit_log import AuditLogEntry
 from app_core.models.diagnosis import Diagnosis
 from app_core.models.fix import Fix
 from app_core.models.integration import ApiKey, SiteIntegration, Webhook
 from app_core.models.org import Invitation, Membership, Organization
 from app_core.models.plan import Plan, Subscription
+from app_core.models.report import Report
 from app_core.models.site import Site
 from app_core.models.tracking import (
     AiCheck,
@@ -24,6 +26,7 @@ __all__ = [
     "AiPrompt",
     "AiReferralEvent",
     "ApiKey",
+    "Audit",
     "AuditLogEntry",
     "CrawlSnapshot",
     "Diagnosis",
@@ -35,6 +38,7 @@ __all__ = [
     "Plan",
     "RankCheck",
     "RefreshToken",
+    "Report",
     "Site",
     "SiteIntegration",
     "Subscription",

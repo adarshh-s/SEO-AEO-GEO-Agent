@@ -20,7 +20,9 @@ export default {
     }
 
     const siteKey = env.QUARDLINK_SITE_KEY || "YOUR_SITE_KEY_HERE";
-    const apiUrl = (env.QUARDLINK_API_URL || "https://api.quardlink.com").replace(/\/+$/, "");
+    const apiUrl = (
+      env.QUARDLINK_API_URL || "https://api.quardlink.com"
+    ).replace(/\/+$/, "");
 
     // 1. Asynchronous AI crawler and referral logging
     ctx.waitUntil(trackAiTelemetry(request, siteKey, apiUrl));
@@ -30,7 +32,7 @@ export default {
       const cache = caches.default;
       const cacheKey = new Request(
         `${apiUrl}/public/v1/fixes?site_key=${encodeURIComponent(siteKey)}&url=${encodeURIComponent(request.url)}`,
-        { method: "GET" }
+        { method: "GET" },
       );
 
       let fixesResponse = await cache.match(cacheKey);
@@ -80,7 +82,7 @@ export default {
             element(e) {
               e.append(
                 `<script type="application/ld+json">${JSON.stringify(fix.payload)}</script>\n`,
-                { html: true }
+                { html: true },
               );
             },
           });

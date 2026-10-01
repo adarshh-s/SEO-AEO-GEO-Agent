@@ -83,6 +83,9 @@ SAMPLE_BODIES = {
         "property_url": "https://b-site.com",
         "redirect_uri": "https://example.com/oauth",
     },
+    ("POST", "/sites/{site_id}/audits"): {},
+    ("POST", "/sites/{site_id}/reports"): {"language": "en", "report_type": "audit"},
+    ("POST", "/sites/{site_id}/reports/digest/send-test"): {"language": "en"},
 }
 
 
@@ -151,6 +154,11 @@ def world(app, outbox):
         json={"provider": "wordpress", "config": {"site_url": "https://a-secret-site.com"}},
     ).json()
 
+    audit_resp = a.client.post(f"/sites/{site['id']}/audits", json={}).json()
+    report_resp = a.client.post(
+        f"/sites/{site['id']}/reports", json={"language": "en", "report_type": "audit"}
+    ).json()
+
     ids.update(
         {
             "key_id": key["id"],
@@ -158,6 +166,8 @@ def world(app, outbox):
             "diagnosis_id": diag["id"],
             "fix_id": str(fix_id),
             "integration_id": integ["id"],
+            "audit_id": audit_resp["id"],
+            "report_id": report_resp["id"],
         }
     )
 
@@ -213,6 +223,8 @@ def test_every_endpoint_is_classified(app):
             "key_id",
             "webhook_id",
             "integration_id",
+            "audit_id",
+            "report_id",
         }
         assert params <= known, f"New path parameter in {path}: extend the isolation test"
 

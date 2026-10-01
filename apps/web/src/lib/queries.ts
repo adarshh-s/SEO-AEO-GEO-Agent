@@ -5,8 +5,11 @@ import type {
   ApiKeyCreatedOut,
   ApiKeyCreateIn,
   ApiKeyOut,
+  AuditOut,
+  AuditTriggerIn,
   DiagnosisOut,
   DiagnosisTriggerIn,
+  DigestSendTestOut,
   FixDeployIn,
   FixOut,
   FixUpdateIn,
@@ -16,6 +19,8 @@ import type {
   OrgOut,
   PlanOut,
   PromptOut,
+  ReportCreateIn,
+  ReportOut,
   SiteIntegrationCreateIn,
   SiteIntegrationOut,
   SiteIntegrationUpdateIn,
@@ -550,5 +555,73 @@ export function useGscPerformance(siteId: string | undefined, enabled = true) {
     queryFn: () =>
       api<GscPerformanceOut>(`/sites/${siteId}/integrations/google-search-console/performance`),
     enabled: !!org && !!siteId && enabled,
+  });
+}
+
+export function useAudits(siteId: string | undefined) {
+  const org = useOrgKey();
+  return useQuery({
+    queryKey: ["audits", org, siteId],
+    queryFn: () => api<AuditOut[]>(`/sites/${siteId}/audits`),
+    enabled: !!org && !!siteId,
+  });
+}
+
+export function useAudit(siteId: string | undefined, auditId: string | undefined) {
+  const org = useOrgKey();
+  return useQuery({
+    queryKey: ["audit", org, siteId, auditId],
+    queryFn: () => api<AuditOut>(`/sites/${siteId}/audits/${auditId}`),
+    enabled: !!org && !!siteId && !!auditId,
+  });
+}
+
+export function useRunAudit(siteId: string | undefined) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (body?: AuditTriggerIn) =>
+      api<AuditOut>(`/sites/${siteId}/audits`, { method: "POST", body }),
+    onSuccess: () => {
+      void qc.invalidateQueries({ queryKey: ["audits"] });
+    },
+  });
+}
+
+export function useReports(siteId: string | undefined) {
+  const org = useOrgKey();
+  return useQuery({
+    queryKey: ["reports", org, siteId],
+    queryFn: () => api<ReportOut[]>(`/sites/${siteId}/reports`),
+    enabled: !!org && !!siteId,
+  });
+}
+
+export function useReport(siteId: string | undefined, reportId: string | undefined) {
+  const org = useOrgKey();
+  return useQuery({
+    queryKey: ["report", org, siteId, reportId],
+    queryFn: () => api<ReportOut>(`/sites/${siteId}/reports/${reportId}`),
+    enabled: !!org && !!siteId && !!reportId,
+  });
+}
+
+export function useGenerateReport(siteId: string | undefined) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (body?: ReportCreateIn) =>
+      api<ReportOut>(`/sites/${siteId}/reports`, { method: "POST", body }),
+    onSuccess: () => {
+      void qc.invalidateQueries({ queryKey: ["reports"] });
+    },
+  });
+}
+
+export function useSendTestDigest(siteId: string | undefined) {
+  return useMutation({
+    mutationFn: (body?: { language?: string }) =>
+      api<DigestSendTestOut>(`/sites/${siteId}/reports/digest/send-test`, {
+        method: "POST",
+        body,
+      }),
   });
 }

@@ -20,6 +20,7 @@ class Email:
     to: str
     subject: str
     text: str
+    html: str | None = None
 
 
 class EmailProvider(Protocol):
@@ -47,6 +48,8 @@ class SmtpEmailProvider:
         msg["To"] = email.to
         msg["Subject"] = email.subject
         msg.set_content(email.text)
+        if email.html:
+            msg.add_alternative(email.html, subtype="html")
         with smtplib.SMTP(self.s.smtp_host, self.s.smtp_port, timeout=15) as smtp:
             if self.s.smtp_starttls:
                 smtp.starttls()
@@ -60,15 +63,18 @@ class ResendEmailProvider:
         self.s = settings
 
     def send(self, email: Email) -> None:
+        payload = {
+            "from": f"{BRAND['email_from_name']} <{self.s.email_from_address}>",
+            "to": [email.to],
+            "subject": email.subject,
+            "text": email.text,
+        }
+        if email.html:
+            payload["html"] = email.html
         resp = httpx.post(
             "https://api.resend.com/emails",
             headers={"Authorization": f"Bearer {self.s.resend_api_key}"},
-            json={
-                "from": f"{BRAND['email_from_name']} <{self.s.email_from_address}>",
-                "to": [email.to],
-                "subject": email.subject,
-                "text": email.text,
-            },
+            json=payload,
             timeout=15,
         )
         resp.raise_for_status()

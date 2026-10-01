@@ -9,7 +9,7 @@ from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
 from app_api.errors import ApiError
-from app_core.models import AiPrompt, Keyword, Organization, Plan, Site
+from app_core.models import AiPrompt, Audit, Keyword, Organization, Plan, Site
 
 
 def _limit_error(what: str, limit: int) -> ApiError:
@@ -68,3 +68,21 @@ def check_languages(db: Session, org_id: uuid.UUID, languages: list[str]) -> Non
 
 def _addon_key(lang: str) -> str:
     return {"ar": "arabic"}.get(lang, f"lang_{lang}")
+
+
+def check_audits(db: Session, org_id: uuid.UUID) -> None:
+    """Check monthly audit limits for the organization."""
+    from datetime import UTC, datetime, timedelta
+
+    _, plan = org_plan(db, org_id)
+    thirty_days_ago = datetime.now(UTC) - timedelta(days=30)
+    count = (
+        db.scalar(
+            select(func.count())
+            .select_from(Audit)
+            .where(Audit.org_id == org_id, Audit.created_at >= thirty_days_ago)
+        )
+        or 0
+    )
+    if count >= plan.audits_per_month:
+        raise _limit_error("audits per month", plan.audits_per_month)
