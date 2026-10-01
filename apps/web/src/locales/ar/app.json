@@ -175,8 +175,23 @@
     "addWebhook": "إضافة رابط Webhook",
     "webhookUrl": "رابط الاستقبال (URL)",
     "subscribedEvents": "الأحداث المشترك بها",
-    "delete": "حذف"
+    "delete": "حذف",
+    "deepIntegrationsTitle": "التكاملات العميقة للمنصات",
+    "deepIntegrationsDesc": "تطبيق التحسينات تلقائياً عبر واجهات المنصات الأصلية، إضافة ووردبريس، تضمين شوبيفاي، طلبات سحب GitHub، أو خوادم Cloudflare في الحافة.",
+    "connected": "متصل",
+    "disconnected": "غير متصل",
+    "testConnection": "فحص الاتصال",
+    "testing": "جارٍ الفحص...",
+    "connect": "اتصال",
+    "disconnect": "إلغاء الاتصال",
+    "downloadPlugin": "تحميل إضافة ووردبريس (.zip)",
+    "downloadWorker": "تحميل كود Cloudflare Worker (.js)",
+    "connectGsc": "ربط Google Search Console",
+    "gscVerifiedOwner": "تم تأكيد ملكية النطاق عبر Google Search Console",
+    "gscPerformance": "أداء الموقع في بحث Google",
+    "saveConfig": "حفظ الإعدادات"
   },
+
   "diagnosis": {
     "button": "تشخيص الفجوات",
     "diagnosing": "جارٍ التشخيص...",

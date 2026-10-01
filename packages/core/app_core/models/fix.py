@@ -55,3 +55,5 @@ class Fix(UUIDPk, OrgOwned, Timestamps, Base):
     )
     # Rollback snapshot: previous state of meta / schema / content
     previous_state: Mapped[dict | None] = mapped_column(JSONB, nullable=True)
+    # External reference (e.g. GitHub PR URL, Shopify mutation ID, WordPress post ID)
+    external_reference: Mapped[str | None] = mapped_column(Text, nullable=True)

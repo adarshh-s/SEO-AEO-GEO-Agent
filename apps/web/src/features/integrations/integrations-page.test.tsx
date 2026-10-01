@@ -67,6 +67,7 @@ function api(url: string, _init: RequestInit) {
   if (url.endsWith("/sites")) return { body: mockSites };
   if (url.includes("/verification")) return { body: mockVerification };
   if (url.includes("/integrations/snippet")) return { body: mockSnippet };
+  if (url.endsWith("/integrations")) return { body: [] };
   if (url.endsWith("/org/api-keys")) return { body: mockApiKeys };
   if (url.endsWith("/org/webhooks")) return { body: mockWebhooks };
   return undefined;
@@ -90,12 +91,14 @@ describe("IntegrationsPage", () => {
   });
   afterEach(() => vi.unstubAllGlobals());
 
-  it("renders verification meta tag, DNS TXT, universal snippet, and API keys", async () => {
+  it("renders verification meta tag, DNS TXT, deep platform integrations, snippet, and API keys", async () => {
     mockFetch(api);
     renderWithProviders(<IntegrationsPage />);
 
     expect(await screen.findByText(/Domain Ownership Verification/i)).toBeInTheDocument();
     expect(await screen.findByText(/quardlink-verification=token-12345/i)).toBeInTheDocument();
+    expect(await screen.findByText(/Deep Platform Integrations/i)).toBeInTheDocument();
+    expect(await screen.findByText(/QuardLink WordPress Plugin/i)).toBeInTheDocument();
     expect(await screen.findByText(/Universal JavaScript Snippet/i)).toBeInTheDocument();
     expect(screen.getByText(/qls_abc123/i)).toBeInTheDocument();
     expect(await screen.findByText("Production Next.js Key")).toBeInTheDocument();

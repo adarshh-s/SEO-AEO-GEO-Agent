@@ -366,9 +366,29 @@ export function FixesPage() {
               )}
 
               {fix.deployed_via && (
-                <div className="text-muted-foreground flex items-center gap-1.5 text-xs">
+                <div className="text-muted-foreground flex flex-wrap items-center gap-1.5 text-xs">
                   <UploadCloud className="h-3.5 w-3.5 text-emerald-600" />
                   <span>{t("fixes.deployedVia", { method: fix.deployed_via })}</span>
+                  {fix.external_reference && (
+                    <span className="ms-2 inline-flex items-center gap-1">
+                      •
+                      {fix.external_reference.startsWith("http") ? (
+                        <a
+                          href={fix.external_reference}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="text-primary inline-flex items-center gap-1 font-mono hover:underline"
+                        >
+                          <span>{fix.external_reference}</span>
+                          <ExternalLink className="h-3 w-3" />
+                        </a>
+                      ) : (
+                        <span className="text-muted-foreground/90 font-mono">
+                          {fix.external_reference}
+                        </span>
+                      )}
+                    </span>
+                  )}
                   {fix.previous_state && (
                     <span className="text-muted-foreground/80 ms-2">
                       • {t("fixes.previousStateSaved")}

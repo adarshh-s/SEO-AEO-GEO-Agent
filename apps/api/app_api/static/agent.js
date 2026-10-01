@@ -13,14 +13,16 @@
 
     var currentScript =
       document.currentScript ||
-      document.querySelector('script[data-site]') ||
+      document.querySelector("script[data-site]") ||
       document.querySelector('script[src*="agent.js"]');
 
     if (!currentScript) {
       return;
     }
 
-    var siteKey = currentScript.getAttribute("data-site") || currentScript.getAttribute("data-site-key");
+    var siteKey =
+      currentScript.getAttribute("data-site") ||
+      currentScript.getAttribute("data-site-key");
     if (!siteKey) {
       return;
     }
@@ -45,7 +47,10 @@
     var referrer = (document.referrer || "").toLowerCase();
     var aiEngine = null;
 
-    if (referrer.indexOf("chatgpt.com") !== -1 || referrer.indexOf("com.openai.chatgpt") !== -1) {
+    if (
+      referrer.indexOf("chatgpt.com") !== -1 ||
+      referrer.indexOf("com.openai.chatgpt") !== -1
+    ) {
       aiEngine = "chatgpt";
     } else if (referrer.indexOf("perplexity.ai") !== -1) {
       aiEngine = "perplexity";
@@ -120,19 +125,30 @@
                   document.title = fix.payload.title;
                 }
                 if (fix.payload.meta_description) {
-                  var metaDesc = document.querySelector('meta[name="description"]');
+                  var metaDesc = document.querySelector(
+                    'meta[name="description"]',
+                  );
                   if (!metaDesc) {
                     metaDesc = document.createElement("meta");
                     metaDesc.setAttribute("name", "description");
                     document.head.appendChild(metaDesc);
                   }
-                  metaDesc.setAttribute("content", fix.payload.meta_description);
+                  metaDesc.setAttribute(
+                    "content",
+                    fix.payload.meta_description,
+                  );
                 }
                 window.QuardLink.appliedFixes.push(fix.id);
-              } else if ((fix.type === "faq" || fix.type === "content_block") && fix.payload && fix.payload.html) {
+              } else if (
+                (fix.type === "faq" || fix.type === "content_block") &&
+                fix.payload &&
+                fix.payload.html
+              ) {
                 var containerSelector =
                   fix.payload.container_selector ||
-                  (fix.type === "faq" ? "[data-quardlink-faq]" : "[data-quardlink-container]");
+                  (fix.type === "faq"
+                    ? "[data-quardlink-faq]"
+                    : "[data-quardlink-container]");
                 var targetEl = document.querySelector(containerSelector);
                 if (targetEl) {
                   var wrapper = document.createElement("div");

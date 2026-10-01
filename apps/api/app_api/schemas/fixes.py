@@ -22,6 +22,7 @@ class FixOut(BaseModel):
     deployed_via: str | None
     deployed_at: datetime | None
     previous_state: dict[str, Any] | None
+    external_reference: str | None = None
     created_at: datetime
     updated_at: datetime
 

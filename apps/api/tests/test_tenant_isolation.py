@@ -72,6 +72,17 @@ SAMPLE_BODIES = {
     ("POST", "/sites/{site_id}/verify"): {},
     ("POST", "/org/api-keys"): {"name": "Test Key", "scopes": ["*"]},
     ("POST", "/org/webhooks"): {"url": "https://example.com/webhook", "events": ["fix.created"]},
+    ("POST", "/sites/{site_id}/integrations"): {
+        "provider": "wordpress",
+        "config": {"site_url": "https://b-site.com"},
+    },
+    ("PATCH", "/sites/{site_id}/integrations/{integration_id}"): {"status": "active"},
+    ("POST", "/sites/{site_id}/integrations/{integration_id}/test"): {},
+    ("POST", "/sites/{site_id}/integrations/google-search-console/connect"): {
+        "code": "auth-code",
+        "property_url": "https://b-site.com",
+        "redirect_uri": "https://example.com/oauth",
+    },
 }
 
 
@@ -135,12 +146,18 @@ def world(app, outbox):
         )
         session.commit()
 
+    integ = a.client.post(
+        f"/sites/{site['id']}/integrations",
+        json={"provider": "wordpress", "config": {"site_url": "https://a-secret-site.com"}},
+    ).json()
+
     ids.update(
         {
             "key_id": key["id"],
             "webhook_id": wh["id"],
             "diagnosis_id": diag["id"],
             "fix_id": str(fix_id),
+            "integration_id": integ["id"],
         }
     )
 
@@ -195,6 +212,7 @@ def test_every_endpoint_is_classified(app):
             "diagnosis_id",
             "key_id",
             "webhook_id",
+            "integration_id",
         }
         assert params <= known, f"New path parameter in {path}: extend the isolation test"
 

@@ -3,7 +3,7 @@
 from app_core.models.audit_log import AuditLogEntry
 from app_core.models.diagnosis import Diagnosis
 from app_core.models.fix import Fix
-from app_core.models.integration import ApiKey, Webhook
+from app_core.models.integration import ApiKey, SiteIntegration, Webhook
 from app_core.models.org import Invitation, Membership, Organization
 from app_core.models.plan import Plan, Subscription
 from app_core.models.site import Site
@@ -36,6 +36,7 @@ __all__ = [
     "RankCheck",
     "RefreshToken",
     "Site",
+    "SiteIntegration",
     "Subscription",
     "UsageCounter",
     "User",

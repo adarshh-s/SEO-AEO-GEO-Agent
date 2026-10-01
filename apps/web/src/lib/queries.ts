@@ -16,15 +16,23 @@ import type {
   OrgOut,
   PlanOut,
   PromptOut,
+  SiteIntegrationCreateIn,
+  SiteIntegrationOut,
+  SiteIntegrationUpdateIn,
   SiteOut,
   SiteUpdateIn,
   SnippetInfoOut,
+  TestConnectionOut,
+  GscAuthUrlOut,
+  GscConnectIn,
+  GscPerformanceOut,
   UserOut,
   VerificationStatusOut,
   VerifyAttemptOut,
   WebhookCreateIn,
   WebhookOut,
 } from "./api-types";
+
 import { useSession } from "@/stores/session";
 
 /** Query keys include the org so switching orgs never shows another org's cache. */
@@ -451,5 +459,96 @@ export function useDeleteWebhook() {
     onSuccess: () => {
       void qc.invalidateQueries({ queryKey: ["webhooks"] });
     },
+  });
+}
+
+// --- Phase 4: Deep Platform Integrations ---
+
+export function useSiteIntegrations(siteId: string | undefined) {
+  const org = useOrgKey();
+  return useQuery({
+    queryKey: ["site-integrations", org, siteId],
+    queryFn: () => api<SiteIntegrationOut[]>(`/sites/${siteId}/integrations`),
+    enabled: !!org && !!siteId,
+  });
+}
+
+export function useCreateSiteIntegration(siteId: string | undefined) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (body: SiteIntegrationCreateIn) =>
+      api<SiteIntegrationOut>(`/sites/${siteId}/integrations`, { method: "POST", body }),
+    onSuccess: () => {
+      void qc.invalidateQueries({ queryKey: ["site-integrations"] });
+    },
+  });
+}
+
+export function useUpdateSiteIntegration(siteId: string | undefined) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, body }: { id: string; body: SiteIntegrationUpdateIn }) =>
+      api<SiteIntegrationOut>(`/sites/${siteId}/integrations/${id}`, { method: "PATCH", body }),
+    onSuccess: () => {
+      void qc.invalidateQueries({ queryKey: ["site-integrations"] });
+    },
+  });
+}
+
+export function useDeleteSiteIntegration(siteId: string | undefined) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) => api(`/sites/${siteId}/integrations/${id}`, { method: "DELETE" }),
+    onSuccess: () => {
+      void qc.invalidateQueries({ queryKey: ["site-integrations"] });
+    },
+  });
+}
+
+export function useTestSiteIntegration(siteId: string | undefined) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) =>
+      api<TestConnectionOut>(`/sites/${siteId}/integrations/${id}/test`, { method: "POST" }),
+    onSuccess: () => {
+      void qc.invalidateQueries({ queryKey: ["site-integrations"] });
+    },
+  });
+}
+
+export function useGscAuthUrl(siteId: string | undefined, redirectUri?: string) {
+  const org = useOrgKey();
+  const query = redirectUri ? `?redirect_uri=${encodeURIComponent(redirectUri)}` : "";
+  return useQuery({
+    queryKey: ["gsc-auth-url", org, siteId, redirectUri],
+    queryFn: () =>
+      api<GscAuthUrlOut>(`/sites/${siteId}/integrations/google-search-console/auth-url${query}`),
+    enabled: !!org && !!siteId,
+  });
+}
+
+export function useConnectGsc(siteId: string | undefined) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (body: GscConnectIn) =>
+      api<SiteIntegrationOut>(`/sites/${siteId}/integrations/google-search-console/connect`, {
+        method: "POST",
+        body,
+      }),
+    onSuccess: () => {
+      void qc.invalidateQueries({ queryKey: ["site-integrations"] });
+      void qc.invalidateQueries({ queryKey: ["site"] });
+      void qc.invalidateQueries({ queryKey: ["verification"] });
+    },
+  });
+}
+
+export function useGscPerformance(siteId: string | undefined, enabled = true) {
+  const org = useOrgKey();
+  return useQuery({
+    queryKey: ["gsc-performance", org, siteId],
+    queryFn: () =>
+      api<GscPerformanceOut>(`/sites/${siteId}/integrations/google-search-console/performance`),
+    enabled: !!org && !!siteId && enabled,
   });
 }

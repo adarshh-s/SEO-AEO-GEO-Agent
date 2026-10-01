@@ -1,0 +1,29 @@
+{
+  "name": "@quardlink/sdk",
+  "version": "0.1.0",
+  "description": "QuardLink SDK for Next.js, React, and Modern Web Frameworks",
+  "main": "dist/index.js",
+  "module": "dist/index.mjs",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc -b",
+    "typecheck": "tsc --noEmit"
+  },
+  "keywords": [
+    "seo",
+    "aeo",
+    "nextjs",
+    "metadata",
+    "schema",
+    "json-ld"
+  ],
+  "author": "QuardLink",
+  "license": "MIT",
+  "peerDependencies": {
+    "react": ">=18.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.18",
+    "typescript": "^5.5.0"
+  }
+}

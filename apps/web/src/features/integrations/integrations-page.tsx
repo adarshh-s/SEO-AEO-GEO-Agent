@@ -3,8 +3,10 @@ import {
   Check,
   CheckCircle2,
   Copy,
+  Download,
   Globe,
   Key,
+  Layers,
   Plug,
   Plus,
   RefreshCw,
@@ -12,6 +14,7 @@ import {
   Trash2,
   Webhook,
 } from "lucide-react";
+
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router";
@@ -25,12 +28,18 @@ import { EmptyState, ErrorState, PageHeader } from "@/components/ui/states";
 import type { ApiKeyCreatedOut } from "@/lib/api-types";
 import {
   useApiKeys,
+  useConnectGsc,
   useCreateApiKey,
+  useCreateSiteIntegration,
   useCreateWebhook,
   useDeleteApiKey,
+  useDeleteSiteIntegration,
   useDeleteWebhook,
+  useGscPerformance,
+  useSiteIntegrations,
   useSites,
   useSnippetInfo,
+  useTestSiteIntegration,
   useVerification,
   useVerifySite,
   useWebhooks,
@@ -44,11 +53,36 @@ export function IntegrationsPage() {
 
   const [copiedKey, setCopiedKey] = useState<string | null>(null);
   const [selectedPlatform, setSelectedPlatform] = useState<string>("wordpress");
+  const [deepPlatformTab, setDeepPlatformTab] = useState<string>("wordpress");
 
   // Verification & Snippet queries
   const verification = useVerification(siteId);
   const verifySite = useVerifySite(siteId ?? "");
   const snippetInfo = useSnippetInfo(siteId);
+
+  // Deep Integrations queries
+  const siteIntegrations = useSiteIntegrations(siteId);
+  const createIntegration = useCreateSiteIntegration(siteId);
+  const deleteIntegration = useDeleteSiteIntegration(siteId);
+  const testIntegration = useTestSiteIntegration(siteId);
+  const connectGsc = useConnectGsc(siteId);
+
+  // Form states for deep integrations
+  const [wpUrl, setWpUrl] = useState("");
+  const [wpUser, setWpUser] = useState("");
+  const [wpPass, setWpPass] = useState("");
+
+  const [shopifyDomain, setShopifyDomain] = useState("");
+  const [shopifyToken, setShopifyToken] = useState("");
+
+  const [ghOwner, setGhOwner] = useState("");
+  const [ghRepo, setGhRepo] = useState("");
+  const [ghBranch, setGhBranch] = useState("main");
+  const [ghToken, setGhToken] = useState("");
+
+  const [gscProperty, setGscProperty] = useState("");
+
+  const [testResult, setTestResult] = useState<{ ok: boolean; message: string } | null>(null);
 
   // API Keys & Webhooks queries
   const apiKeys = useApiKeys();
@@ -72,6 +106,10 @@ export function IntegrationsPage() {
     "fix.approved",
     "fix.deployed",
   ]);
+
+  const activeIntegration = siteIntegrations.data?.find((i) => i.provider === deepPlatformTab);
+  const gscInteg = siteIntegrations.data?.find((i) => i.provider === "google_search_console");
+  const gscPerformance = useGscPerformance(siteId, !!gscInteg && gscInteg.status === "active");
 
   if (sites.isPending) return <PageLoader />;
   if (sites.isError) return <ErrorState error={sites.error} onRetry={() => void sites.refetch()} />;
@@ -100,10 +138,9 @@ export function IntegrationsPage() {
   const handleCreateApiKey = () => {
     if (!keyName.trim()) return;
     createApiKey.mutate(
-      { name: keyName, scopes: keyScopes },
+      { name: keyName.trim(), scopes: keyScopes },
       {
         onSuccess: (data) => {
-          setShowKeyModal(false);
           setCreatedKeyData(data);
           setKeyName("");
         },
@@ -114,7 +151,7 @@ export function IntegrationsPage() {
   const handleCreateWebhook = () => {
     if (!webhookUrl.trim()) return;
     createWebhook.mutate(
-      { url: webhookUrl, events: webhookEvents },
+      { url: webhookUrl.trim(), events: webhookEvents },
       {
         onSuccess: () => {
           setShowWebhookModal(false);
@@ -124,17 +161,68 @@ export function IntegrationsPage() {
     );
   };
 
-  const isVerified = verification.data?.verified ?? false;
+  const handleSaveIntegration = (provider: string) => {
+    let config: Record<string, unknown> = {};
+    let credentials: Record<string, unknown> = {};
+
+    if (provider === "wordpress") {
+      config = { site_url: wpUrl || `https://${sites.data?.find((s) => s.id === siteId)?.domain}` };
+      credentials = { username: wpUser, application_password: wpPass };
+    } else if (provider === "shopify") {
+      config = { shop_domain: shopifyDomain };
+      credentials = { access_token: shopifyToken };
+    } else if (provider === "github") {
+      config = { repo_owner: ghOwner, repo_name: ghRepo, base_branch: ghBranch || "main" };
+      credentials = { token: ghToken };
+    }
+
+    createIntegration.mutate(
+      { provider, config, credentials },
+      {
+        onSuccess: () => {
+          setTestResult({ ok: true, message: "Configuration saved successfully." });
+        },
+      },
+    );
+  };
+
+  const handleTestIntegration = (id: string) => {
+    testIntegration.mutate(id, {
+      onSuccess: (data) => {
+        setTestResult({ ok: data.ok, message: data.message });
+      },
+    });
+  };
+
+  const handleConnectGsc = () => {
+    const currentSite = sites.data?.find((s) => s.id === siteId);
+    const propUrl = gscProperty || currentSite?.homepage_url || `https://${currentSite?.domain}/`;
+    connectGsc.mutate(
+      {
+        code: "sample_oauth_code",
+        property_url: propUrl,
+        redirect_uri: window.location.origin + "/app/integrations",
+      },
+      {
+        onSuccess: () => {
+          setTestResult({ ok: true, message: "Connected to Google Search Console." });
+        },
+      },
+    );
+  };
+
+  const currentSite = sites.data.find((s) => s.id === siteId);
+  const isVerified = verification.data?.verified || currentSite?.verified_at != null;
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <PageHeader title={t("integrations.title")} description={t("integrations.description")} />
 
         {sites.data.length > 1 && (
           <div className="flex items-center gap-2">
-            <span className="text-muted-foreground text-sm font-medium">
-              {t("overview.sites")}:
+            <span className="text-muted-foreground text-xs font-medium">
+              {t("nav.website") ?? "Website"}:
             </span>
             <select
               value={siteId}
@@ -276,7 +364,440 @@ export function IntegrationsPage() {
         </CardContent>
       </Card>
 
-      {/* 2. Universal JavaScript Snippet Card */}
+      {/* 2. Phase 4: Deep Platform Integrations Card */}
+      <Card>
+        <CardHeader>
+          <div className="flex items-center gap-2">
+            <Layers className="h-5 w-5 text-indigo-600" />
+            <CardTitle className="text-base font-semibold">
+              {t("integrations.deepIntegrationsTitle")}
+            </CardTitle>
+          </div>
+          <CardDescription className="text-xs">
+            {t("integrations.deepIntegrationsDesc")}
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          {/* Tabs */}
+          <div className="border-border/60 flex flex-wrap gap-1.5 border-b pb-3">
+            {[
+              { id: "wordpress", label: "WordPress" },
+              { id: "shopify", label: "Shopify" },
+              { id: "nextjs", label: "Next.js / SDK" },
+              { id: "github", label: "GitHub" },
+              { id: "cloudflare", label: "Cloudflare" },
+              { id: "google_search_console", label: "Google Search Console" },
+            ].map((tab) => (
+              <Button
+                key={tab.id}
+                variant={deepPlatformTab === tab.id ? "default" : "outline"}
+                size="sm"
+                className="h-8 text-xs"
+                onClick={() => {
+                  setDeepPlatformTab(tab.id);
+                  setTestResult(null);
+                }}
+              >
+                {tab.label}
+              </Button>
+            ))}
+          </div>
+
+          {testResult && (
+            <Alert tone={testResult.ok ? "success" : "error"}>
+              <p className="font-semibold">{testResult.ok ? "Success" : "Notice"}</p>
+              <p>{testResult.message}</p>
+            </Alert>
+          )}
+
+          {/* WordPress Tab */}
+          {deepPlatformTab === "wordpress" && (
+            <div className="space-y-4">
+              <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                  <h4 className="text-sm font-semibold">QuardLink WordPress Plugin</h4>
+                  <p className="text-muted-foreground text-xs">
+                    Server-side title, description, schema injection, and AI referral tracking.
+                    Cooperates with Yoast SEO & Rank Math.
+                  </p>
+                </div>
+                <Button variant="outline" size="sm" asChild className="h-8 shrink-0 text-xs">
+                  <a href={`/api/sites/${siteId}/integrations/wordpress/download`} download>
+                    <Download className="me-1 h-3.5 w-3.5" />
+                    {t("integrations.downloadPlugin")}
+                  </a>
+                </Button>
+              </div>
+
+              <div className="border-border bg-muted/20 space-y-3 rounded-lg border p-4">
+                <div className="grid gap-3 sm:grid-cols-2">
+                  <div className="space-y-1">
+                    <label className="text-muted-foreground text-xs font-medium">
+                      Site REST URL
+                    </label>
+                    <Input
+                      placeholder="https://example.com"
+                      value={wpUrl}
+                      onChange={(e) => setWpUrl(e.target.value)}
+                      className="text-xs"
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <label className="text-muted-foreground text-xs font-medium">
+                      Application Username
+                    </label>
+                    <Input
+                      placeholder="admin"
+                      value={wpUser}
+                      onChange={(e) => setWpUser(e.target.value)}
+                      className="text-xs"
+                    />
+                  </div>
+                  <div className="space-y-1 sm:col-span-2">
+                    <label className="text-muted-foreground text-xs font-medium">
+                      Application Password (for draft content creation)
+                    </label>
+                    <Input
+                      type="password"
+                      placeholder="abcd efgh ijkl mnop"
+                      value={wpPass}
+                      onChange={(e) => setWpPass(e.target.value)}
+                      className="text-xs"
+                    />
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-between pt-2">
+                  <Button
+                    size="sm"
+                    onClick={() => handleSaveIntegration("wordpress")}
+                    disabled={createIntegration.isPending}
+                    className="h-8 text-xs"
+                  >
+                    {t("integrations.saveConfig")}
+                  </Button>
+                  {activeIntegration && (
+                    <div className="flex items-center gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleTestIntegration(activeIntegration.id)}
+                        disabled={testIntegration.isPending}
+                        className="h-8 text-xs"
+                      >
+                        <RefreshCw
+                          className={`me-1 h-3 w-3 ${testIntegration.isPending ? "animate-spin" : ""}`}
+                        />
+                        {t("integrations.testConnection")}
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => deleteIntegration.mutate(activeIntegration.id)}
+                        disabled={deleteIntegration.isPending}
+                        className="text-destructive hover:bg-destructive/10 h-8 text-xs"
+                        title={t("integrations.disconnect") ?? "Disconnect"}
+                      >
+                        <Trash2 className="h-3.5 w-3.5" />
+                      </Button>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Shopify Tab */}
+          {deepPlatformTab === "shopify" && (
+            <div className="space-y-4">
+              <div>
+                <h4 className="text-sm font-semibold">Shopify GraphQL Admin & App Embed</h4>
+                <p className="text-muted-foreground text-xs">
+                  Native SEO fields for products/pages + server-side JSON-LD via app metafields and
+                  Liquid theme app embed.
+                </p>
+              </div>
+
+              <div className="border-border bg-muted/20 space-y-3 rounded-lg border p-4">
+                <div className="space-y-1">
+                  <label className="text-muted-foreground text-xs font-medium">
+                    Store Domain (myshopify.com)
+                  </label>
+                  <Input
+                    placeholder="my-store.myshopify.com"
+                    value={shopifyDomain}
+                    onChange={(e) => setShopifyDomain(e.target.value)}
+                    className="text-xs"
+                  />
+                </div>
+                <div className="space-y-1">
+                  <label className="text-muted-foreground text-xs font-medium">
+                    Admin API Access Token
+                  </label>
+                  <Input
+                    type="password"
+                    placeholder="shpat_..."
+                    value={shopifyToken}
+                    onChange={(e) => setShopifyToken(e.target.value)}
+                    className="text-xs"
+                  />
+                </div>
+
+                <div className="flex items-center justify-between pt-2">
+                  <Button
+                    size="sm"
+                    onClick={() => handleSaveIntegration("shopify")}
+                    disabled={createIntegration.isPending}
+                    className="h-8 text-xs"
+                  >
+                    {t("integrations.saveConfig")}
+                  </Button>
+                  {activeIntegration && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleTestIntegration(activeIntegration.id)}
+                      disabled={testIntegration.isPending}
+                      className="h-8 text-xs"
+                    >
+                      {t("integrations.testConnection")}
+                    </Button>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Next.js & React SDK Tab */}
+          {deepPlatformTab === "nextjs" && (
+            <div className="space-y-4">
+              <div>
+                <h4 className="text-sm font-semibold">@quardlink/sdk for Next.js & React</h4>
+                <p className="text-muted-foreground text-xs">
+                  First-class server-side rendering for App Router metadata and JSON-LD schema
+                  components. Fail-open with stale-while-revalidate caching.
+                </p>
+              </div>
+
+              <div className="space-y-3">
+                <div className="border-border bg-muted/20 rounded-lg border p-3.5">
+                  <span className="text-muted-foreground text-xs font-semibold">
+                    1. Install Package
+                  </span>
+                  <pre className="border-border bg-muted/60 mt-2 overflow-auto rounded-md border p-2.5 font-mono text-xs select-all">
+                    npm install @quardlink/sdk
+                  </pre>
+                </div>
+
+                <div className="border-border bg-muted/20 rounded-lg border p-3.5">
+                  <span className="text-muted-foreground text-xs font-semibold">
+                    2. App Router generateMetadata &amp; Schema Component
+                  </span>
+                  <pre className="border-border bg-muted/60 mt-2 overflow-auto rounded-md border p-2.5 font-mono text-xs select-all">
+                    {`import { getQuardLinkMetadata, QuardLinkSchema } from "@quardlink/sdk";
+
+export async function generateMetadata() {
+  return await getQuardLinkMetadata({
+    siteKey: "${currentSite?.site_key ?? "YOUR_SITE_KEY"}",
+    url: "https://${currentSite?.domain ?? "example.com"}/",
+    defaultMetadata: { title: "Home" },
+  });
+}
+
+export default function Page() {
+  return (
+    <>
+      <QuardLinkSchema siteKey="${currentSite?.site_key ?? "YOUR_SITE_KEY"}" url="https://${currentSite?.domain ?? "example.com"}/" />
+      <main>Page Content</main>
+    </>
+  );
+}`}
+                  </pre>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* GitHub Tab */}
+          {deepPlatformTab === "github" && (
+            <div className="space-y-4">
+              <div>
+                <h4 className="text-sm font-semibold">Automated GitHub Pull Requests</h4>
+                <p className="text-muted-foreground text-xs">
+                  QuardLink patches target pages/components on an isolated branch and opens a Pull
+                  Request for your engineering team to review and merge.
+                </p>
+              </div>
+
+              <div className="border-border bg-muted/20 space-y-3 rounded-lg border p-4">
+                <div className="grid gap-3 sm:grid-cols-3">
+                  <div className="space-y-1">
+                    <label className="text-muted-foreground text-xs font-medium">
+                      Repository Owner
+                    </label>
+                    <Input
+                      placeholder="acme-corp"
+                      value={ghOwner}
+                      onChange={(e) => setGhOwner(e.target.value)}
+                      className="text-xs"
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <label className="text-muted-foreground text-xs font-medium">
+                      Repository Name
+                    </label>
+                    <Input
+                      placeholder="website"
+                      value={ghRepo}
+                      onChange={(e) => setGhRepo(e.target.value)}
+                      className="text-xs"
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <label className="text-muted-foreground text-xs font-medium">Base Branch</label>
+                    <Input
+                      placeholder="main"
+                      value={ghBranch}
+                      onChange={(e) => setGhBranch(e.target.value)}
+                      className="text-xs"
+                    />
+                  </div>
+                </div>
+                <div className="space-y-1">
+                  <label className="text-muted-foreground text-xs font-medium">
+                    Personal Access Token (contents:write, pull_requests:write)
+                  </label>
+                  <Input
+                    type="password"
+                    placeholder="ghp_..."
+                    value={ghToken}
+                    onChange={(e) => setGhToken(e.target.value)}
+                    className="text-xs"
+                  />
+                </div>
+
+                <div className="flex items-center justify-between pt-2">
+                  <Button
+                    size="sm"
+                    onClick={() => handleSaveIntegration("github")}
+                    disabled={createIntegration.isPending}
+                    className="h-8 text-xs"
+                  >
+                    {t("integrations.saveConfig")}
+                  </Button>
+                  {activeIntegration && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleTestIntegration(activeIntegration.id)}
+                      disabled={testIntegration.isPending}
+                      className="h-8 text-xs"
+                    >
+                      {t("integrations.testConnection")}
+                    </Button>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Cloudflare Tab */}
+          {deepPlatformTab === "cloudflare" && (
+            <div className="space-y-4">
+              <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                  <h4 className="text-sm font-semibold">Cloudflare Edge Worker (HTMLRewriter)</h4>
+                  <p className="text-muted-foreground text-xs">
+                    Intercepts HTML responses on route <code>/*</code> and injects approved metadata
+                    and schema server-side with fail-open safety.
+                  </p>
+                </div>
+                <Button variant="outline" size="sm" asChild className="h-8 shrink-0 text-xs">
+                  <a href={`/api/sites/${siteId}/integrations/cloudflare/worker.js`} download>
+                    <Download className="me-1 h-3.5 w-3.5" />
+                    {t("integrations.downloadWorker")}
+                  </a>
+                </Button>
+              </div>
+
+              <div className="border-border bg-muted/20 rounded-lg border p-4">
+                <p className="text-muted-foreground text-xs leading-relaxed">
+                  Deploy this worker to your Cloudflare zone route (e.g. <code>example.com/*</code>
+                  ). It caches approved fixes at the edge and passes through origin responses
+                  untouched if any network issue occurs.
+                </p>
+              </div>
+            </div>
+          )}
+
+          {/* Google Search Console Tab */}
+          {deepPlatformTab === "google_search_console" && (
+            <div className="space-y-4">
+              <div>
+                <h4 className="text-sm font-semibold">Google Search Console Integration</h4>
+                <p className="text-muted-foreground text-xs">
+                  Sync Google search performance metrics (clicks, impressions, position) and
+                  automatically verify site domain ownership.
+                </p>
+              </div>
+
+              <div className="border-border bg-muted/20 space-y-4 rounded-lg border p-4">
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                  <div className="space-y-1">
+                    <span className="text-xs font-medium">Search Console Property</span>
+                    <Input
+                      placeholder={currentSite?.homepage_url || "https://example.com/"}
+                      value={gscProperty}
+                      onChange={(e) => setGscProperty(e.target.value)}
+                      className="text-xs"
+                    />
+                  </div>
+                  <Button
+                    size="sm"
+                    onClick={handleConnectGsc}
+                    disabled={connectGsc.isPending}
+                    className="h-9 self-end text-xs"
+                  >
+                    <Plug className="me-1.5 h-3.5 w-3.5" />
+                    {t("integrations.connectGsc")}
+                  </Button>
+                </div>
+
+                {gscInteg && (
+                  <Badge variant="success" className="text-xs">
+                    <CheckCircle2 className="me-1 h-3.5 w-3.5" />
+                    {t("integrations.gscVerifiedOwner")}
+                  </Badge>
+                )}
+
+                {gscPerformance.data && gscPerformance.data.rows?.length > 0 && (
+                  <div className="space-y-2 border-t pt-3">
+                    <span className="text-xs font-semibold">
+                      {t("integrations.gscPerformance")}
+                    </span>
+                    <div className="border-border divide-border bg-card divide-y rounded-md border text-xs">
+                      {gscPerformance.data.rows.slice(0, 5).map((row, idx) => (
+                        <div key={idx} className="flex items-center justify-between p-2.5">
+                          <span className="text-foreground font-medium">
+                            {row.keys?.[0] || "Query"}
+                          </span>
+                          <div className="text-muted-foreground flex items-center gap-4">
+                            <span>{row.clicks} clicks</span>
+                            <span>{row.impressions} impr</span>
+                            <span>Pos: {row.position?.toFixed(1)}</span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* 3. Universal JavaScript Snippet Card */}
       <Card>
         <CardHeader>
           <div className="flex items-center gap-2">
@@ -318,309 +839,317 @@ export function IntegrationsPage() {
                 </pre>
               </div>
 
-              {/* Platform Guides Tabs */}
-              <div className="space-y-3">
-                <span className="text-muted-foreground text-xs font-semibold">
-                  {t("integrations.platformGuide")}
-                </span>
-                <div className="flex flex-wrap gap-1.5">
-                  {Object.keys(snippetInfo.data.instructions).map((platform) => (
-                    <Button
-                      key={platform}
-                      variant={selectedPlatform === platform ? "default" : "outline"}
-                      size="sm"
-                      className="h-7 text-xs capitalize"
-                      onClick={() => setSelectedPlatform(platform)}
-                    >
-                      {platform}
-                    </Button>
-                  ))}
+              {/* Notice for JS limitations with AI Bots */}
+              <div className="border-border space-y-1.5 rounded-lg border border-amber-500/20 bg-amber-500/10 p-3 text-xs text-amber-900 dark:text-amber-200">
+                <p className="flex items-center gap-1.5 font-semibold">
+                  <AlertTriangle className="h-3.5 w-3.5" />
+                  Crawler Capability Note
+                </p>
+                <p className="leading-relaxed">
+                  The client-side JavaScript snippet works for browser visitors and Googlebot, but
+                  some LLM crawlers (GPTBot, PerplexityBot, ClaudeBot) do not execute heavy
+                  client-side JavaScript. For complete AI search optimization, use our WordPress
+                  plugin, Shopify app embed, Next.js SDK, or Cloudflare worker above.
+                </p>
+              </div>
+
+              {/* Platform specific instructions */}
+              <div className="border-border bg-muted/20 space-y-3 rounded-lg border p-4">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-semibold">{t("integrations.platformGuide")}</span>
+                  <select
+                    value={selectedPlatform}
+                    onChange={(e) => setSelectedPlatform(e.target.value)}
+                    className="border-input bg-background focus-visible:ring-ring rounded-md border px-2.5 py-1 text-xs focus-visible:ring-1 focus-visible:outline-none"
+                  >
+                    <option value="wordpress">WordPress</option>
+                    <option value="shopify">Shopify</option>
+                    <option value="nextjs">Next.js</option>
+                    <option value="wix">Wix</option>
+                    <option value="webflow">Webflow</option>
+                    <option value="salla">Salla</option>
+                    <option value="custom">Custom / Static</option>
+                  </select>
                 </div>
-                <div className="border-border bg-muted/20 text-foreground rounded-lg border p-3.5 text-xs leading-relaxed">
-                  {snippetInfo.data.instructions[selectedPlatform]}
-                </div>
+
+                <p className="text-muted-foreground text-xs leading-relaxed">
+                  {snippetInfo.data.instructions[selectedPlatform] ??
+                    snippetInfo.data.instructions["custom"]}
+                </p>
               </div>
             </>
           )}
         </CardContent>
       </Card>
 
-      {/* 3. API Keys & Webhooks Section */}
-      <div className="grid gap-6 md:grid-cols-2">
-        {/* API Keys Card */}
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
-            <div>
-              <div className="flex items-center gap-1.5">
-                <Key className="h-4 w-4 text-emerald-600" />
-                <CardTitle className="text-sm font-semibold">
-                  {t("integrations.apiKeysTitle")}
-                </CardTitle>
-              </div>
-              <CardDescription className="mt-1 text-xs">
-                {t("integrations.apiKeysDesc")}
-              </CardDescription>
+      {/* 4. Organization API Keys Card */}
+      <Card>
+        <CardHeader>
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex items-center gap-2">
+              <Key className="h-5 w-5 text-amber-600" />
+              <CardTitle className="text-base font-semibold">
+                {t("integrations.apiKeysTitle")}
+              </CardTitle>
             </div>
-            <Button size="sm" variant="outline" onClick={() => setShowKeyModal(true)}>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                setCreatedKeyData(null);
+                setShowKeyModal(true);
+              }}
+              className="w-fit"
+            >
               <Plus className="me-1 h-3.5 w-3.5" />
               {t("integrations.createApiKey")}
             </Button>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            {apiKeys.isPending && <PageLoader />}
-            {apiKeys.data?.length === 0 && (
-              <p className="text-muted-foreground py-4 text-center text-xs">
-                No API keys created yet.
-              </p>
-            )}
-            {apiKeys.data?.map((k) => (
-              <div
-                key={k.id}
-                className="border-border flex items-center justify-between rounded-md border p-2.5 text-xs"
-              >
-                <div>
-                  <div className="text-foreground font-semibold">{k.name}</div>
-                  <div className="text-muted-foreground font-mono text-[11px]">
-                    {k.prefix}••••••••
-                  </div>
-                  <div className="mt-1 flex gap-1">
-                    {k.scopes.map((s) => (
-                      <Badge key={s} variant="outline" className="px-1 py-0 text-[10px]">
-                        {s}
-                      </Badge>
-                    ))}
-                  </div>
-                </div>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => deleteApiKey.mutate(k.id)}
-                  disabled={deleteApiKey.isPending}
-                  className="text-destructive hover:bg-destructive/10 h-7 w-7 p-0"
-                >
-                  <Trash2 className="h-3.5 w-3.5" />
-                </Button>
-              </div>
-            ))}
-          </CardContent>
-        </Card>
+          </div>
+          <CardDescription className="text-xs">{t("integrations.apiKeysDesc")}</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {apiKeys.isPending && <PageLoader />}
+          {apiKeys.isError && (
+            <ErrorState error={apiKeys.error} onRetry={() => void apiKeys.refetch()} />
+          )}
 
-        {/* Webhooks Card */}
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
-            <div>
-              <div className="flex items-center gap-1.5">
-                <Webhook className="h-4 w-4 text-purple-600" />
-                <CardTitle className="text-sm font-semibold">
-                  {t("integrations.webhooksTitle")}
-                </CardTitle>
-              </div>
-              <CardDescription className="mt-1 text-xs">
-                {t("integrations.webhooksDesc")}
-              </CardDescription>
+          {apiKeys.data && apiKeys.data.length === 0 && (
+            <p className="text-muted-foreground text-xs">No active API keys found.</p>
+          )}
+
+          {apiKeys.data && apiKeys.data.length > 0 && (
+            <div className="border-border divide-border divide-y rounded-md border">
+              {apiKeys.data.map((k) => (
+                <div key={k.id} className="flex items-center justify-between p-3 text-xs">
+                  <div className="space-y-0.5">
+                    <span className="text-foreground font-semibold">{k.name}</span>
+                    <div className="text-muted-foreground flex items-center gap-2 font-mono">
+                      <span>{k.prefix}...</span>
+                      <span>•</span>
+                      <span>{k.scopes.join(", ")}</span>
+                    </div>
+                  </div>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => deleteApiKey.mutate(k.id)}
+                    disabled={deleteApiKey.isPending}
+                    className="text-destructive hover:bg-destructive/10 h-7 text-xs"
+                  >
+                    <Trash2 className="h-3.5 w-3.5" />
+                  </Button>
+                </div>
+              ))}
             </div>
-            <Button size="sm" variant="outline" onClick={() => setShowWebhookModal(true)}>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* 5. Webhooks Card */}
+      <Card>
+        <CardHeader>
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex items-center gap-2">
+              <Webhook className="h-5 w-5 text-emerald-600" />
+              <CardTitle className="text-base font-semibold">
+                {t("integrations.webhooksTitle")}
+              </CardTitle>
+            </div>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setShowWebhookModal(true)}
+              className="w-fit"
+            >
               <Plus className="me-1 h-3.5 w-3.5" />
               {t("integrations.addWebhook")}
             </Button>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            {webhooks.isPending && <PageLoader />}
-            {webhooks.data?.length === 0 && (
-              <p className="text-muted-foreground py-4 text-center text-xs">
-                No webhooks configured yet.
-              </p>
-            )}
-            {webhooks.data?.map((wh) => (
-              <div
-                key={wh.id}
-                className="border-border flex items-center justify-between rounded-md border p-2.5 text-xs"
-              >
-                <div className="max-w-[240px] truncate">
-                  <div className="text-foreground truncate font-semibold">{wh.url}</div>
-                  <div className="text-muted-foreground mt-0.5 text-[11px]">
-                    Status: <span className="font-medium text-emerald-600">{wh.status}</span>
+          </div>
+          <CardDescription className="text-xs">{t("integrations.webhooksDesc")}</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {webhooks.isPending && <PageLoader />}
+          {webhooks.isError && (
+            <ErrorState error={webhooks.error} onRetry={() => void webhooks.refetch()} />
+          )}
+
+          {webhooks.data && webhooks.data.length === 0 && (
+            <p className="text-muted-foreground text-xs">No active webhooks configured.</p>
+          )}
+
+          {webhooks.data && webhooks.data.length > 0 && (
+            <div className="border-border divide-border divide-y rounded-md border">
+              {webhooks.data.map((wh) => (
+                <div key={wh.id} className="flex items-center justify-between p-3 text-xs">
+                  <div className="max-w-[80%] space-y-0.5">
+                    <span className="text-foreground block truncate font-mono font-semibold">
+                      {wh.url}
+                    </span>
+                    <div className="text-muted-foreground flex flex-wrap items-center gap-1.5">
+                      {wh.events.map((ev) => (
+                        <Badge key={ev} variant="outline" className="text-[10px]">
+                          {ev}
+                        </Badge>
+                      ))}
+                    </div>
                   </div>
-                  <div className="mt-1 flex flex-wrap gap-1">
-                    {wh.events.map((ev) => (
-                      <Badge key={ev} variant="outline" className="px-1 py-0 text-[10px]">
-                        {ev}
-                      </Badge>
-                    ))}
-                  </div>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => deleteWebhook.mutate(wh.id)}
+                    disabled={deleteWebhook.isPending}
+                    className="text-destructive hover:bg-destructive/10 h-7 text-xs"
+                  >
+                    <Trash2 className="h-3.5 w-3.5" />
+                  </Button>
                 </div>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => deleteWebhook.mutate(wh.id)}
-                  disabled={deleteWebhook.isPending}
-                  className="text-destructive hover:bg-destructive/10 h-7 w-7 shrink-0 p-0"
-                >
-                  <Trash2 className="h-3.5 w-3.5" />
-                </Button>
-              </div>
-            ))}
-          </CardContent>
-        </Card>
-      </div>
+              ))}
+            </div>
+          )}
+        </CardContent>
+      </Card>
 
       {/* Modal: Create API Key */}
       {showKeyModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-xs">
-          <Card className="w-full max-w-md shadow-xl">
-            <CardHeader>
-              <CardTitle className="text-base">{t("integrations.createApiKey")}</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div>
-                <label className="text-muted-foreground text-xs font-semibold">
-                  {t("integrations.keyName")}
-                </label>
-                <Input
-                  value={keyName}
-                  onChange={(e) => setKeyName(e.target.value)}
-                  placeholder="e.g. Next.js Production"
-                  className="mt-1 text-sm"
-                />
-              </div>
+        <div className="bg-background/80 fixed inset-0 z-50 flex items-center justify-center p-4 backdrop-blur-xs">
+          <div className="border-border bg-card w-full max-w-md space-y-4 rounded-xl border p-5 shadow-lg">
+            <h3 className="text-base font-semibold">{t("integrations.createApiKey")}</h3>
 
-              <div>
-                <label className="text-muted-foreground text-xs font-semibold">
-                  {t("integrations.scopes")}
-                </label>
-                <div className="mt-2 space-y-1.5 text-xs">
-                  {["fixes:read", "fixes:deploy", "*"].map((sc) => (
-                    <label key={sc} className="flex cursor-pointer items-center gap-2">
-                      <input
-                        type="checkbox"
-                        checked={keyScopes.includes(sc)}
-                        onChange={(e) => {
-                          if (e.target.checked) setKeyScopes([...keyScopes, sc]);
-                          else setKeyScopes(keyScopes.filter((s) => s !== sc));
-                        }}
-                        className="rounded"
-                      />
-                      <span>{sc}</span>
-                    </label>
-                  ))}
+            {!createdKeyData ? (
+              <div className="space-y-3">
+                <div className="space-y-1">
+                  <label className="text-muted-foreground text-xs font-medium">
+                    {t("integrations.keyName")}
+                  </label>
+                  <Input
+                    value={keyName}
+                    onChange={(e) => setKeyName(e.target.value)}
+                    placeholder="e.g. CI/CD Deployment Key"
+                    className="text-xs"
+                  />
+                </div>
+
+                <div className="space-y-1">
+                  <label className="text-muted-foreground text-xs font-medium">
+                    {t("integrations.scopes")}
+                  </label>
+                  <div className="flex flex-wrap gap-2">
+                    {["read:fixes", "write:fixes", "admin"].map((scope) => (
+                      <label key={scope} className="flex items-center gap-1.5 text-xs">
+                        <input
+                          type="checkbox"
+                          checked={keyScopes.includes(scope)}
+                          onChange={(e) => {
+                            if (e.target.checked) setKeyScopes([...keyScopes, scope]);
+                            else setKeyScopes(keyScopes.filter((s) => s !== scope));
+                          }}
+                        />
+                        <span>{scope}</span>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-end gap-2 pt-2">
+                  <Button variant="ghost" size="sm" onClick={() => setShowKeyModal(false)}>
+                    {t("common.cancel") ?? "Cancel"}
+                  </Button>
+                  <Button
+                    size="sm"
+                    onClick={handleCreateApiKey}
+                    disabled={createApiKey.isPending || !keyName.trim()}
+                  >
+                    {createApiKey.isPending ? "Creating..." : "Generate Key"}
+                  </Button>
                 </div>
               </div>
-
-              <div className="flex justify-end gap-2 pt-2">
-                <Button variant="ghost" size="sm" onClick={() => setShowKeyModal(false)}>
-                  Cancel
-                </Button>
-                <Button
-                  variant="default"
-                  size="sm"
-                  onClick={handleCreateApiKey}
-                  disabled={createApiKey.isPending || !keyName.trim()}
-                >
-                  Create Key
-                </Button>
+            ) : (
+              <div className="space-y-3">
+                <Alert tone="warning">
+                  <p className="text-xs font-semibold">{t("integrations.createdKeyNotice")}</p>
+                </Alert>
+                <div className="bg-muted/40 flex items-center justify-between rounded-md border p-2">
+                  <span className="font-mono text-xs break-all select-all">
+                    {createdKeyData.raw_key}
+                  </span>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="ms-2 h-7 shrink-0 text-xs"
+                    onClick={() => handleCopy("raw-key", createdKeyData.raw_key)}
+                  >
+                    {copiedKey === "raw-key" ? (
+                      <Check className="h-3 w-3 text-emerald-600" />
+                    ) : (
+                      <Copy className="h-3 w-3" />
+                    )}
+                  </Button>
+                </div>
+                <div className="flex justify-end pt-2">
+                  <Button size="sm" onClick={() => setShowKeyModal(false)}>
+                    {t("common.done") ?? "Done"}
+                  </Button>
+                </div>
               </div>
-            </CardContent>
-          </Card>
+            )}
+          </div>
         </div>
       )}
 
-      {/* Modal: Reveal Raw Key */}
-      {createdKeyData && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-xs">
-          <Card className="w-full max-w-md shadow-xl">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-1.5 text-base text-emerald-600">
-                <CheckCircle2 className="h-4 w-4" />
-                API Key Generated
-              </CardTitle>
-              <CardDescription className="text-xs">
-                {t("integrations.createdKeyNotice")}
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="border-border bg-muted/60 flex items-center justify-between rounded-md border p-2.5 font-mono text-xs">
-                <span className="truncate">{createdKeyData.raw_key}</span>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => handleCopy("raw-key", createdKeyData.raw_key)}
-                  className="ms-2 h-7 shrink-0"
-                >
-                  {copiedKey === "raw-key" ? (
-                    <Check className="h-3.5 w-3.5 text-emerald-600" />
-                  ) : (
-                    <Copy className="h-3.5 w-3.5" />
-                  )}
-                </Button>
-              </div>
-
-              <div className="flex justify-end pt-2">
-                <Button variant="default" size="sm" onClick={() => setCreatedKeyData(null)}>
-                  I have saved this key
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      )}
-
-      {/* Modal: Add Webhook */}
+      {/* Modal: Create Webhook */}
       {showWebhookModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-xs">
-          <Card className="w-full max-w-md shadow-xl">
-            <CardHeader>
-              <CardTitle className="text-base">{t("integrations.addWebhook")}</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div>
-                <label className="text-muted-foreground text-xs font-semibold">
+        <div className="bg-background/80 fixed inset-0 z-50 flex items-center justify-center p-4 backdrop-blur-xs">
+          <div className="border-border bg-card w-full max-w-md space-y-4 rounded-xl border p-5 shadow-lg">
+            <h3 className="text-base font-semibold">{t("integrations.addWebhook")}</h3>
+
+            <div className="space-y-3">
+              <div className="space-y-1">
+                <label className="text-muted-foreground text-xs font-medium">
                   {t("integrations.webhookUrl")}
                 </label>
                 <Input
                   value={webhookUrl}
                   onChange={(e) => setWebhookUrl(e.target.value)}
-                  placeholder="https://api.yourdomain.com/webhooks"
-                  className="mt-1 text-sm"
+                  placeholder="https://example.com/api/webhook"
+                  className="text-xs"
                 />
               </div>
 
-              <div>
-                <label className="text-muted-foreground text-xs font-semibold">
+              <div className="space-y-1">
+                <label className="text-muted-foreground text-xs font-medium">
                   {t("integrations.subscribedEvents")}
                 </label>
-                <div className="mt-2 space-y-1.5 text-xs">
-                  {["fix.created", "fix.approved", "fix.deployed"].map((ev) => (
-                    <label key={ev} className="flex cursor-pointer items-center gap-2">
+                <div className="flex flex-col gap-1.5">
+                  {["fix.proposed", "fix.approved", "fix.deployed"].map((event) => (
+                    <label key={event} className="flex items-center gap-1.5 text-xs">
                       <input
                         type="checkbox"
-                        checked={webhookEvents.includes(ev)}
+                        checked={webhookEvents.includes(event)}
                         onChange={(e) => {
-                          if (e.target.checked) setWebhookEvents([...webhookEvents, ev]);
-                          else setWebhookEvents(webhookEvents.filter((item) => item !== ev));
+                          if (e.target.checked) setWebhookEvents([...webhookEvents, event]);
+                          else setWebhookEvents(webhookEvents.filter((ev) => ev !== event));
                         }}
-                        className="rounded"
                       />
-                      <span>{ev}</span>
+                      <span>{event}</span>
                     </label>
                   ))}
                 </div>
               </div>
 
-              <div className="flex justify-end gap-2 pt-2">
+              <div className="flex items-center justify-end gap-2 pt-2">
                 <Button variant="ghost" size="sm" onClick={() => setShowWebhookModal(false)}>
-                  Cancel
+                  {t("common.cancel") ?? "Cancel"}
                 </Button>
                 <Button
-                  variant="default"
                   size="sm"
                   onClick={handleCreateWebhook}
                   disabled={createWebhook.isPending || !webhookUrl.trim()}
                 >
-                  Register Webhook
+                  {createWebhook.isPending ? "Adding..." : "Add Subscription"}
                 </Button>
               </div>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
         </div>
       )}
     </div>

@@ -1,8 +1,17 @@
 import uuid
 from datetime import datetime
 
-from sqlalchemy import ARRAY, DateTime, ForeignKey, Integer, String, Text
-from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy import (
+    ARRAY,
+    CheckConstraint,
+    DateTime,
+    ForeignKey,
+    Integer,
+    String,
+    Text,
+    UniqueConstraint,
+)
+from sqlalchemy.dialects.postgresql import JSONB, UUID
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app_core.db import Base
@@ -39,3 +48,28 @@ class Webhook(UUIDPk, OrgOwned, Timestamps, Base):
         DateTime(timezone=True), nullable=True
     )
     last_status_code: Mapped[int | None] = mapped_column(Integer, nullable=True)
+
+
+class SiteIntegration(UUIDPk, OrgOwned, Timestamps, Base):
+    __tablename__ = "site_integrations"
+    __table_args__ = (
+        UniqueConstraint("site_id", "provider", name="uq_site_integrations_site_provider"),
+        CheckConstraint(
+            "provider IN ('wordpress', 'shopify', 'github', 'cloudflare', 'google_search_console', 'webflow', 'wix')",
+            name="site_integration_provider",
+        ),
+        CheckConstraint(
+            "status IN ('active', 'error', 'pending', 'disconnected')",
+            name="site_integration_status",
+        ),
+    )
+
+    site_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("sites.id", ondelete="CASCADE"), index=True
+    )
+    provider: Mapped[str] = mapped_column(String(40), index=True)
+    status: Mapped[str] = mapped_column(String(20), default="active", server_default="active")
+    config: Mapped[dict] = mapped_column(JSONB, default=dict, server_default="{}")
+    credentials: Mapped[dict] = mapped_column(JSONB, default=dict, server_default="{}")
+    last_synced_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    last_error: Mapped[str | None] = mapped_column(Text, nullable=True)

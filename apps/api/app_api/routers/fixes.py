@@ -8,12 +8,13 @@ from fastapi import APIRouter, Query, Request
 from sqlalchemy import desc, select
 
 from app_api.deps import Admin, Member, Tenant, TenantDb, VerifiedUser
-from app_api.errors import not_found
+from app_api.errors import ApiError, not_found
 from app_api.ratelimit import client_ip
 from app_api.routers.sites import get_site
 from app_api.schemas.fixes import FixDeployIn, FixOut, FixUpdateIn
 from app_api.services import audit
-from app_core.models import Fix, Webhook
+from app_core.connectors import get_connector
+from app_core.models import Fix, Site, SiteIntegration, Webhook
 from app_core.tenancy import TenantContext, scoped
 
 router = APIRouter(prefix="/sites/{site_id}/fixes", tags=["fixes"])
@@ -159,6 +160,36 @@ def deploy_fix(
     fix = _get_site_fix(db, ctx, site_id, fix_id)
     if body.previous_state:
         fix.previous_state = body.previous_state
+
+    # Route through deep platform connector if applicable
+    connector = get_connector(body.deployed_via)
+    if connector:
+        site = db.scalar(scoped(select(Site), Site, ctx).where(Site.id == site_id))
+        integration = db.scalar(
+            scoped(select(SiteIntegration), SiteIntegration, ctx).where(
+                SiteIntegration.site_id == site_id,
+                SiteIntegration.provider == body.deployed_via,
+            )
+        )
+        config = integration.config if integration else {}
+        credentials = integration.credentials if integration else {}
+        deploy_res = connector.deploy_fix(
+            target_url=fix.target_url,
+            fix_type=fix.type,
+            title=fix.title,
+            payload=fix.payload,
+            config=config,
+            credentials=credentials,
+            site_key=site.site_key if site else "",
+            previous_state=body.previous_state or fix.previous_state,
+        )
+        if not deploy_res.ok:
+            raise ApiError(400, "deployment_failed", deploy_res.message)
+        if deploy_res.external_reference:
+            fix.external_reference = deploy_res.external_reference
+        if deploy_res.previous_state and not fix.previous_state:
+            fix.previous_state = deploy_res.previous_state
+
     fix.status = "deployed"
     fix.deployed_via = body.deployed_via
     fix.deployed_at = datetime.now(UTC)
@@ -171,7 +202,12 @@ def deploy_fix(
         actor_user_id=ctx.user_id,
         target_type="fix",
         target_id=fix.id,
-        data={"type": fix.type, "target_url": fix.target_url, "deployed_via": body.deployed_via},
+        data={
+            "type": fix.type,
+            "target_url": fix.target_url,
+            "deployed_via": body.deployed_via,
+            "external_reference": fix.external_reference,
+        },
         ip=client_ip(request),
     )
     db.commit()
@@ -188,6 +224,28 @@ def rollback_fix(
     db: TenantDb,
 ) -> Fix:
     fix = _get_site_fix(db, ctx, site_id, fix_id)
+
+    # Roll back on external platform if deployed via connector
+    if fix.deployed_via:
+        connector = get_connector(fix.deployed_via)
+        if connector:
+            integration = db.scalar(
+                scoped(select(SiteIntegration), SiteIntegration, ctx).where(
+                    SiteIntegration.site_id == site_id,
+                    SiteIntegration.provider == fix.deployed_via,
+                )
+            )
+            config = integration.config if integration else {}
+            credentials = integration.credentials if integration else {}
+            connector.rollback_fix(
+                target_url=fix.target_url,
+                fix_type=fix.type,
+                external_reference=fix.external_reference,
+                previous_state=fix.previous_state,
+                config=config,
+                credentials=credentials,
+            )
+
     fix.status = "rolled_back"
     audit.record(
         db,

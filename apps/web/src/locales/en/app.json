@@ -175,8 +175,23 @@
     "addWebhook": "Add Webhook",
     "webhookUrl": "Webhook URL",
     "subscribedEvents": "Subscribed Events",
-    "delete": "Delete"
+    "delete": "Delete",
+    "deepIntegrationsTitle": "Deep Platform Integrations",
+    "deepIntegrationsDesc": "Directly apply fixes using native platform APIs, WordPress plugin, Shopify App Embed, GitHub Pull Requests, or Cloudflare Edge Worker.",
+    "connected": "Connected",
+    "disconnected": "Not Connected",
+    "testConnection": "Test Connection",
+    "testing": "Testing...",
+    "connect": "Connect",
+    "disconnect": "Disconnect",
+    "downloadPlugin": "Download WordPress Plugin (.zip)",
+    "downloadWorker": "Download Worker Script (.js)",
+    "connectGsc": "Connect Google Search Console",
+    "gscVerifiedOwner": "Site Ownership Verified via Google Search Console",
+    "gscPerformance": "Google Search Console Performance",
+    "saveConfig": "Save Configuration"
   },
+
   "diagnosis": {
     "button": "Diagnose Gaps",
     "diagnosing": "Diagnosing...",

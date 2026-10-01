@@ -143,7 +143,8 @@ def test_password_reset_is_single_use_and_revokes_sessions(app, outbox):
         ).status_code
         == 400
     )
-    assert acct.client.post("/auth/refresh").status_code == 401  # old sessions revoked
+    # old sessions revoked
+    assert acct.client.post("/auth/refresh").status_code == 401
     assert (
         anon.post(
             "/auth/login", json={"email": "reset@example.com", "password": "a-brand-new-password"}
