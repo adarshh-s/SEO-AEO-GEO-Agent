@@ -1,4 +1,4 @@
-import { FileSearch, FileText, Plug, Wrench } from "lucide-react";
+import { FileSearch, FileText } from "lucide-react";
 import { createBrowserRouter, Navigate } from "react-router";
 import { AppShell } from "@/components/layout/app-shell";
 import { PublicLayout } from "@/components/layout/public-layout";
@@ -25,6 +25,8 @@ import { SiteDetailPage } from "@/features/sites/site-detail-page";
 import { SitesPage } from "@/features/sites/sites-page";
 import { KeywordsPage } from "@/features/keywords/keywords-page";
 import { AiVisibilityPage } from "@/features/ai-visibility/ai-visibility-page";
+import { FixesPage } from "@/features/fixes/fixes-page";
+import { IntegrationsPage as AppIntegrationsPage } from "@/features/integrations/integrations-page";
 import { RedirectIfAuthed, RequireAuth, RequirePlatformAdmin } from "./guards";
 
 export const routes = [
@@ -63,10 +65,10 @@ export const routes = [
           { path: "onboarding", element: <OnboardingPage /> },
           { path: "keywords", element: <KeywordsPage /> },
           { path: "ai-visibility", element: <AiVisibilityPage /> },
-          { path: "fixes", element: <PlaceholderPage section="fixes" icon={Wrench} /> },
+          { path: "fixes", element: <FixesPage /> },
           { path: "audits", element: <PlaceholderPage section="audits" icon={FileSearch} /> },
           { path: "reports", element: <PlaceholderPage section="reports" icon={FileText} /> },
-          { path: "integrations", element: <PlaceholderPage section="integrations" icon={Plug} /> },
+          { path: "integrations", element: <AppIntegrationsPage /> },
           { path: "sites", element: <SitesPage /> },
           { path: "sites/:siteId", element: <SiteDetailPage /> },
           { path: "settings", element: <SettingsPage /> },

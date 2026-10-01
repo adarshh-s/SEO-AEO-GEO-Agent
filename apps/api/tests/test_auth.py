@@ -111,7 +111,7 @@ def _token_from(text: str) -> str:
 
 
 def test_email_verification(app, outbox):
-    acct = signup(app)
+    acct = signup(app, verified=False)
     token = _token_from(outbox.outbox[-1].text)
     assert acct.client.get("/auth/me").json()["user"]["email_verified"] is False
     assert acct.client.post("/auth/verify-email", json={"token": token}).status_code == 200

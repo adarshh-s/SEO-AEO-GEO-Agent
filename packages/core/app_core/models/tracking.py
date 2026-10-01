@@ -157,3 +157,19 @@ class VisibilityScore(UUIDPk, OrgOwned, Timestamps, Base):
     seo_score: Mapped[Decimal] = mapped_column(Numeric(5, 2), default=Decimal("0.0"))
     ai_share_of_voice: Mapped[Decimal] = mapped_column(Numeric(5, 2), default=Decimal("0.0"))
     per_engine: Mapped[dict] = mapped_column(JSONB, default=dict, server_default="{}")
+
+
+class AiReferralEvent(UUIDPk, OrgOwned, Timestamps, Base):
+    __tablename__ = "ai_referral_events"
+
+    site_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("sites.id", ondelete="CASCADE"), index=True
+    )
+    url: Mapped[str] = mapped_column(Text)
+    referrer_engine: Mapped[str] = mapped_column(
+        String(40), index=True
+    )  # chatgpt | perplexity | gemini | claude | other_ai
+    user_agent_category: Mapped[str | None] = mapped_column(String(40), nullable=True)
+    occurred_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=func.now(), index=True
+    )

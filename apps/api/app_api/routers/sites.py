@@ -5,7 +5,7 @@ import uuid
 from fastapi import APIRouter, Request
 from sqlalchemy import select
 
-from app_api.deps import Admin, Member, Tenant, TenantDb
+from app_api.deps import Admin, Member, Tenant, TenantDb, VerifiedUser
 from app_api.errors import not_found
 from app_api.ratelimit import client_ip
 from app_api.schemas.common import Ok
@@ -41,7 +41,9 @@ def list_sites(ctx: Tenant, db: TenantDb) -> list[Site]:
 
 
 @router.post("", response_model=SiteOut, status_code=201)
-def create_site(body: SiteCreateIn, request: Request, ctx: Admin, db: TenantDb) -> Site:
+def create_site(
+    body: SiteCreateIn, request: Request, ctx: Admin, db: TenantDb, _user: VerifiedUser
+) -> Site:
     site = site_service.create_site(db, ctx, body)
     audit.record(
         db,

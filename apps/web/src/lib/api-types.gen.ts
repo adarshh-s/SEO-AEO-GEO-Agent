@@ -770,6 +770,341 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/sites/{site_id}/fixes": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** List Fixes */
+    get: operations["list_fixes_sites__site_id__fixes_get"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/sites/{site_id}/fixes/{fix_id}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Read Fix */
+    get: operations["read_fix_sites__site_id__fixes__fix_id__get"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    /** Update Fix */
+    patch: operations["update_fix_sites__site_id__fixes__fix_id__patch"];
+    trace?: never;
+  };
+  "/sites/{site_id}/fixes/{fix_id}/approve": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Approve Fix */
+    post: operations["approve_fix_sites__site_id__fixes__fix_id__approve_post"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/sites/{site_id}/fixes/{fix_id}/reject": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Reject Fix */
+    post: operations["reject_fix_sites__site_id__fixes__fix_id__reject_post"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/sites/{site_id}/fixes/{fix_id}/deploy": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Deploy Fix */
+    post: operations["deploy_fix_sites__site_id__fixes__fix_id__deploy_post"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/sites/{site_id}/fixes/{fix_id}/rollback": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Rollback Fix */
+    post: operations["rollback_fix_sites__site_id__fixes__fix_id__rollback_post"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/sites/{site_id}/diagnose": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Trigger Diagnosis */
+    post: operations["trigger_diagnosis_sites__site_id__diagnose_post"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/sites/{site_id}/diagnoses/{diagnosis_id}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Read Diagnosis */
+    get: operations["read_diagnosis_sites__site_id__diagnoses__diagnosis_id__get"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/sites/{site_id}/diagnoses": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** List Diagnoses */
+    get: operations["list_diagnoses_sites__site_id__diagnoses_get"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/sites/{site_id}/verification": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Get Verification Status */
+    get: operations["get_verification_status_sites__site_id__verification_get"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/sites/{site_id}/verify": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Verify Site Ownership */
+    post: operations["verify_site_ownership_sites__site_id__verify_post"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/sites/{site_id}/integrations/snippet": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Get Site Snippet Info */
+    get: operations["get_site_snippet_info_sites__site_id__integrations_snippet_get"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/org/api-keys": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** List Api Keys */
+    get: operations["list_api_keys_org_api_keys_get"];
+    put?: never;
+    /** Create Api Key */
+    post: operations["create_api_key_org_api_keys_post"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/org/api-keys/{key_id}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post?: never;
+    /** Delete Api Key */
+    delete: operations["delete_api_key_org_api_keys__key_id__delete"];
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/org/webhooks": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** List Webhooks */
+    get: operations["list_webhooks_org_webhooks_get"];
+    put?: never;
+    /** Create Webhook */
+    post: operations["create_webhook_org_webhooks_post"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/org/webhooks/{webhook_id}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post?: never;
+    /** Delete Webhook */
+    delete: operations["delete_webhook_org_webhooks__webhook_id__delete"];
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/public/v1/agent.js": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Get Agent Script
+     * @description Serve the universal JavaScript snippet.
+     */
+    get: operations["get_agent_script_public_v1_agent_js_get"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/public/v1/fixes": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Get Public Fixes
+     * @description Read-only endpoint delivering approved/deployed fixes to client snippets and SDKs.
+     */
+    get: operations["get_public_fixes_public_v1_fixes_get"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/public/v1/telemetry/referral": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Record Ai Referral
+     * @description Cookieless endpoint recording traffic referred by AI answer engines.
+     */
+    post: operations["record_ai_referral_public_v1_telemetry_referral_post"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -930,6 +1265,63 @@ export interface components {
       /** Competitors */
       competitors: string[];
     };
+    /** ApiKeyCreateIn */
+    ApiKeyCreateIn: {
+      /** Name */
+      name: string;
+      /**
+       * Scopes
+       * @default [
+       *       "read:fixes",
+       *       "write:fixes"
+       *     ]
+       */
+      scopes: string[];
+    };
+    /** ApiKeyCreatedOut */
+    ApiKeyCreatedOut: {
+      /**
+       * Id
+       * Format: uuid
+       */
+      id: string;
+      /** Name */
+      name: string;
+      /** Prefix */
+      prefix: string;
+      /** Scopes */
+      scopes: string[];
+      /** Last Used At */
+      last_used_at: string | null;
+      /**
+       * Created At
+       * Format: date-time
+       */
+      created_at: string;
+      /** Raw Key */
+      raw_key: string;
+    };
+    /** ApiKeyOut */
+    ApiKeyOut: {
+      /**
+       * Id
+       * Format: uuid
+       */
+      id: string;
+      /** Name */
+      name: string;
+      /** Prefix */
+      prefix: string;
+      /** Scopes */
+      scopes: string[];
+      /** Last Used At */
+      last_used_at: string | null;
+      /**
+       * Created At
+       * Format: date-time
+       */
+      created_at: string;
+    };
     /** BulkKeywordsIn */
     BulkKeywordsIn: {
       /** Items */
@@ -1005,6 +1397,55 @@ export interface components {
        */
       fetched_at: string;
     };
+    /** DiagnosisOut */
+    DiagnosisOut: {
+      /**
+       * Id
+       * Format: uuid
+       */
+      id: string;
+      /**
+       * Site Id
+       * Format: uuid
+       */
+      site_id: string;
+      /** Target Type */
+      target_type: string;
+      /**
+       * Target Id
+       * Format: uuid
+       */
+      target_id: string;
+      /** Status */
+      status: string;
+      /** Findings */
+      findings: {
+        [key: string]: unknown;
+      };
+      /** Competitor Pages */
+      competitor_pages: {
+        [key: string]: unknown;
+      }[];
+      /** Error */
+      error: string | null;
+      /** Completed At */
+      completed_at: string | null;
+      /**
+       * Created At
+       * Format: date-time
+       */
+      created_at: string;
+    };
+    /** DiagnosisTriggerIn */
+    DiagnosisTriggerIn: {
+      /** Target Type */
+      target_type: string;
+      /**
+       * Target Id
+       * Format: uuid
+       */
+      target_id: string;
+    };
     /** EmailIn */
     EmailIn: {
       /**
@@ -1024,6 +1465,80 @@ export interface components {
        * @default neutral
        */
       sentiment: string;
+    };
+    /** FixDeployIn */
+    FixDeployIn: {
+      /**
+       * Deployed Via
+       * @default snippet
+       */
+      deployed_via: string;
+      /** Previous State */
+      previous_state?: {
+        [key: string]: unknown;
+      } | null;
+    };
+    /** FixOut */
+    FixOut: {
+      /**
+       * Id
+       * Format: uuid
+       */
+      id: string;
+      /**
+       * Site Id
+       * Format: uuid
+       */
+      site_id: string;
+      /** Diagnosis Id */
+      diagnosis_id: string | null;
+      /** Type */
+      type: string;
+      /** Target Url */
+      target_url: string;
+      /** Language */
+      language: string;
+      /** Title */
+      title: string;
+      /** Description */
+      description: string | null;
+      /** Payload */
+      payload: {
+        [key: string]: unknown;
+      };
+      /** Recommended Delivery */
+      recommended_delivery: string;
+      /** Status */
+      status: string;
+      /** Deployed Via */
+      deployed_via: string | null;
+      /** Deployed At */
+      deployed_at: string | null;
+      /** Previous State */
+      previous_state: {
+        [key: string]: unknown;
+      } | null;
+      /**
+       * Created At
+       * Format: date-time
+       */
+      created_at: string;
+      /**
+       * Updated At
+       * Format: date-time
+       */
+      updated_at: string;
+    };
+    /** FixUpdateIn */
+    FixUpdateIn: {
+      /** Title */
+      title?: string | null;
+      /** Description */
+      description?: string | null;
+      /** Payload */
+      payload?: {
+        [key: string]: unknown;
+      } | null;
     };
     /** HTTPValidationError */
     HTTPValidationError: {
@@ -1361,6 +1876,31 @@ export interface components {
       /** Last Checked At */
       last_checked_at?: string | null;
     };
+    /** PublicFixItem */
+    PublicFixItem: {
+      /**
+       * Id
+       * Format: uuid
+       */
+      id: string;
+      /** Type */
+      type: string;
+      /** Target Url */
+      target_url: string;
+      /** Payload */
+      payload: {
+        [key: string]: unknown;
+      };
+    };
+    /** PublicFixesResponse */
+    PublicFixesResponse: {
+      /** Site Key */
+      site_key: string;
+      /** Url */
+      url: string;
+      /** Fixes */
+      fixes: components["schemas"]["PublicFixItem"][];
+    };
     /** RankedKeywordOut */
     RankedKeywordOut: {
       /**
@@ -1593,6 +2133,21 @@ export interface components {
       /** Competitor Domains */
       competitor_domains?: string[] | null;
     };
+    /** SnippetInfoOut */
+    SnippetInfoOut: {
+      /** Site Key */
+      site_key: string;
+      /** Script Url */
+      script_url: string;
+      /** Snippet Tag */
+      snippet_tag: string;
+      /** Platform */
+      platform: string;
+      /** Instructions */
+      instructions: {
+        [key: string]: string;
+      };
+    };
     /** StatusIn */
     StatusIn: {
       /**
@@ -1636,6 +2191,15 @@ export interface components {
       language: string;
       /** Intent */
       intent: string;
+    };
+    /** TelemetryReferralIn */
+    TelemetryReferralIn: {
+      /** Site Key */
+      site_key: string;
+      /** Url */
+      url: string;
+      /** Referrer Engine */
+      referrer_engine: string;
     };
     /** TokenIn */
     TokenIn: {
@@ -1683,6 +2247,71 @@ export interface components {
       input?: unknown;
       /** Context */
       ctx?: Record<string, never>;
+    };
+    /** VerificationStatusOut */
+    VerificationStatusOut: {
+      /** Domain */
+      domain: string;
+      /** Verified */
+      verified: boolean;
+      /** Verified At */
+      verified_at: string | null;
+      /** Verification Method */
+      verification_method: string | null;
+      /** Token */
+      token: string;
+      /** Meta Tag */
+      meta_tag: string;
+      /** Dns Txt Record */
+      dns_txt_record: string;
+    };
+    /** VerifyAttemptOut */
+    VerifyAttemptOut: {
+      /** Verified */
+      verified: boolean;
+      /** Method */
+      method?: string | null;
+      /** Message */
+      message: string;
+    };
+    /** WebhookCreateIn */
+    WebhookCreateIn: {
+      /** Url */
+      url: string;
+      /**
+       * Events
+       * @default [
+       *       "fix.proposed",
+       *       "fix.approved",
+       *       "fix.deployed"
+       *     ]
+       */
+      events: string[];
+    };
+    /** WebhookOut */
+    WebhookOut: {
+      /**
+       * Id
+       * Format: uuid
+       */
+      id: string;
+      /** Url */
+      url: string;
+      /** Secret */
+      secret: string;
+      /** Events */
+      events: string[];
+      /** Status */
+      status: string;
+      /** Last Delivery At */
+      last_delivery_at: string | null;
+      /** Last Status Code */
+      last_status_code: number | null;
+      /**
+       * Created At
+       * Format: date-time
+       */
+      created_at: string;
     };
   };
   responses: never;
@@ -3451,6 +4080,747 @@ export interface operations {
         };
         content: {
           "application/json": components["schemas"]["SiteOverviewOut"];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  list_fixes_sites__site_id__fixes_get: {
+    parameters: {
+      query?: {
+        status?: string | null;
+        type?: string | null;
+        language?: string | null;
+      };
+      header?: {
+        "X-Org-Id"?: string | null;
+      };
+      path: {
+        site_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["FixOut"][];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  read_fix_sites__site_id__fixes__fix_id__get: {
+    parameters: {
+      query?: never;
+      header?: {
+        "X-Org-Id"?: string | null;
+      };
+      path: {
+        site_id: string;
+        fix_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["FixOut"];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  update_fix_sites__site_id__fixes__fix_id__patch: {
+    parameters: {
+      query?: never;
+      header?: {
+        "X-Org-Id"?: string | null;
+      };
+      path: {
+        site_id: string;
+        fix_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["FixUpdateIn"];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["FixOut"];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  approve_fix_sites__site_id__fixes__fix_id__approve_post: {
+    parameters: {
+      query?: never;
+      header?: {
+        "X-Org-Id"?: string | null;
+      };
+      path: {
+        site_id: string;
+        fix_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["FixOut"];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  reject_fix_sites__site_id__fixes__fix_id__reject_post: {
+    parameters: {
+      query?: never;
+      header?: {
+        "X-Org-Id"?: string | null;
+      };
+      path: {
+        site_id: string;
+        fix_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["FixOut"];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  deploy_fix_sites__site_id__fixes__fix_id__deploy_post: {
+    parameters: {
+      query?: never;
+      header?: {
+        "X-Org-Id"?: string | null;
+      };
+      path: {
+        site_id: string;
+        fix_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["FixDeployIn"];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["FixOut"];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  rollback_fix_sites__site_id__fixes__fix_id__rollback_post: {
+    parameters: {
+      query?: never;
+      header?: {
+        "X-Org-Id"?: string | null;
+      };
+      path: {
+        site_id: string;
+        fix_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["FixOut"];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  trigger_diagnosis_sites__site_id__diagnose_post: {
+    parameters: {
+      query?: never;
+      header?: {
+        "X-Org-Id"?: string | null;
+      };
+      path: {
+        site_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["DiagnosisTriggerIn"];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      202: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["DiagnosisOut"];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  read_diagnosis_sites__site_id__diagnoses__diagnosis_id__get: {
+    parameters: {
+      query?: never;
+      header?: {
+        "X-Org-Id"?: string | null;
+      };
+      path: {
+        site_id: string;
+        diagnosis_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["DiagnosisOut"];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  list_diagnoses_sites__site_id__diagnoses_get: {
+    parameters: {
+      query?: never;
+      header?: {
+        "X-Org-Id"?: string | null;
+      };
+      path: {
+        site_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["DiagnosisOut"][];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  get_verification_status_sites__site_id__verification_get: {
+    parameters: {
+      query?: never;
+      header?: {
+        "X-Org-Id"?: string | null;
+      };
+      path: {
+        site_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["VerificationStatusOut"];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  verify_site_ownership_sites__site_id__verify_post: {
+    parameters: {
+      query?: never;
+      header?: {
+        "X-Org-Id"?: string | null;
+      };
+      path: {
+        site_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["VerifyAttemptOut"];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  get_site_snippet_info_sites__site_id__integrations_snippet_get: {
+    parameters: {
+      query?: never;
+      header?: {
+        "X-Org-Id"?: string | null;
+      };
+      path: {
+        site_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["SnippetInfoOut"];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  list_api_keys_org_api_keys_get: {
+    parameters: {
+      query?: never;
+      header?: {
+        "X-Org-Id"?: string | null;
+      };
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiKeyOut"][];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  create_api_key_org_api_keys_post: {
+    parameters: {
+      query?: never;
+      header?: {
+        "X-Org-Id"?: string | null;
+      };
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["ApiKeyCreateIn"];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiKeyCreatedOut"];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  delete_api_key_org_api_keys__key_id__delete: {
+    parameters: {
+      query?: never;
+      header?: {
+        "X-Org-Id"?: string | null;
+      };
+      path: {
+        key_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Ok"];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  list_webhooks_org_webhooks_get: {
+    parameters: {
+      query?: never;
+      header?: {
+        "X-Org-Id"?: string | null;
+      };
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["WebhookOut"][];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  create_webhook_org_webhooks_post: {
+    parameters: {
+      query?: never;
+      header?: {
+        "X-Org-Id"?: string | null;
+      };
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["WebhookCreateIn"];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["WebhookOut"];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  delete_webhook_org_webhooks__webhook_id__delete: {
+    parameters: {
+      query?: never;
+      header?: {
+        "X-Org-Id"?: string | null;
+      };
+      path: {
+        webhook_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Ok"];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  get_agent_script_public_v1_agent_js_get: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": unknown;
+        };
+      };
+    };
+  };
+  get_public_fixes_public_v1_fixes_get: {
+    parameters: {
+      query: {
+        /** @description The site's public key (qls_...) */
+        site_key: string;
+        /** @description The current page URL */
+        url: string;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["PublicFixesResponse"];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  record_ai_referral_public_v1_telemetry_referral_post: {
+    parameters: {
+      query?: never;
+      header?: {
+        "User-Agent"?: string | null;
+      };
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["TelemetryReferralIn"];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            [key: string]: boolean;
+          };
         };
       };
       /** @description Validation Error */

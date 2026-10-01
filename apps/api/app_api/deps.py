@@ -65,6 +65,18 @@ def get_current_user(request: Request, db: SystemDb) -> User:
 CurrentUser = Annotated[User, Depends(get_current_user)]
 
 
+def require_verified_email(user: CurrentUser) -> User:
+    """Enforce email verification before critical actions like site connect or fix deploy (Decision D24)."""
+    if not user.email_verified_at:
+        raise ApiError(
+            403, "email_not_verified", "Please verify your email address to perform this action."
+        )
+    return user
+
+
+VerifiedUser = Annotated[User, Depends(require_verified_email)]
+
+
 def get_tenant(
     user: CurrentUser,
     db: SystemDb,

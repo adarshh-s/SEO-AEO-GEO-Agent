@@ -9,7 +9,21 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
 from app_api.deps import CSRF_HEADER, ORG_HEADER
-from app_api.routers import admin, auth, health, onboarding, orgs, plans, sites, tracking
+from app_api.routers import (
+    admin,
+    auth,
+    diagnose,
+    fixes,
+    health,
+    integrations,
+    onboarding,
+    orgs,
+    plans,
+    public,
+    sites,
+    tracking,
+    verification,
+)
 from app_core.brand import PRODUCT_NAME
 from app_core.logging import configure_logging
 from app_core.settings import get_settings
@@ -62,7 +76,21 @@ def create_app() -> FastAPI:
             },
         )
 
-    for module in (health, auth, orgs, sites, onboarding, plans, admin, tracking):
+    for module in (
+        health,
+        auth,
+        orgs,
+        sites,
+        onboarding,
+        plans,
+        admin,
+        tracking,
+        fixes,
+        diagnose,
+        verification,
+        integrations,
+        public,
+    ):
         app.include_router(module.router)
     return app
 

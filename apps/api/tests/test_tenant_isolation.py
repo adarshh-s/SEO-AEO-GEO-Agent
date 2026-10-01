@@ -6,9 +6,12 @@ takes one), otherwise this test fails. That is intentional.
 """
 
 import re
+import uuid
 
 import pytest
 
+from app_core.db import system_session
+from app_core.models import Fix
 from conftest import SITE, make_client, set_plan, signup
 
 # Endpoints that are not org-scoped (auth, self, public). Everything else is tested.
@@ -28,6 +31,9 @@ NOT_TENANT_SCOPED = {
     "/orgs",
     "/invitations/accept",
     "/plans",
+    "/public/v1/agent.js",
+    "/public/v1/fixes",
+    "/public/v1/telemetry/referral",
 }
 PLATFORM_ADMIN_PREFIX = "/admin"
 
@@ -54,6 +60,18 @@ SAMPLE_BODIES = {
     ("POST", "/sites/{site_id}/prompts/{prompt_id}/check"): {},
     ("POST", "/sites/{site_id}/prompts/check-all"): {},
     ("POST", "/sites/{site_id}/crawl"): {},
+    ("PATCH", "/sites/{site_id}/fixes/{fix_id}"): {"title": "Updated Fix Title"},
+    ("POST", "/sites/{site_id}/fixes/{fix_id}/approve"): {},
+    ("POST", "/sites/{site_id}/fixes/{fix_id}/reject"): {},
+    ("POST", "/sites/{site_id}/fixes/{fix_id}/deploy"): {"deployed_via": "manual"},
+    ("POST", "/sites/{site_id}/fixes/{fix_id}/rollback"): {},
+    ("POST", "/sites/{site_id}/diagnose"): {
+        "target_type": "keyword",
+        "target_id": "00000000-0000-0000-0000-000000000000",
+    },
+    ("POST", "/sites/{site_id}/verify"): {},
+    ("POST", "/org/api-keys"): {"name": "Test Key", "scopes": ["*"]},
+    ("POST", "/org/webhooks"): {"url": "https://example.com/webhook", "events": ["fix.created"]},
 }
 
 
@@ -89,6 +107,43 @@ def world(app, outbox):
         "org_id": str(a.org_id),
         "plan_code": "growth",
     }
+    key = a.client.post("/org/api-keys", json={"name": "A secret key", "scopes": ["*"]}).json()
+    wh = a.client.post(
+        "/org/webhooks",
+        json={"url": "https://a-corp.com/webhook", "events": ["fix.created"]},
+    ).json()
+    diag = a.client.post(
+        f"/sites/{site['id']}/diagnose",
+        json={"target_type": "keyword", "target_id": ids["keyword_id"]},
+    ).json()
+
+    fix_id = uuid.uuid4()
+    with system_session() as session:
+        session.add(
+            Fix(
+                id=fix_id,
+                org_id=a.org_id,
+                site_id=uuid.UUID(site["id"]),
+                type="schema",
+                status="proposed",
+                language="en",
+                target_url=site["homepage_url"],
+                title="A secret schema fix",
+                description="A secret fix description",
+                payload={"type": "Organization"},
+            )
+        )
+        session.commit()
+
+    ids.update(
+        {
+            "key_id": key["id"],
+            "webhook_id": wh["id"],
+            "diagnosis_id": diag["id"],
+            "fix_id": str(fix_id),
+        }
+    )
+
     b = signup(app, email="mallory@b-corp.com", org_name="B Corp")
     set_plan(b.org_id, "growth")
     b_site = b.client.post("/sites", json={**SITE, "homepage_url": "b-own-site.com"}).json()
@@ -97,6 +152,8 @@ def world(app, outbox):
         "a-secret-site.com",
         "a secret keyword",
         "a secret prompt",
+        "a secret schema fix",
+        "https://a-corp.com/webhook",
         "alice@a-corp.com",
         "bob@a-corp.com",
         "pending@a-corp.com",
@@ -134,6 +191,10 @@ def test_every_endpoint_is_classified(app):
             "invitation_id",
             "org_id",
             "plan_code",
+            "fix_id",
+            "diagnosis_id",
+            "key_id",
+            "webhook_id",
         }
         assert params <= known, f"New path parameter in {path}: extend the isolation test"
 

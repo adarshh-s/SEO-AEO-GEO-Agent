@@ -2,6 +2,14 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { api } from "./api";
 import type {
   AdminOrgOut,
+  ApiKeyCreatedOut,
+  ApiKeyCreateIn,
+  ApiKeyOut,
+  DiagnosisOut,
+  DiagnosisTriggerIn,
+  FixDeployIn,
+  FixOut,
+  FixUpdateIn,
   InvitationOut,
   KeywordOut,
   MemberOut,
@@ -10,7 +18,12 @@ import type {
   PromptOut,
   SiteOut,
   SiteUpdateIn,
+  SnippetInfoOut,
   UserOut,
+  VerificationStatusOut,
+  VerifyAttemptOut,
+  WebhookCreateIn,
+  WebhookOut,
 } from "./api-types";
 import { useSession } from "@/stores/session";
 
@@ -222,6 +235,221 @@ export function useTriggerCrawl(siteId: string) {
     onSuccess: () => {
       void qc.invalidateQueries({ queryKey: ["crawl-latest"] });
       void qc.invalidateQueries({ queryKey: ["site"] });
+    },
+  });
+}
+
+// --- Phase 3: Fixes ---
+
+export function useFixes(
+  siteId: string | undefined,
+  filters?: { status?: string; type?: string; language?: string },
+) {
+  const org = useOrgKey();
+  const params = new URLSearchParams();
+  if (filters?.status && filters.status !== "all") params.set("status", filters.status);
+  if (filters?.type && filters.type !== "all") params.set("type", filters.type);
+  if (filters?.language && filters.language !== "all") params.set("language", filters.language);
+  const qs = params.toString() ? `?${params.toString()}` : "";
+
+  return useQuery({
+    queryKey: ["fixes", org, siteId, filters],
+    queryFn: () => api<FixOut[]>(`/sites/${siteId}/fixes${qs}`),
+    enabled: !!org && !!siteId,
+  });
+}
+
+export function useFix(siteId: string | undefined, fixId: string | undefined) {
+  const org = useOrgKey();
+  return useQuery({
+    queryKey: ["fix", org, siteId, fixId],
+    queryFn: () => api<FixOut>(`/sites/${siteId}/fixes/${fixId}`),
+    enabled: !!org && !!siteId && !!fixId,
+  });
+}
+
+export function useUpdateFix(siteId: string) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({ fixId, body }: { fixId: string; body: FixUpdateIn }) =>
+      api<FixOut>(`/sites/${siteId}/fixes/${fixId}`, { method: "PATCH", body }),
+    onSuccess: () => {
+      void qc.invalidateQueries({ queryKey: ["fixes"] });
+      void qc.invalidateQueries({ queryKey: ["fix"] });
+    },
+  });
+}
+
+export function useApproveFix(siteId: string) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (fixId: string) =>
+      api<FixOut>(`/sites/${siteId}/fixes/${fixId}/approve`, { method: "POST" }),
+    onSuccess: () => {
+      void qc.invalidateQueries({ queryKey: ["fixes"] });
+      void qc.invalidateQueries({ queryKey: ["fix"] });
+    },
+  });
+}
+
+export function useRejectFix(siteId: string) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (fixId: string) =>
+      api<FixOut>(`/sites/${siteId}/fixes/${fixId}/reject`, { method: "POST" }),
+    onSuccess: () => {
+      void qc.invalidateQueries({ queryKey: ["fixes"] });
+      void qc.invalidateQueries({ queryKey: ["fix"] });
+    },
+  });
+}
+
+export function useDeployFix(siteId: string) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({ fixId, body }: { fixId: string; body: FixDeployIn }) =>
+      api<FixOut>(`/sites/${siteId}/fixes/${fixId}/deploy`, { method: "POST", body }),
+    onSuccess: () => {
+      void qc.invalidateQueries({ queryKey: ["fixes"] });
+      void qc.invalidateQueries({ queryKey: ["fix"] });
+    },
+  });
+}
+
+export function useRollbackFix(siteId: string) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (fixId: string) =>
+      api<FixOut>(`/sites/${siteId}/fixes/${fixId}/rollback`, { method: "POST" }),
+    onSuccess: () => {
+      void qc.invalidateQueries({ queryKey: ["fixes"] });
+      void qc.invalidateQueries({ queryKey: ["fix"] });
+    },
+  });
+}
+
+// --- Phase 3: Diagnosis ---
+
+export function useDiagnoses(siteId: string | undefined) {
+  const org = useOrgKey();
+  return useQuery({
+    queryKey: ["diagnoses", org, siteId],
+    queryFn: () => api<DiagnosisOut[]>(`/sites/${siteId}/diagnoses`),
+    enabled: !!org && !!siteId,
+  });
+}
+
+export function useDiagnosis(siteId: string | undefined, diagnosisId: string | undefined) {
+  const org = useOrgKey();
+  return useQuery({
+    queryKey: ["diagnosis", org, siteId, diagnosisId],
+    queryFn: () => api<DiagnosisOut>(`/sites/${siteId}/diagnoses/${diagnosisId}`),
+    enabled: !!org && !!siteId && !!diagnosisId,
+  });
+}
+
+export function useTriggerDiagnosis(siteId: string) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (body: DiagnosisTriggerIn) =>
+      api<DiagnosisOut>(`/sites/${siteId}/diagnose`, { method: "POST", body }),
+    onSuccess: () => {
+      void qc.invalidateQueries({ queryKey: ["diagnoses"] });
+      void qc.invalidateQueries({ queryKey: ["fixes"] });
+    },
+  });
+}
+
+// --- Phase 3: Verification ---
+
+export function useVerification(siteId: string | undefined) {
+  const org = useOrgKey();
+  return useQuery({
+    queryKey: ["verification", org, siteId],
+    queryFn: () => api<VerificationStatusOut>(`/sites/${siteId}/verification`),
+    enabled: !!org && !!siteId,
+  });
+}
+
+export function useVerifySite(siteId: string) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: () => api<VerifyAttemptOut>(`/sites/${siteId}/verify`, { method: "POST" }),
+    onSuccess: () => {
+      void qc.invalidateQueries({ queryKey: ["verification"] });
+      void qc.invalidateQueries({ queryKey: ["site"] });
+      void qc.invalidateQueries({ queryKey: ["sites"] });
+    },
+  });
+}
+
+// --- Phase 3: Integrations & API Keys / Webhooks ---
+
+export function useSnippetInfo(siteId: string | undefined) {
+  const org = useOrgKey();
+  return useQuery({
+    queryKey: ["snippet-info", org, siteId],
+    queryFn: () => api<SnippetInfoOut>(`/sites/${siteId}/integrations/snippet`),
+    enabled: !!org && !!siteId,
+  });
+}
+
+export function useApiKeys() {
+  const org = useOrgKey();
+  return useQuery({
+    queryKey: ["api-keys", org],
+    queryFn: () => api<ApiKeyOut[]>("/org/api-keys"),
+    enabled: !!org,
+  });
+}
+
+export function useCreateApiKey() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (body: ApiKeyCreateIn) =>
+      api<ApiKeyCreatedOut>("/org/api-keys", { method: "POST", body }),
+    onSuccess: () => {
+      void qc.invalidateQueries({ queryKey: ["api-keys"] });
+    },
+  });
+}
+
+export function useDeleteApiKey() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (keyId: string) => api(`/org/api-keys/${keyId}`, { method: "DELETE" }),
+    onSuccess: () => {
+      void qc.invalidateQueries({ queryKey: ["api-keys"] });
+    },
+  });
+}
+
+export function useWebhooks() {
+  const org = useOrgKey();
+  return useQuery({
+    queryKey: ["webhooks", org],
+    queryFn: () => api<WebhookOut[]>("/org/webhooks"),
+    enabled: !!org,
+  });
+}
+
+export function useCreateWebhook() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (body: WebhookCreateIn) =>
+      api<WebhookOut>("/org/webhooks", { method: "POST", body }),
+    onSuccess: () => {
+      void qc.invalidateQueries({ queryKey: ["webhooks"] });
+    },
+  });
+}
+
+export function useDeleteWebhook() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (webhookId: string) => api(`/org/webhooks/${webhookId}`, { method: "DELETE" }),
+    onSuccess: () => {
+      void qc.invalidateQueries({ queryKey: ["webhooks"] });
     },
   });
 }

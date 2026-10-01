@@ -6,6 +6,7 @@ import {
   Minus,
   RefreshCw,
   Sparkles,
+  Wrench,
 } from "lucide-react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -15,6 +16,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { PageLoader } from "@/components/ui/spinner";
 import { EmptyState, ErrorState, PageHeader } from "@/components/ui/states";
+import { DiagnosisModal } from "@/features/diagnosis/diagnosis-modal";
 import type { RankedKeywordOut } from "@/lib/api-types";
 import { formatNumber } from "@/lib/i18n";
 import {
@@ -31,6 +33,7 @@ export function KeywordsPage() {
 
   const [selectedSiteId, setSelectedSiteId] = useState<string | null>(null);
   const [selectedLang, setSelectedLang] = useState<string>("all");
+  const [diagnosingItem, setDiagnosingItem] = useState<RankedKeywordOut | null>(null);
 
   const siteId = selectedSiteId ?? sites.data?.[0]?.id;
   const currentSite = sites.data?.find((s) => s.id === siteId);
@@ -152,6 +155,7 @@ export function KeywordsPage() {
                     key={k.id}
                     item={k}
                     onCheck={() => triggerCheck.mutate(k.id)}
+                    onDiagnose={() => setDiagnosingItem(k)}
                     isChecking={triggerCheck.isPending}
                   />
                 ))}
@@ -160,6 +164,17 @@ export function KeywordsPage() {
           </div>
         </Card>
       )}
+
+      {diagnosingItem && siteId && (
+        <DiagnosisModal
+          siteId={siteId}
+          targetType="keyword"
+          targetId={diagnosingItem.id}
+          targetText={diagnosingItem.keyword}
+          isOpen={true}
+          onClose={() => setDiagnosingItem(null)}
+        />
+      )}
     </div>
   );
 }
@@ -167,10 +182,12 @@ export function KeywordsPage() {
 function KeywordRow({
   item,
   onCheck,
+  onDiagnose,
   isChecking,
 }: {
   item: RankedKeywordOut;
   onCheck: () => void;
+  onDiagnose: () => void;
   isChecking: boolean;
 }) {
   const { t } = useTranslation("app");
@@ -272,15 +289,26 @@ function KeywordRow({
         )}
       </td>
       <td className="px-4 py-3 text-end">
-        <Button
-          size="sm"
-          variant="ghost"
-          aria-label={t("keywords.checkNow")}
-          disabled={isChecking}
-          onClick={onCheck}
-        >
-          <RefreshCw className={`size-3.5 ${isChecking ? "animate-spin" : ""}`} aria-hidden />
-        </Button>
+        <div className="flex items-center justify-end gap-1">
+          <Button
+            size="sm"
+            variant="ghost"
+            aria-label="Diagnose Gaps"
+            title="Diagnose on-page gaps"
+            onClick={onDiagnose}
+          >
+            <Wrench className="size-3.5 text-indigo-600" aria-hidden />
+          </Button>
+          <Button
+            size="sm"
+            variant="ghost"
+            aria-label={t("keywords.checkNow")}
+            disabled={isChecking}
+            onClick={onCheck}
+          >
+            <RefreshCw className={`size-3.5 ${isChecking ? "animate-spin" : ""}`} aria-hidden />
+          </Button>
+        </div>
       </td>
     </tr>
   );

@@ -16,3 +16,8 @@ def test_ping_runs_eagerly():
 def test_beat_schedule_tasks_are_registered():
     for entry in app.conf.beat_schedule.values():
         assert entry["task"] in app.tasks
+
+
+def test_phase3_tasks_registered():
+    assert "app_worker.tasks.diagnose.run_diagnosis" in app.tasks
+    assert "app_worker.tasks.webhooks.dispatch_webhook" in app.tasks

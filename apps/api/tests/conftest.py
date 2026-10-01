@@ -50,6 +50,11 @@ def database() -> Iterator[None]:
 
 
 TABLES_TO_RESET = [
+    "ai_referral_events",
+    "webhooks",
+    "api_keys",
+    "fixes",
+    "diagnoses",
     "usage_counters",
     "visibility_scores",
     "ai_checks",
@@ -136,7 +141,11 @@ def make_client(app):
 
 
 def signup(
-    app, email: str | None = None, org_name: str = "Acme", ui_language: str = "en"
+    app,
+    email: str | None = None,
+    org_name: str = "Acme",
+    ui_language: str = "en",
+    verified: bool = True,
 ) -> Account:
     client = make_client(app)
     email = email or f"user-{uuid.uuid4().hex[:8]}@example.com"
@@ -154,7 +163,18 @@ def signup(
     body = r.json()
     org_id = body["orgs"][0]["id"]
     client.headers.update({"X-CSRF-Token": body["csrf_token"], "X-Org-Id": org_id})
-    return Account(client, uuid.UUID(body["user"]["id"]), uuid.UUID(org_id), email)
+    user_id = uuid.UUID(body["user"]["id"])
+    if verified:
+        from datetime import UTC, datetime
+
+        from app_core.db import system_session
+        from app_core.models import User
+
+        with system_session() as db:
+            user = db.get(User, user_id)
+            if user:
+                user.email_verified_at = datetime.now(UTC)
+    return Account(client, user_id, uuid.UUID(org_id), email)
 
 
 @pytest.fixture

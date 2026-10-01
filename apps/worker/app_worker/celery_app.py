@@ -44,8 +44,10 @@ app.conf.update(
     },
 )
 import app_worker.tasks.crawl  # noqa: E402,F401
+import app_worker.tasks.diagnose  # noqa: E402,F401
 import app_worker.tasks.maintenance  # noqa: E402,F401
 import app_worker.tasks.tracking  # noqa: E402,F401
+import app_worker.tasks.webhooks  # noqa: E402,F401
 
 
 @worker_process_init.connect
