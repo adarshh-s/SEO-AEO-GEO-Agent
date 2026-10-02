@@ -2,7 +2,6 @@
 
 import uuid
 
-from celery import current_app
 from fastapi import APIRouter
 from sqlalchemy import desc, select
 
@@ -10,6 +9,7 @@ from app_api.deps import Member, Tenant, TenantDb
 from app_api.errors import not_found
 from app_api.routers.sites import get_site
 from app_api.schemas.diagnose import DiagnosisOut, DiagnosisTriggerIn
+from app_api.task_dispatcher import dispatch_task
 from app_core.models import AiPrompt, Diagnosis, Keyword
 from app_core.tenancy import scoped
 
@@ -54,7 +54,7 @@ def trigger_diagnosis(
     db.add(diag)
     db.commit()
 
-    current_app.send_task(
+    dispatch_task(
         "app_worker.tasks.diagnose.run_diagnosis",
         args=[str(diag.id)],
         queue="agents",

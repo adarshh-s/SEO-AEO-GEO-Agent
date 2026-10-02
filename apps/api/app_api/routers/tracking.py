@@ -3,7 +3,6 @@
 import uuid
 from datetime import UTC, datetime, timedelta
 
-from celery import current_app
 from fastapi import APIRouter
 from sqlalchemy import desc, select
 
@@ -22,6 +21,7 @@ from app_api.schemas.tracking import (
     RankingWinLossOut,
     SiteOverviewOut,
 )
+from app_api.task_dispatcher import dispatch_task
 from app_core.cost_guard import get_monthly_spend
 from app_core.models import (
     AiCheck,
@@ -118,7 +118,7 @@ def trigger_keyword_check(
     site_id: uuid.UUID, keyword_id: uuid.UUID, ctx: Member, db: TenantDb
 ) -> Ok:
     kw = _get_site_keyword(db, ctx, site_id, keyword_id)
-    current_app.send_task(
+    dispatch_task(
         "app_worker.tasks.tracking.run_keyword_rank_check",
         args=[str(kw.id)],
         queue="tracking",
@@ -135,7 +135,7 @@ def trigger_all_keyword_checks(site_id: uuid.UUID, ctx: Member, db: TenantDb) ->
         )
     ).all()
     for kw in keywords:
-        current_app.send_task(
+        dispatch_task(
             "app_worker.tasks.tracking.run_keyword_rank_check",
             args=[str(kw.id)],
             queue="tracking",
@@ -280,7 +280,7 @@ def get_prompt_runs(
 @router.post("/prompts/{prompt_id}/check", response_model=Ok)
 def trigger_prompt_check(site_id: uuid.UUID, prompt_id: uuid.UUID, ctx: Member, db: TenantDb) -> Ok:
     p = _get_site_prompt(db, ctx, site_id, prompt_id)
-    current_app.send_task(
+    dispatch_task(
         "app_worker.tasks.tracking.run_ai_prompt_check",
         args=[str(p.id)],
         queue="tracking",
@@ -297,7 +297,7 @@ def trigger_all_prompt_checks(site_id: uuid.UUID, ctx: Member, db: TenantDb) -> 
         )
     ).all()
     for p in prompts:
-        current_app.send_task(
+        dispatch_task(
             "app_worker.tasks.tracking.run_ai_prompt_check",
             args=[str(p.id)],
             queue="tracking",
@@ -340,7 +340,7 @@ def get_latest_crawl(site_id: uuid.UUID, ctx: Tenant, db: TenantDb) -> CrawlSnap
 @router.post("/crawl", response_model=Ok)
 def trigger_site_crawl(site_id: uuid.UUID, ctx: Member, db: TenantDb) -> Ok:
     site = get_site(db, ctx, site_id)
-    current_app.send_task(
+    dispatch_task(
         "app_worker.tasks.crawl.crawl_site",
         args=[str(site.id)],
         queue="crawl",

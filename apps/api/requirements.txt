@@ -1,0 +1,9 @@
+-e ../../packages/core
+fastapi>=0.115
+uvicorn[standard]>=0.32
+alembic>=1.14
+argon2-cffi>=23.1
+pyjwt[crypto]>=2.10
+httpx>=0.28
+redis>=5.2
+sentry-sdk[fastapi]>=2.19

@@ -1,6 +1,7 @@
 """FastAPI application."""
 
 import uuid
+from typing import Any
 
 import structlog
 from fastapi import FastAPI, Request
@@ -39,12 +40,29 @@ def _init_sentry(dsn: str | None, env: str) -> None:
     sentry_sdk.init(dsn=dsn, environment=env, traces_sample_rate=0.05, send_default_pii=False)
 
 
+class ApiPrefixMiddleware:
+    """ASGI middleware to strip /api prefix from request path when routed through Vercel."""
+
+    def __init__(self, app: Any) -> None:
+        self.app = app
+
+    async def __call__(self, scope: Any, receive: Any, send: Any) -> None:
+        if scope["type"] == "http":
+            path = scope.get("path", "")
+            if path.startswith("/api/"):
+                scope["path"] = path[4:]
+            elif path == "/api":
+                scope["path"] = "/"
+        await self.app(scope, receive, send)
+
+
 def create_app() -> FastAPI:
     s = get_settings()
     configure_logging(s.log_level, s.log_json)
     _init_sentry(s.sentry_dsn, s.env)
 
     app = FastAPI(title=f"{PRODUCT_NAME} API", version="0.1.0")
+    app.add_middleware(ApiPrefixMiddleware)
     app.add_middleware(
         CORSMiddleware,
         allow_origins=s.cors_origins,

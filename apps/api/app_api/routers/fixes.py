@@ -3,7 +3,6 @@
 import uuid
 from datetime import UTC, datetime
 
-from celery import current_app
 from fastapi import APIRouter, Query, Request
 from sqlalchemy import desc, select
 
@@ -13,6 +12,7 @@ from app_api.ratelimit import client_ip
 from app_api.routers.sites import get_site
 from app_api.schemas.fixes import FixDeployIn, FixOut, FixUpdateIn
 from app_api.services import audit
+from app_api.task_dispatcher import dispatch_task
 from app_core.connectors import get_connector
 from app_core.models import Fix, Site, SiteIntegration, Webhook
 from app_core.tenancy import TenantContext, scoped
@@ -35,7 +35,7 @@ def _dispatch_fix_webhooks(db: TenantDb, org_id: uuid.UUID, event: str, fix: Fix
     ).all()
     for wh in webhooks:
         if event in wh.events:
-            current_app.send_task(
+            dispatch_task(
                 "app_worker.tasks.webhooks.dispatch_webhook",
                 args=[
                     str(wh.id),

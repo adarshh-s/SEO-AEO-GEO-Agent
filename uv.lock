@@ -129,8 +129,10 @@ dependencies = [
     { name = "app-core" },
     { name = "beautifulsoup4" },
     { name = "celery", extra = ["redis"] },
+    { name = "fastapi" },
     { name = "requests" },
     { name = "sentry-sdk", extra = ["celery"] },
+    { name = "uvicorn", extra = ["standard"] },
 ]
 
 [package.metadata]
@@ -138,8 +140,10 @@ requires-dist = [
     { name = "app-core", editable = "packages/core" },
     { name = "beautifulsoup4", specifier = ">=4.12" },
     { name = "celery", extras = ["redis"], specifier = ">=5.4" },
+    { name = "fastapi", specifier = ">=0.115" },
     { name = "requests", specifier = ">=2.31" },
     { name = "sentry-sdk", extras = ["celery"], specifier = ">=2.19" },
+    { name = "uvicorn", extras = ["standard"], specifier = ">=0.32" },
 ]
 
 [[package]]

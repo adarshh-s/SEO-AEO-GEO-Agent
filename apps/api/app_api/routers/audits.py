@@ -59,11 +59,15 @@ def trigger_audit(
         db.refresh(audit_entry)
         return audit_entry
 
-    # Attempt to dispatch asynchronously via Celery; fallback to inline execution
+    # Attempt to dispatch asynchronously via HTTP worker or Celery; fallback to inline execution
     try:
-        from app_worker.tasks.audit import run_site_audit
+        from app_api.task_dispatcher import dispatch_task
 
-        run_site_audit.delay(str(audit_entry.id))
+        dispatch_task(
+            "app_worker.tasks.audit.run_site_audit",
+            args=[str(audit_entry.id)],
+            queue="default",
+        )
     except Exception:
         # Inline fallback for tests / environments without a live celery broker
         try:

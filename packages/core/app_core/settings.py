@@ -18,6 +18,7 @@ class Settings(BaseSettings):
     app_url: str = "http://localhost:5173"
     api_url: str = "http://localhost:8000"
     cdn_url: str = "http://localhost:8000/cdn"
+    worker_url: str | None = None
     # Comma-separated in env (NoDecode: don't try to parse it as JSON first).
     cors_origins: Annotated[list[str], NoDecode] = Field(
         default_factory=lambda: ["http://localhost:5173"]
