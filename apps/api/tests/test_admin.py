@@ -45,3 +45,59 @@ def test_admin_edits_trial_limits(app, account):
         == 422
     )
     assert account.client.get("/org").json()["plan"]["max_sites"] == 2
+
+
+def test_admin_cost_summary_and_org_costs(app, account):
+    from decimal import Decimal
+
+    from app_core.cost_guard import record_usage
+    from app_core.db import system_session
+
+    with system_session() as db:
+        record_usage(
+            db,
+            org_id=account.org_id,
+            category="ai_check",
+            provider="openai",
+            units=10,
+            cost_usd=Decimal("0.2500"),
+        )
+        record_usage(
+            db,
+            org_id=account.org_id,
+            category="serp",
+            provider="dataforseo",
+            units=5,
+            cost_usd=Decimal("0.0500"),
+        )
+        db.commit()
+
+    admin = signup(app, email="ops3@example.com")
+    make_platform_admin(admin.user_id)
+
+    # Summary
+    r = admin.client.get("/admin/costs/summary")
+    assert r.status_code == 200
+    data = r.json()
+    assert float(data["total_spend_usd"]) >= 0.30
+    assert "openai" in data["provider_breakdown"]
+    assert "dataforseo" in data["provider_breakdown"]
+    assert len(data["top_spending_orgs"]) >= 1
+
+    # Org Cost Details
+    r_detail = admin.client.get(f"/admin/orgs/{account.org_id}/costs")
+    assert r_detail.status_code == 200
+    detail = r_detail.json()
+    assert float(detail["current_spend_usd"]) >= 0.30
+    assert len(detail["counters"]) >= 2
+
+    # Reset Counters
+    r_reset = admin.client.post(f"/admin/orgs/{account.org_id}/reset-counters")
+    assert r_reset.status_code == 200
+    assert r_reset.json()["ok"] is True
+
+    # Audit logs
+    r_logs = admin.client.get("/admin/audit-logs")
+    assert r_logs.status_code == 200
+    logs = r_logs.json()
+    assert any(log["action"] == "admin.counters_reset" for log in logs)

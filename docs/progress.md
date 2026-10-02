@@ -1,6 +1,7 @@
 # Progress
 
 ## Phase 0: Plan (done 2026-09-29)
+
 - Spec saved as `CLAUDE.md`; claude-seo added as a pinned submodule (`ff87fce`).
 - `docs/claude-seo-mapping.md`, `docs/platforms/*.md`, `docs/architecture.md`, `docs/decisions.md`.
 - Review decisions recorded (D1–D20). **Payments moved to a final Phase 7** (no payment code
@@ -10,6 +11,7 @@
 ## Phase 1: Foundation (done 2026-09-29, awaiting review)
 
 **Built**
+
 - **Monorepo**: uv workspace (`packages/core` = `app_core`, `apps/api` = `app_api`,
   `apps/worker` = `app_worker`) + pnpm workspace (`apps/web`). Neutral internal names (D1).
 - **Brand**: `config/brand.json` (QuardLink) → `scripts/brand_sync.py` generates Python and TS
@@ -60,4 +62,46 @@ run yet (no GitHub remote).
 **Bugs found and fixed by the tests**: comma-separated `CORS_ORIGINS` crashed settings
 parsing; the overview redirected back to onboarding right after finishing (stale cache).
 
-## Phase 2: Crawling & tracking (not started)
+## Phase 2: Crawling & tracking (done)
+
+- Platform fingerprinting, raw vs rendered HTML scraping with Playwright, and robots.txt AI-bot detection.
+- SERP rank tracking via DataForSEO; AI visibility tracking across ChatGPT, Gemini, Claude, and Perplexity.
+- Normalization and brand detection (including Arabic normalization: diacritics, tatweel, letter unification).
+- Visibility scoring engine and scheduling via Celery Beat.
+- Per-org monthly cost guard with soft alert (80%), non-essential work pause (100%), and hard cap (120%).
+- Frontend dashboards for Overview, Keywords, AI Visibility, and Cost alerts.
+
+## Phase 3: Diagnose & fix (done)
+
+- Deterministic diff diagnostics comparing target pages with top competitor pages.
+- AI fix generator for schema (JSON-LD), meta tags, headings, content, and FAQ blocks in the target page's language.
+- Secure HTML & JSON sanitization pipeline (`nh3` allowlist, script escaping).
+- Fix lifecycle and review inbox (`draft -> approved -> deploying -> deployed | failed -> rolled_back`).
+- Universal JavaScript snippet with AI crawler visit analytics and edge caching.
+- Site ownership verification (meta tag, file placement, DNS TXT) and public API / webhooks.
+
+## Phase 4: Deep platform integrations (done)
+
+- Connectors and automatic delivery: WordPress plugin, Shopify App (theme app extension), Next.js / React SDK (`@quardlink/sdk`), GitHub PR creator (`@octokit/rest`), Cloudflare Edge Worker (`@cloudflare/workers-types`), Google Search Console integration, Webflow connector, and Wix connector.
+- Dynamic fallback to manual/snippet delivery if connectors are not connected.
+
+## Phase 5: Audits, reports, and Saudi platforms (done)
+
+- Full site technical SEO audits with automated scoring (0-100) and issue categorize/severity trees.
+- PDF executive report generator (WeasyPrint) with bilingual English/Arabic layout support.
+- Scheduled weekly email digests (Resend / SMTP) sent to org admins.
+- Salla and Zid e-commerce platform connectors with merchant onboarding instructions and OAuth scaffolding.
+
+## Phase 6: Launch readiness (done, awaiting review)
+
+- Public website: landing page with interactive FAQ, platform ticker, and feature walkthrough; pricing page with Growth badge and direct "Contact Us" routing (`adarshs18400@gmail.com`); integrations directory with category filter chips.
+- Platform Admin Console (`/app/admin`): 4 functional tabs (Organizations & Plans, API Costs & Providers with live spending gauges, Plan Configurations editor, and Platform Audit Logs).
+- Production deployment setup: `docker-compose.prod.yml`, `infra/docker/web.Dockerfile`, `infra/nginx/spa.conf`, `infra/nginx/nginx.conf`.
+- Pre-flight validation script: `scripts/verify_prod_env.py` checking secrets, DB connectivity, PostgreSQL `app_tenant` RLS role, Redis, email providers, and production domain compliance.
+- Complete production deployment guide in `docs/deployment.md`.
+
+## Phase 7: Billing & payments (not started)
+
+- Moyasar & Tap payment integrations for Saudi Arabia (SAR, mada, Apple Pay).
+- Stripe integration for international payments.
+- Subscription billing, webhooks, checkout flows, and self-serve plan upgrades.

@@ -1,7 +1,11 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { api } from "./api";
 import type {
+  AdminAuditLogOut,
+  AdminCostSummaryOut,
+  AdminOrgCostDetailOut,
   AdminOrgOut,
+  AdminPlanUpdateIn,
   ApiKeyCreatedOut,
   ApiKeyCreateIn,
   ApiKeyOut,
@@ -136,6 +140,57 @@ export function useAdminPlans(enabled: boolean) {
     queryKey: ["admin-plans"],
     queryFn: () => api<PlanOut[]>("/admin/plans"),
     enabled,
+  });
+}
+
+export function useAdminCostSummary(enabled: boolean) {
+  return useQuery({
+    queryKey: ["admin-cost-summary"],
+    queryFn: () => api<AdminCostSummaryOut>("/admin/costs/summary"),
+    enabled,
+  });
+}
+
+export function useAdminOrgCosts(orgId: string | undefined, enabled: boolean) {
+  return useQuery({
+    queryKey: ["admin-org-costs", orgId],
+    queryFn: () => api<AdminOrgCostDetailOut>(`/admin/orgs/${orgId}/costs`),
+    enabled: enabled && !!orgId,
+  });
+}
+
+export function useAdminResetCounters() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (orgId: string) =>
+      api<{ ok: boolean; message: string }>(`/admin/orgs/${orgId}/reset-counters`, {
+        method: "POST",
+      }),
+    onSuccess: () => {
+      void qc.invalidateQueries({ queryKey: ["admin-orgs"] });
+      void qc.invalidateQueries({ queryKey: ["admin-cost-summary"] });
+      void qc.invalidateQueries({ queryKey: ["admin-org-costs"] });
+    },
+  });
+}
+
+export function useAdminAuditLogs(enabled: boolean) {
+  return useQuery({
+    queryKey: ["admin-audit-logs"],
+    queryFn: () => api<AdminAuditLogOut[]>("/admin/audit-logs"),
+    enabled,
+  });
+}
+
+export function useAdminUpdatePlan() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({ code, body }: { code: string; body: AdminPlanUpdateIn }) =>
+      api<PlanOut>(`/admin/plans/${code}`, { method: "PATCH", body }),
+    onSuccess: () => {
+      void qc.invalidateQueries({ queryKey: ["admin-plans"] });
+      void qc.invalidateQueries({ queryKey: ["plans"] });
+    },
   });
 }
 

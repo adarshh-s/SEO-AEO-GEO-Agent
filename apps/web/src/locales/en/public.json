@@ -108,5 +108,27 @@
         "p": "Every change we apply can be rolled back. Content is never published without your explicit approval."
       }
     ]
+  },
+  "faq": {
+    "title": "Frequently Asked Questions",
+    "subtitle": "Everything you need to know about AI search visibility, tracking, and platform connectors.",
+    "items": [
+      {
+        "q": "How is AI Engine Optimization (AEO) different from traditional SEO?",
+        "a": "Traditional SEO targets search engine rank positions on Google. AEO focuses on getting your business cited and recommended by conversational AI assistants like ChatGPT, Perplexity, Gemini, and Claude."
+      },
+      {
+        "q": "Does the tracking snippet slow down my website or use cookies?",
+        "a": "No. The snippet is ultra-lightweight, loaded asynchronously, and 100% cookieless. It tracks visits and AI bot crawlers without collecting personally identifiable information."
+      },
+      {
+        "q": "How do the Salla and Zid Saudi e-commerce connectors work?",
+        "a": "You can connect your Salla or Zid store immediately via custom theme header scripts without waiting for app store reviews, or via direct Partner APIs for automated product metadata synchronization."
+      },
+      {
+        "q": "Can I try QuardLink before committing?",
+        "a": "Yes! All new accounts start with a full-featured 14-day Trial with no credit card required. You can connect your website, track rankings, check AI visibility, and run full audits immediately."
+      }
+    ]
   }
 }

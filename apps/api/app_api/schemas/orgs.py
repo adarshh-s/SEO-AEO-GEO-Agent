@@ -88,6 +88,10 @@ class AdminOrgOut(ApiModel):
     members: int
     sites: int
     created_at: datetime
+    current_spend_usd: Decimal = Decimal("0.0000")
+    effective_ceiling_usd: Decimal | None = None
+    spend_ratio: float = 0.0
+    is_trial_expired: bool = False
 
 
 class AdminSetPlanIn(ApiModel):
@@ -113,3 +117,38 @@ class AdminPlanUpdateIn(ApiModel):
     audits_per_month: int | None = Field(default=None, ge=0)
     monthly_cost_ceiling_usd: Decimal | None = Field(default=None, ge=0)
     trial_days: int | None = Field(default=None, ge=0)
+
+
+class AdminCostSummaryOut(ApiModel):
+    total_spend_usd: Decimal
+    total_orgs: int
+    orgs_at_warning: int
+    orgs_at_paused: int
+    provider_breakdown: dict[str, Decimal]
+    category_breakdown: dict[str, Decimal]
+    top_spending_orgs: list[dict]
+
+
+class AdminOrgCostDetailOut(ApiModel):
+    org_id: uuid.UUID
+    org_name: str
+    plan_code: str
+    current_spend_usd: Decimal
+    effective_ceiling_usd: Decimal | None
+    spend_ratio: float
+    is_trial_expired: bool
+    trial_days_remaining: int | None
+    counters: list[dict]
+
+
+class AdminAuditLogOut(ApiModel):
+    id: int
+    org_id: uuid.UUID | None
+    actor_user_id: uuid.UUID | None
+    actor_email: str | None
+    action: str
+    target_type: str | None
+    target_id: str | None
+    data: dict
+    ip: str | None
+    created_at: datetime

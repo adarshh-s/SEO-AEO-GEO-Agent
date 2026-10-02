@@ -1,12 +1,77 @@
 {
-  "title": "Platform admin",
-  "description": "Assign plans and add-ons manually. Payments are not connected yet.",
+  "title": "Platform Admin Console",
+  "description": "Tenant organization management, plan quotas, real-time API cost controls, and security audit logs.",
+  "tabs": {
+    "orgs": "Organizations & Plans",
+    "costs": "API Costs & Providers",
+    "plans": "Plan Configurations",
+    "logs": "Platform Audit Logs"
+  },
   "columns": {
     "org": "Organization",
-    "plan": "Plan",
-    "arabic": "Arabic add-on",
+    "plan": "Assigned Plan",
+    "arabic": "Arabic Add-on",
     "members": "Members",
-    "sites": "Websites",
-    "created": "Created"
+    "sites": "Sites",
+    "created": "Created",
+    "spend": "Monthly Spend / Ceiling",
+    "status": "Budget Status",
+    "actions": "Actions"
+  },
+  "costs": {
+    "totalSpend": "Total Platform Spend",
+    "totalSpendDesc": "Across all active tenants this calendar month",
+    "activeTenants": "Active Tenants",
+    "activeTenantsDesc": "Total registered organizations",
+    "warningTenants": "Tenants Near Ceiling",
+    "warningTenantsDesc": "At or above 80% monthly spend limit",
+    "pausedTenants": "Paused Tenants",
+    "pausedTenantsDesc": "At or exceeding 100% monthly spend ceiling",
+    "providerBreakdown": "Provider Cost Breakdown",
+    "categoryBreakdown": "Usage Category Breakdown",
+    "topTenants": "Top Spending Organizations",
+    "spend": "Spend",
+    "ceiling": "Ceiling",
+    "ratio": "Budget Ratio"
+  },
+  "status": {
+    "normal": "Normal",
+    "warning": "Warning (80%+)",
+    "paused": "Paused (100%+)",
+    "trialExpired": "Trial Expired"
+  },
+  "actions": {
+    "editCeiling": "Edit Ceiling",
+    "resetCounters": "Reset Counters",
+    "resetConfirm": "Are you sure you want to reset monthly counters for this organization?",
+    "viewDetails": "View Details",
+    "searchOrgs": "Search organizations by name or slug...",
+    "save": "Save Changes",
+    "cancel": "Cancel",
+    "editPlan": "Edit Plan Limits",
+    "customCeilingPlaceholder": "Override in USD (e.g. 50.00)"
+  },
+  "plans": {
+    "title": "Plan Tier Limits",
+    "desc": "Manage quotas and AI engine access per subscription tier.",
+    "code": "Plan Code",
+    "name": "Name",
+    "maxSites": "Max Sites",
+    "maxKeywords": "Max Keywords",
+    "maxPrompts": "Max Prompts",
+    "engines": "Engines",
+    "frequency": "Check Frequency",
+    "audits": "Audits / Mo",
+    "ceiling": "Cost Ceiling",
+    "trialDays": "Trial Days"
+  },
+  "logs": {
+    "title": "Platform Activity Audit Trail",
+    "desc": "Immutable security log of administrative changes and sensitive operations.",
+    "actor": "Actor",
+    "action": "Action",
+    "target": "Target",
+    "details": "Details",
+    "time": "Timestamp"
   }
 }

@@ -54,6 +54,7 @@ SAMPLE_BODIES = {
     ("POST", "/onboarding/complete"): {"site": {**SITE, "homepage_url": "b-complete.com"}},
     ("PUT", "/admin/orgs/{org_id}/plan"): {"plan_code": "business"},
     ("PATCH", "/admin/orgs/{org_id}"): {"addons": {"arabic": True}},
+    ("POST", "/admin/orgs/{org_id}/reset-counters"): {},
     ("PATCH", "/admin/plans/{plan_code}"): {"max_sites": 99},
     ("POST", "/sites/{site_id}/keywords/{keyword_id}/check"): {},
     ("POST", "/sites/{site_id}/keywords/check-all"): {},
