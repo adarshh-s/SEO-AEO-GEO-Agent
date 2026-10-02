@@ -24,7 +24,7 @@ test("sign up, onboard a website, see it listed, switch to Arabic", async ({ pag
   await page.getByRole("button", { name: "Save and continue" }).click();
 
   await expect(page.getByText("Connect your website")).toBeVisible();
-  await expect(page.getByText(/data-site="qls_/)).toBeVisible();
+  await expect(page.getByText(/data-site="ors_/)).toBeVisible();
   await page.getByRole("button", { name: "Continue" }).click();
   await page.getByRole("button", { name: "Go to dashboard" }).click();
 

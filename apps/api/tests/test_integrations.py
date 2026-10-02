@@ -1,5 +1,4 @@
-"""Tests for Integrations: universal snippet info, API key management, and Webhooks."""
-
+from app_core.brand import BRAND
 from conftest import SITE, signup
 
 
@@ -11,7 +10,7 @@ def test_snippet_info(app):
     res = owner.client.get(f"/sites/{site_id}/integrations/snippet")
     assert res.status_code == 200
     data = res.json()
-    assert data["site_key"].startswith("qls_")
+    assert data["site_key"].startswith(f"{BRAND['site_key_prefix']}_")
     assert "/public/v1/agent.js" in data["script_url"]
     assert f'data-site="{data["site_key"]}"' in data["snippet_tag"]
     assert "wordpress" in data["instructions"]
@@ -32,7 +31,7 @@ def test_api_keys_lifecycle(app):
     assert created["name"] == "Production Key"
     assert created["scopes"] == ["fixes:read", "fixes:deploy"]
     assert "raw_key" in created
-    assert created["raw_key"].startswith("ql_live_")
+    assert created["raw_key"].startswith(f"{BRAND['api_key_prefix']}_live_")
     key_id = created["id"]
 
     # 2. List API keys (raw_key should NOT be present)
@@ -44,7 +43,7 @@ def test_api_keys_lifecycle(app):
     assert keys[0]["name"] == "Production Key"
     assert "raw_key" not in keys[0]
     assert "hashed_key" not in keys[0]
-    assert keys[0]["prefix"].startswith("ql_live_")
+    assert keys[0]["prefix"].startswith(f"{BRAND['api_key_prefix']}_live_")
 
     # 3. Delete API key
     del_res = owner.client.delete(f"/org/api-keys/{key_id}")

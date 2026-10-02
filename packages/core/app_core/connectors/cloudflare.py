@@ -11,6 +11,7 @@ Supports:
 import logging
 from typing import Any
 
+from app_core.brand import BRAND
 from app_core.connectors.base import ConnectionTestResult, DeploymentResult, RollbackResult
 
 logger = logging.getLogger(__name__)
@@ -18,8 +19,12 @@ logger = logging.getLogger(__name__)
 
 def generate_cloudflare_worker_js(site_key: str, api_url: str) -> str:
     """Generate production-ready Cloudflare Worker script using HTMLRewriter."""
+    product = BRAND["product_name"]
+    slug = BRAND["brand_slug"]
+    env_prefix = slug.upper()
+
     return f"""/**
- * QuardLink Cloudflare Edge Worker
+ * {product} Cloudflare Edge Worker
  * Server-side SEO & AI Visibility Injection via HTMLRewriter
  *
  * Site Key: {site_key}
@@ -44,8 +49,8 @@ export default {{
       return response;
     }}
 
-    const siteKey = env.QUARDLINK_SITE_KEY || "{site_key}";
-    const apiUrl = (env.QUARDLINK_API_URL || "{api_url}").replace(/\\/+$/, "");
+    const siteKey = env.{env_prefix}_SITE_KEY || "{site_key}";
+    const apiUrl = (env.{env_prefix}_API_URL || "{api_url}").replace(/\\/+$/, "");
 
     // 2. Track AI crawlers & AI referrals asynchronously (fail-safe)
     ctx.waitUntil(trackAiTelemetry(request, siteKey, apiUrl));
@@ -61,7 +66,7 @@ export default {{
       let fixesResponse = await cache.match(cacheKey);
       if (!fixesResponse) {{
         fixesResponse = await fetch(cacheKey.url, {{
-          headers: {{ "User-Agent": "QuardLink-Cloudflare-Worker/1.0" }},
+          headers: {{ "User-Agent": "{product}-Cloudflare-Worker/1.0" }},
           cf: {{ cacheTtl: 300, cacheEverything: true }},
         }});
         if (fixesResponse.ok) {{

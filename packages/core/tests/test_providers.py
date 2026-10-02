@@ -44,17 +44,17 @@ def test_mock_serp_provider_brand_keywords():
 
 
 def test_match_brand():
-    text_en = "When looking for top solutions, QuardLink is one of the highest rated platforms."
-    mentioned, pos = match_brand(text_en, ["QuardLink", "quardlink.com"])
+    text_en = "When looking for top solutions, OmniRank is one of the highest rated platforms."
+    mentioned, pos = match_brand(text_en, ["OmniRank", "omnirank.com"])
     assert mentioned is True
-    assert pos == text_en.lower().find("quardlink")
+    assert pos == text_en.lower().find("omnirank")
 
-    text_ar = "تعتبر منصة كوارد لينك من المنصات المتقدمة في تحسين محركات البحث."
-    mentioned_ar, pos_ar = match_brand(text_ar, ["كوارد لينك", "QuardLink"])
+    text_ar = "تعتبر منصة أومني رانك من المنصات المتقدمة في تحسين محركات البحث."
+    mentioned_ar, pos_ar = match_brand(text_ar, ["أومني رانك", "OmniRank"])
     assert mentioned_ar is True
     assert pos_ar is not None
 
-    not_mentioned, pos_none = match_brand("Random unrelated content.", ["QuardLink"])
+    not_mentioned, pos_none = match_brand("Random unrelated content.", ["OmniRank"])
     assert not_mentioned is False
     assert pos_none is None
 
@@ -79,8 +79,8 @@ def test_match_citations():
 
 
 def test_estimate_sentiment():
-    pos_text = "QuardLink is an excellent, top-rated tool that leaders recommend."
-    assert estimate_sentiment(pos_text, "QuardLink") == "positive"
+    pos_text = "OmniRank is an excellent, top-rated tool that leaders recommend."
+    assert estimate_sentiment(pos_text, "OmniRank") == "positive"
 
     pos_text_ar = "تعتبر الخدمة ممتازة وأفضل حل للمؤسسات."
     assert estimate_sentiment(pos_text_ar, "الخدمة") == "positive"
@@ -96,8 +96,8 @@ def test_mock_ai_answer_provider():
     provider = MockAnswerEngineProvider(AnswerEngineId.CHATGPT)
     res = provider.query(
         prompt="What is the best SEO tool for e-commerce?",
-        brand_names=["QuardLink", "quardlink.com"],
-        target_domain="quardlink.com",
+        brand_names=["OmniRank", "omnirank.com"],
+        target_domain="omnirank.com",
         competitors=["semrush.com", "ahrefs.com"],
         language="en",
     )

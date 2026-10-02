@@ -15,35 +15,42 @@ import urllib.parse
 import zipfile
 from typing import Any
 
+from app_core.brand import BRAND
 from app_core.connectors.base import ConnectionTestResult, DeploymentResult, RollbackResult
 
 logger = logging.getLogger(__name__)
 
 
 def generate_wordpress_plugin_php(site_key: str, api_url: str) -> str:
-    """Generate the full PHP source code for the QuardLink WordPress plugin."""
+    """Generate the full PHP source code for the WordPress plugin."""
+    product = BRAND["product_name"]
+    slug = BRAND["brand_slug"]
+    wp_slug = BRAND.get("wp_plugin_slug", slug)
+    const_prefix = slug.upper()
+    cls_name = f"{product}_SEO"
+
     return f"""<?php
 /**
- * Plugin Name: QuardLink SEO & AEO
- * Plugin URI: https://quardlink.com
+ * Plugin Name: {product} SEO & AEO
+ * Plugin URI: https://{slug}.com
  * Description: Automatic SEO & AI search optimization for WordPress. Seamlessly integrates with Yoast SEO and Rank Math.
  * Version: 1.0.0
- * Author: QuardLink
- * Author URI: https://quardlink.com
+ * Author: {product}
+ * Author URI: https://{slug}.com
  * License: GPL v2 or later
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
- * Text Domain: quardlink-seo
+ * Text Domain: {wp_slug}-seo
  */
 
 if (!defined('ABSPATH')) {{
     exit;
 }}
 
-define('QUARDLINK_VERSION', '1.0.0');
-define('QUARDLINK_DEFAULT_SITE_KEY', '{site_key}');
-define('QUARDLINK_DEFAULT_API_URL', '{api_url}');
+define('{const_prefix}_VERSION', '1.0.0');
+define('{const_prefix}_DEFAULT_SITE_KEY', '{site_key}');
+define('{const_prefix}_DEFAULT_API_URL', '{api_url}');
 
-class QuardLink_SEO {{
+class {cls_name} {{
     private static $instance = null;
     private $site_key;
     private $api_url;
@@ -56,8 +63,8 @@ class QuardLink_SEO {{
     }}
 
     private function __construct() {{
-        $this->site_key = get_option('quardlink_site_key', QUARDLINK_DEFAULT_SITE_KEY);
-        $this->api_url = rtrim(get_option('quardlink_api_url', QUARDLINK_DEFAULT_API_URL), '/');
+        $this->site_key = get_option('{slug}_site_key', {const_prefix}_DEFAULT_SITE_KEY);
+        $this->api_url = rtrim(get_option('{slug}_api_url', {const_prefix}_DEFAULT_API_URL), '/');
 
         add_action('init', array($this, 'track_ai_visits'));
         add_action('wp_head', array($this, 'render_head_fixes'), 1);
@@ -235,19 +242,19 @@ class QuardLink_SEO {{
         $fixes = $this->get_current_fixes();
         foreach ($fixes as $fix) {{
             if ($fix['type'] === 'schema' && !empty($fix['payload'])) {{
-                $data['quardlink_schema'] = $fix['payload'];
+                $data['{slug}_schema'] = $fix['payload'];
             }}
         }}
         return $data;
     }}
 
     public function register_admin_menu() {{
-        add_options_page('QuardLink SEO', 'QuardLink SEO', 'manage_options', 'quardlink-seo', array($this, 'admin_page_html'));
+        add_options_page('{product} SEO', '{product} SEO', 'manage_options', '{wp_slug}-seo', array($this, 'admin_page_html'));
     }}
 
     public function register_settings() {{
-        register_setting('quardlink_settings', 'quardlink_site_key');
-        register_setting('quardlink_settings', 'quardlink_api_url');
+        register_setting('{slug}_settings', '{slug}_site_key');
+        register_setting('{slug}_settings', '{slug}_api_url');
     }}
 
     public function admin_page_html() {{
@@ -256,18 +263,18 @@ class QuardLink_SEO {{
         }}
         ?>
         <div class="wrap">
-            <h1>QuardLink SEO & AEO Settings</h1>
-            <p>Connect your WordPress site to the QuardLink SEO Platform for automated search and AI visibility optimization.</p>
+            <h1>{product} SEO & AEO Settings</h1>
+            <p>Connect your WordPress site to the {product} SEO Platform for automated search and AI visibility optimization.</p>
             <form action="options.php" method="post">
-                <?php settings_fields('quardlink_settings'); ?>
+                <?php settings_fields('{slug}_settings'); ?>
                 <table class="form-table">
                     <tr>
                         <th scope="row">Site Key</th>
-                        <td><input type="text" name="quardlink_site_key" value="<?php echo esc_attr(get_option('quardlink_site_key', $this->site_key)); ?>" class="regular-text" /></td>
+                        <td><input type="text" name="{slug}_site_key" value="<?php echo esc_attr(get_option('{slug}_site_key', $this->site_key)); ?>" class="regular-text" /></td>
                     </tr>
                     <tr>
                         <th scope="row">API URL</th>
-                        <td><input type="url" name="quardlink_api_url" value="<?php echo esc_attr(get_option('quardlink_api_url', $this->api_url)); ?>" class="regular-text" /></td>
+                        <td><input type="url" name="{slug}_api_url" value="<?php echo esc_attr(get_option('{slug}_api_url', $this->api_url)); ?>" class="regular-text" /></td>
                     </tr>
                 </table>
                 <?php submit_button(); ?>
@@ -277,18 +284,22 @@ class QuardLink_SEO {{
     }}
 }}
 
-add_action('plugins_loaded', array('QuardLink_SEO', 'get_instance'));
+add_action('plugins_loaded', array('{cls_name}', 'get_instance'));
 """
 
 
 def generate_wordpress_plugin_zip(site_key: str, api_url: str) -> bytes:
-    """Generate in-memory zip bytes containing quardlink-seo/quardlink-seo.php."""
+    """Generate in-memory zip bytes containing plugin files."""
+    product = BRAND["product_name"]
+    slug = BRAND["brand_slug"]
+    wp_slug = BRAND.get("wp_plugin_slug", slug)
+
     php_code = generate_wordpress_plugin_php(site_key, api_url)
     zip_buffer = io.BytesIO()
     with zipfile.ZipFile(zip_buffer, "w", zipfile.ZIP_DEFLATED) as zf:
-        zf.writestr("quardlink-seo/quardlink-seo.php", php_code.encode("utf-8"))
-        readme = f"""=== QuardLink SEO & AEO ===
-Contributors: quardlink
+        zf.writestr(f"{wp_slug}-seo/{wp_slug}-seo.php", php_code.encode("utf-8"))
+        readme = f"""=== {product} SEO & AEO ===
+Contributors: {slug}
 Requires at least: 5.8
 Tested up to: 6.7
 Stable tag: 1.0.0
@@ -298,7 +309,7 @@ Automatic SEO & AI search optimization for WordPress.
 Seamlessly integrates with Yoast SEO and Rank Math.
 Site Key: {site_key}
 """
-        zf.writestr("quardlink-seo/readme.txt", readme.encode("utf-8"))
+        zf.writestr(f"{wp_slug}-seo/readme.txt", readme.encode("utf-8"))
     return zip_buffer.getvalue()
 
 
@@ -336,7 +347,7 @@ class WordpressConnector:
                 f"{site_url}/wp-json/wp/v2/users/me",
                 auth=HTTPBasicAuth(app_user, app_pass),
                 timeout=10,
-                headers={"User-Agent": "QuardLink/1.0"},
+                headers={"User-Agent": f"{BRAND['product_name']}/1.0"},
             )
             if resp.status_code == 200:
                 data = resp.json()
@@ -381,7 +392,7 @@ class WordpressConnector:
         # Content fixes: create draft post (never publish!)
         if fix_type in ("content_block", "faq"):
             content_html = payload.get("html") or json.dumps(payload.get("items", []))
-            post_title = title or "QuardLink Draft SEO Content"
+            post_title = title or f"{BRAND['product_name']} Draft SEO Content"
 
             if not app_user or not app_pass:
                 # Mock / Plugin transient fallback
@@ -424,7 +435,7 @@ class WordpressConnector:
             except Exception as e:
                 return DeploymentResult(ok=False, message=str(e))
 
-        # Meta & Schema fixes: managed via QuardLink plugin hooks or WP REST post meta
+        # Meta & Schema fixes: managed via plugin hooks or WP REST post meta
         # Previous state capture
         prev = previous_state or {
             "title": config.get("current_title", ""),
@@ -447,7 +458,7 @@ class WordpressConnector:
                         meta_updates["rank_math_title"] = payload.get("title", "")
                         meta_updates["rank_math_description"] = payload.get("meta_description", "")
                 elif fix_type == "schema":
-                    meta_updates["_quardlink_schema"] = json.dumps(payload)
+                    meta_updates[f"_{BRAND['brand_slug']}_schema"] = json.dumps(payload)
 
                 resp = requests.post(
                     f"{site_url}/wp-json/wp/v2/posts/{post_id}",
@@ -465,10 +476,10 @@ class WordpressConnector:
             except Exception as e:
                 logger.warning("WordPress direct REST meta update failed: %s", e)
 
-        # Plugin delivery is active: plugin pulls approved fixes from QuardLink API directly
+        # Plugin delivery is active: plugin pulls approved fixes from API directly
         return DeploymentResult(
             ok=True,
-            message="Fix registered for server-side delivery via QuardLink WordPress Plugin.",
+            message=f"Fix registered for server-side delivery via {BRAND['product_name']} WordPress Plugin.",
             external_reference=f"wp-hook-{hash(target_url) % 10000}",
             previous_state=prev,
             details={"delivery": "plugin_hook", "target_url": target_url},

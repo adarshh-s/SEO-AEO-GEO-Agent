@@ -10,6 +10,7 @@ import requests
 from celery.utils.log import get_task_logger
 from sqlalchemy.orm import Session
 
+from app_core.brand import BRAND
 from app_core.db import get_engine
 from app_core.models import Webhook
 from app_worker.celery_app import app
@@ -45,9 +46,9 @@ def dispatch_webhook(webhook_id_str: str, event: str, payload: dict) -> None:
 
         headers = {
             "Content-Type": "application/json",
-            "X-QuardLink-Event": event,
-            "X-QuardLink-Signature": f"sha256={signature}",
-            "User-Agent": "QuardLink-Webhooks/1.0",
+            f"X-{BRAND['product_name']}-Event": event,
+            f"X-{BRAND['product_name']}-Signature": f"sha256={signature}",
+            "User-Agent": f"{BRAND['product_name']}-Webhooks/1.0",
         }
 
         try:

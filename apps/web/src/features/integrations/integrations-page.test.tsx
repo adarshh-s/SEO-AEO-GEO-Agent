@@ -23,18 +23,18 @@ const mockVerification = {
   verified_at: null,
   verification_method: null,
   token: "token-12345",
-  meta_tag: '<meta name="quardlink-verification" content="token-12345">',
-  dns_txt_record: "quardlink-verification=token-12345",
+  meta_tag: '<meta name="omnirank-verification" content="token-12345">',
+  dns_txt_record: "omnirank-verification=token-12345",
 };
 
 const mockSnippet = {
-  site_key: "qls_abc123",
+  site_key: "ors_abc123",
   script_url: "http://api.test/public/v1/agent.js",
   snippet_tag:
-    '<script async src="http://api.test/public/v1/agent.js" data-site="qls_abc123"></script>',
+    '<script async src="http://api.test/public/v1/agent.js" data-site="ors_abc123"></script>',
   platform: "shopify",
   instructions: {
-    wordpress: "Install the QuardLink plugin.",
+    wordpress: "Install the OmniRank plugin.",
     shopify: "Paste into theme.liquid before </head>.",
   },
 };
@@ -96,11 +96,11 @@ describe("IntegrationsPage", () => {
     renderWithProviders(<IntegrationsPage />);
 
     expect(await screen.findByText(/Domain Ownership Verification/i)).toBeInTheDocument();
-    expect(await screen.findByText(/quardlink-verification=token-12345/i)).toBeInTheDocument();
+    expect(await screen.findByText(/omnirank-verification=token-12345/i)).toBeInTheDocument();
     expect(await screen.findByText(/Deep Platform Integrations/i)).toBeInTheDocument();
-    expect(await screen.findByText(/QuardLink WordPress Plugin/i)).toBeInTheDocument();
+    expect(await screen.findByText(/OmniRank WordPress Plugin/i)).toBeInTheDocument();
     expect(await screen.findByText(/Universal JavaScript Snippet/i)).toBeInTheDocument();
-    expect(screen.getByText(/qls_abc123/i)).toBeInTheDocument();
+    expect(screen.getByText(/ors_abc123/i)).toBeInTheDocument();
     expect(await screen.findByText("Production Next.js Key")).toBeInTheDocument();
     expect(await screen.findByText("https://myshop.com/webhook")).toBeInTheDocument();
   });

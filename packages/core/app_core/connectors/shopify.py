@@ -12,6 +12,7 @@ import json
 import logging
 from typing import Any
 
+from app_core.brand import BRAND
 from app_core.connectors.base import ConnectionTestResult, DeploymentResult, RollbackResult
 
 logger = logging.getLogger(__name__)
@@ -114,7 +115,7 @@ class ShopifyConnector:
         # 1. Content block / FAQ fixes -> draft blog article
 
         if fix_type in ("content_block", "faq"):
-            article_title = title or "QuardLink Suggested Content"
+            article_title = title or f"{BRAND['product_name']} Suggested Content"
             body_html = payload.get("html", "") or json.dumps(payload.get("items", []))
             blog_id = config.get("blog_id")
 
@@ -179,7 +180,7 @@ class ShopifyConnector:
             owner_id = config.get("shop_id") or "gid://shopify/Shop/1"
             metafield_input = {
                 "ownerId": owner_id,
-                "namespace": "quardlink",
+                "namespace": BRAND["brand_slug"],
                 "key": f"schema_{hash(target_url) % 10000}",
                 "value": json.dumps(payload),
                 "type": "json",
@@ -193,7 +194,7 @@ class ShopifyConnector:
                     message="Schema deployed to Shopify app metafield (rendered server-side by app embed).",
                     external_reference=ref,
                     previous_state=prev,
-                    details={"namespace": "quardlink", "key": metafield_input["key"]},
+                    details={"namespace": BRAND["brand_slug"], "key": metafield_input["key"]},
                 )
 
             mutation = """

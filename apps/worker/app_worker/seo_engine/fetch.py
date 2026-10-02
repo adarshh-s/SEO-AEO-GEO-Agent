@@ -12,7 +12,7 @@ except ImportError:
 from app_core.brand import BRAND
 from app_worker.seo_engine.url_safety import safe_requests_get
 
-USER_AGENT = f"{BRAND['crawler_user_agent_token']}/1.0 (+https://quardlink.com/bot)"
+USER_AGENT = f"{BRAND['crawler_user_agent_token']}/1.0 (+https://{BRAND['brand_slug']}.com/bot)"
 
 
 @dataclass

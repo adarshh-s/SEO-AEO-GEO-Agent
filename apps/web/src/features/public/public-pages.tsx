@@ -16,10 +16,11 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { PageLoader } from "@/components/ui/spinner";
 import { ErrorState } from "@/components/ui/states";
-import { CONNECT_OPTIONS, PLATFORMS } from "@/features/onboarding/connect-options";
 import { CONTACT_EMAIL } from "@/lib/config";
 import { formatNumber } from "@/lib/i18n";
 import { usePublicPlans } from "@/lib/queries";
+import { PRODUCT_NAME } from "@/lib/brand";
+import { CONNECT_OPTIONS, PLATFORMS } from "@/features/onboarding/connect-options";
 
 export function LandingPage() {
   const { t } = useTranslation("public");
@@ -87,7 +88,7 @@ export function LandingPage() {
         <div className="mx-auto mb-12 max-w-2xl text-center">
           <h2 className="text-2xl font-bold sm:text-3xl">Comprehensive Search Intelligence</h2>
           <p className="text-muted-foreground mt-2 text-sm sm:text-base">
-            From classic Google rankings to modern LLM referral tracking, QuardLink bridges
+            From classic Google rankings to modern LLM referral tracking, {PRODUCT_NAME} bridges
             traditional SEO and generative AI answer visibility.
           </p>
         </div>
@@ -116,7 +117,7 @@ export function LandingPage() {
       <section className="bg-muted/30 border-border border-y py-16">
         <div className="mx-auto max-w-6xl px-4">
           <div className="mx-auto mb-12 max-w-2xl text-center">
-            <h2 className="text-2xl font-bold sm:text-3xl">How QuardLink Works</h2>
+            <h2 className="text-2xl font-bold sm:text-3xl">How {PRODUCT_NAME} Works</h2>
             <p className="text-muted-foreground mt-2 text-sm sm:text-base">
               Automated, safe, and transparent workflow designed for modern web engineering and
               marketing teams.
@@ -145,8 +146,8 @@ export function LandingPage() {
                 <h3 className="text-base font-semibold">Detect & Diagnose Gaps</h3>
               </div>
               <p className="text-muted-foreground ps-11 text-sm leading-relaxed">
-                QuardLink crawls your pages and benchmarks them against top ranking competitors and
-                AI citation patterns to uncover missing schema and content signals.
+                {PRODUCT_NAME} crawls your pages and benchmarks them against top ranking competitors
+                and AI citation patterns to uncover missing schema and content signals.
               </p>
             </div>
 
@@ -302,7 +303,7 @@ export function PricingPage() {
                         href={`mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(
                           `Inquiry regarding ${p.name} Plan`,
                         )}&body=${encodeURIComponent(
-                          `Hello QuardLink Team,\n\nI would like to get started with the ${p.name} plan for my website.\n\nMy website: \nCompany name: `,
+                          `Hello ${PRODUCT_NAME} Team,\n\nI would like to get started with the ${p.name} plan for my website.\n\nMy website: \nCompany name: `,
                         )}`}
                       >
                         <Mail className="me-2 h-4 w-4" />

@@ -9,7 +9,7 @@ from app_worker.seo_engine.url_safety import URLSafetyError, validate_url, valid
 def test_url_safety_validation():
     # Valid external urls
     assert validate_url("https://example.com") is True
-    assert validate_url("http://quardlink.com/blog") is True
+    assert validate_url("http://omnirank.com/blog") is True
 
     # Invalid schemes
     assert validate_url("ftp://example.com") is False

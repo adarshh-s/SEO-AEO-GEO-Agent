@@ -2,6 +2,7 @@
 
 import uuid
 
+from app_core.brand import BRAND
 from app_core.db import system_session
 from app_core.models import AiReferralEvent, Fix, Site
 from conftest import SITE, make_client, signup
@@ -13,7 +14,7 @@ def test_serve_agent_script(app):
     assert res.status_code == 200
     assert "application/javascript" in res.headers["content-type"]
     assert res.headers.get("access-control-allow-origin") == "*"
-    assert "quardlink" in res.text
+    assert "omnirank" in res.text.lower()
     assert "chatgpt" in res.text
 
 
@@ -86,7 +87,9 @@ def test_public_fixes_delivery(app):
     assert data2["fixes"][0]["id"] == str(f_deployed.id)
 
     # 3. Non-existent site key returns 404
-    res_bad = anon.get("/public/v1/fixes?site_key=qls_invalid_key&url=https://example.com")
+    res_bad = anon.get(
+        f"/public/v1/fixes?site_key={BRAND['site_key_prefix']}_invalid_key&url=https://example.com"
+    )
     assert res_bad.status_code == 404
 
 

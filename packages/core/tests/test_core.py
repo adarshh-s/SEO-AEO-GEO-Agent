@@ -52,5 +52,5 @@ def test_production_refuses_dev_secrets():
 def test_cors_origins_accepts_comma_separated_env(monkeypatch):
     from app_core.settings import Settings
 
-    monkeypatch.setenv("CORS_ORIGINS", "http://localhost:5273, https://app.quardlink.com")
-    assert Settings().cors_origins == ["http://localhost:5273", "https://app.quardlink.com"]
+    monkeypatch.setenv("CORS_ORIGINS", "http://localhost:5273, https://app.omnirank.com")
+    assert Settings().cors_origins == ["http://localhost:5273", "https://app.omnirank.com"]

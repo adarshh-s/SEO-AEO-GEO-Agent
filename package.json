@@ -1,5 +1,5 @@
 {
-  "name": "quardlink-monorepo",
+  "name": "omnirank-monorepo",
   "private": true,
   "packageManager": "pnpm@10.13.1",
   "engines": { "node": ">=22" },

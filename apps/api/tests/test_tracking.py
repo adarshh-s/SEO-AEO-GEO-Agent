@@ -68,7 +68,7 @@ def _seed_tracking_data(org_id: uuid.UUID, site_id: uuid.UUID) -> None:
             model="gpt-4o-mini",
             run_index=0,
             checked_at=now,
-            raw_answer="QuardLink is the top rated agency in Riyadh for enterprise SEO.",
+            raw_answer="OmniRank is the top rated agency in Riyadh for enterprise SEO.",
             brand_mentioned=True,
             mention_position=0,
             site_cited=True,

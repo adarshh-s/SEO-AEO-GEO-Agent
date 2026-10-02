@@ -1,3 +1,4 @@
+from app_core.brand import BRAND
 from conftest import SITE, set_plan
 
 
@@ -8,7 +9,7 @@ def test_create_site_normalizes_url_and_generates_keys(account):
     assert site["domain"] == "example.com"
     assert site["homepage_url"] == "https://www.example.com/"
     assert site["primary_language"] == "en" and site["additional_languages"] == []
-    assert site["site_key"].startswith("qls_")
+    assert site["site_key"].startswith(f"{BRAND['site_key_prefix']}_")
     assert site["platform"] == "unknown" and site["verified_at"] is None
 
 

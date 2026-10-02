@@ -1,3 +1,4 @@
+import { PRODUCT_NAME } from "./brand";
 import i18n, { applyLanguage, formatNumber, isRtl, SUPPORTED_LANGUAGES } from "./i18n";
 
 describe("i18n", () => {
@@ -31,7 +32,7 @@ describe("i18n", () => {
   });
 
   it("fills the product name from brand config", () => {
-    expect(i18n.t("login.description", { ns: "auth" })).toMatch(/QuardLink/);
+    expect(i18n.t("login.description", { ns: "auth" })).toMatch(new RegExp(PRODUCT_NAME));
   });
 
   it("uses Western digits in Arabic (D9)", () => {

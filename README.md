@@ -1,8 +1,8 @@
-# QuardLink
+# OmniRank
 
 Multi-tenant SaaS that helps businesses rank in Google and get mentioned in AI answers
 (ChatGPT, Gemini, Perplexity, Claude, AI Overviews): **track → diagnose → fix → report**.
-"QuardLink" is a working name; all naming comes from [`config/brand.json`](config/brand.json).
+All branding and product naming comes from [`config/brand.json`](config/brand.json).
 
 The product spec is [CLAUDE.md](CLAUDE.md). Design docs are in [docs/](docs/):
 [architecture](docs/architecture.md), [decisions](docs/decisions.md),

@@ -22,7 +22,7 @@ def generate_zid_snippet_code(site_key: str) -> str:
     """Generate script tag for Zid storefront custom scripts."""
     return f"""<!-- {BRAND["product_name"]} SEO & AI Visibility Tag -->
 <meta name="{BRAND["verification_meta_name"]}" content="{site_key}" />
-<script defer src="https://quardlink.com/agent.js" data-site-key="{site_key}" data-platform="zid"></script>
+<script defer src="https://{BRAND["brand_slug"]}.com/{BRAND["snippet_filename"]}" data-site-key="{site_key}" data-platform="zid"></script>
 <!-- End {BRAND["product_name"]} Tag -->"""
 
 
@@ -153,7 +153,7 @@ class ZidConnector:
 
         return DeploymentResult(
             ok=True,
-            message="Fix published to QuardLink CDN snippet for Zid store.",
+            message=f"Fix published to {BRAND['product_name']} CDN snippet for Zid store.",
             external_reference=f"zid-snippet-{site_key[:8]}",
             previous_state={"applied_via": "snippet"},
         )

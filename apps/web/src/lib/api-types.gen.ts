@@ -6215,7 +6215,7 @@ export interface operations {
   get_public_fixes_public_v1_fixes_get: {
     parameters: {
       query: {
-        /** @description The site's public key (qls_...) */
+        /** @description The site's public key (ors_...) */
         site_key: string;
         /** @description The current page URL */
         url: string;

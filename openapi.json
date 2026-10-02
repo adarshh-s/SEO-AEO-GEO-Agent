@@ -1,7 +1,7 @@
 {
   "openapi": "3.1.0",
   "info": {
-    "title": "QuardLink API",
+    "title": "OmniRank API",
     "version": "0.1.0"
   },
   "paths": {
@@ -5630,10 +5630,10 @@
             "required": true,
             "schema": {
               "type": "string",
-              "description": "The site's public key (qls_...)",
+              "description": "The site's public key (ors_...)",
               "title": "Site Key"
             },
-            "description": "The site's public key (qls_...)"
+            "description": "The site's public key (ors_...)"
           },
           {
             "name": "url",

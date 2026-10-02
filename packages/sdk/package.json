@@ -1,7 +1,7 @@
 {
-  "name": "@quardlink/sdk",
+  "name": "@omnirank/sdk",
   "version": "0.1.0",
-  "description": "QuardLink SDK for Next.js, React, and Modern Web Frameworks",
+  "description": "OmniRank SDK for Next.js, React, and Modern Web Frameworks",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
   "types": "dist/index.d.ts",
@@ -12,12 +12,13 @@
   "keywords": [
     "seo",
     "aeo",
+    "geo",
     "nextjs",
     "metadata",
     "schema",
     "json-ld"
   ],
-  "author": "QuardLink",
+  "author": "OmniRank",
   "license": "MIT",
   "peerDependencies": {
     "react": ">=18.0.0"

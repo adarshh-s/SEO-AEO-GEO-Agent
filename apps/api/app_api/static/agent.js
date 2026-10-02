@@ -1,5 +1,5 @@
 /**
- * QuardLink Universal SEO & AI Optimization Snippet (agent.js)
+ * OmniRank Universal SEO & AI Optimization Snippet (agent.js)
  * Zero dependencies, fail-safe, cookieless telemetry and fix injection.
  */
 (function () {
@@ -7,7 +7,10 @@
 
   try {
     // Prevent double execution
-    if (window.QuardLink && window.QuardLink.loaded) {
+    if (
+      (window.OmniRank && window.OmniRank.loaded) ||
+      (window.QuardLink && window.QuardLink.loaded)
+    ) {
       return;
     }
 
@@ -36,12 +39,13 @@
       apiOrigin = a.protocol + "//" + a.host;
     }
 
-    window.QuardLink = {
+    window.OmniRank = {
       version: "1.0.0",
       loaded: true,
       siteKey: siteKey,
       appliedFixes: [],
     };
+    window.QuardLink = window.OmniRank;
 
     // 1. Cookieless AI Referral & Bot Traffic Tracking
     var referrer = (document.referrer || "").toLowerCase();

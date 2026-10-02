@@ -22,7 +22,7 @@ def generate_salla_snippet_code(site_key: str) -> str:
     """Generate script tag for Salla Twilight custom head code."""
     return f"""<!-- {BRAND["product_name"]} SEO & AI Visibility Tag -->
 <meta name="{BRAND["verification_meta_name"]}" content="{site_key}" />
-<script defer src="https://quardlink.com/agent.js" data-site-key="{site_key}" data-platform="salla"></script>
+<script defer src="https://{BRAND["brand_slug"]}.com/{BRAND["snippet_filename"]}" data-site-key="{site_key}" data-platform="salla"></script>
 <!-- End {BRAND["product_name"]} Tag -->"""
 
 
@@ -152,7 +152,7 @@ class SallaConnector:
 
         return DeploymentResult(
             ok=True,
-            message="Fix published to QuardLink CDN snippet for Salla store.",
+            message=f"Fix published to {BRAND['product_name']} CDN snippet for Salla store.",
             external_reference=f"salla-snippet-{site_key[:8]}",
             previous_state={"applied_via": "snippet"},
         )

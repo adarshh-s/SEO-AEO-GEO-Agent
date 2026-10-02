@@ -26,6 +26,7 @@ import { Input } from "@/components/ui/input";
 import { PageLoader } from "@/components/ui/spinner";
 import { EmptyState, ErrorState, PageHeader } from "@/components/ui/states";
 import type { ApiKeyCreatedOut } from "@/lib/api-types";
+import { BRAND, PRODUCT_NAME } from "@/lib/brand";
 import {
   useApiKeys,
   useConnectGsc,
@@ -432,7 +433,7 @@ export function IntegrationsPage() {
             <div className="space-y-4">
               <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                 <div>
-                  <h4 className="text-sm font-semibold">QuardLink WordPress Plugin</h4>
+                  <h4 className="text-sm font-semibold">{PRODUCT_NAME} WordPress Plugin</h4>
                   <p className="text-muted-foreground text-xs">
                     Server-side title, description, schema injection, and AI referral tracking.
                     Cooperates with Yoast SEO & Rank Math.
@@ -589,7 +590,7 @@ export function IntegrationsPage() {
           {deepPlatformTab === "nextjs" && (
             <div className="space-y-4">
               <div>
-                <h4 className="text-sm font-semibold">@quardlink/sdk for Next.js & React</h4>
+                <h4 className="text-sm font-semibold">{BRAND.sdk_package} for Next.js & React</h4>
                 <p className="text-muted-foreground text-xs">
                   First-class server-side rendering for App Router metadata and JSON-LD schema
                   components. Fail-open with stale-while-revalidate caching.
@@ -602,7 +603,7 @@ export function IntegrationsPage() {
                     1. Install Package
                   </span>
                   <pre className="border-border bg-muted/60 mt-2 overflow-auto rounded-md border p-2.5 font-mono text-xs select-all">
-                    npm install @quardlink/sdk
+                    npm install {BRAND.sdk_package}
                   </pre>
                 </div>
 
@@ -611,10 +612,10 @@ export function IntegrationsPage() {
                     2. App Router generateMetadata &amp; Schema Component
                   </span>
                   <pre className="border-border bg-muted/60 mt-2 overflow-auto rounded-md border p-2.5 font-mono text-xs select-all">
-                    {`import { getQuardLinkMetadata, QuardLinkSchema } from "@quardlink/sdk";
+                    {`import { getOmniRankMetadata, OmniRankSchema } from "${BRAND.sdk_package}";
 
 export async function generateMetadata() {
-  return await getQuardLinkMetadata({
+  return await getOmniRankMetadata({
     siteKey: "${currentSite?.site_key ?? "YOUR_SITE_KEY"}",
     url: "https://${currentSite?.domain ?? "example.com"}/",
     defaultMetadata: { title: "Home" },
@@ -624,7 +625,7 @@ export async function generateMetadata() {
 export default function Page() {
   return (
     <>
-      <QuardLinkSchema siteKey="${currentSite?.site_key ?? "YOUR_SITE_KEY"}" url="https://${currentSite?.domain ?? "example.com"}/" />
+      <OmniRankSchema siteKey="${currentSite?.site_key ?? "YOUR_SITE_KEY"}" url="https://${currentSite?.domain ?? "example.com"}/" />
       <main>Page Content</main>
     </>
   );
@@ -641,8 +642,8 @@ export default function Page() {
               <div>
                 <h4 className="text-sm font-semibold">Automated GitHub Pull Requests</h4>
                 <p className="text-muted-foreground text-xs">
-                  QuardLink patches target pages/components on an isolated branch and opens a Pull
-                  Request for your engineering team to review and merge.
+                  {PRODUCT_NAME} patches target pages/components on an isolated branch and opens a
+                  Pull Request for your engineering team to review and merge.
                 </p>
               </div>
 
@@ -902,10 +903,10 @@ export default function Page() {
                 </p>
                 <div className="relative">
                   <pre className="border-border bg-muted/60 overflow-auto rounded-md border p-3 font-mono text-xs select-all">
-                    {`<!-- QuardLink SEO & AI Visibility Tag -->
-<meta name="quardlink-verification" content="${siteId ?? "SITE_KEY"}" />
-<script defer src="https://quardlink.com/agent.js" data-site-key="${siteId ?? "SITE_KEY"}" data-platform="salla"></script>
-<!-- End QuardLink Tag -->`}
+                    {`<!-- ${PRODUCT_NAME} SEO & AI Visibility Tag -->
+<meta name="${BRAND.verification_meta_name}" content="${siteId ?? "SITE_KEY"}" />
+<script defer src="https://${BRAND.brand_slug}.com/${BRAND.snippet_filename}" data-site-key="${siteId ?? "SITE_KEY"}" data-platform="salla"></script>
+<!-- End ${PRODUCT_NAME} Tag -->`}
                   </pre>
                   <Button
                     variant="ghost"
@@ -914,7 +915,7 @@ export default function Page() {
                     onClick={() =>
                       handleCopy(
                         "salla-snippet",
-                        `<!-- QuardLink SEO & AI Visibility Tag -->\n<meta name="quardlink-verification" content="${siteId ?? "SITE_KEY"}" />\n<script defer src="https://quardlink.com/agent.js" data-site-key="${siteId ?? "SITE_KEY"}" data-platform="salla"></script>\n<!-- End QuardLink Tag -->`,
+                        `<!-- ${PRODUCT_NAME} SEO & AI Visibility Tag -->\n<meta name="${BRAND.verification_meta_name}" content="${siteId ?? "SITE_KEY"}" />\n<script defer src="https://${BRAND.brand_slug}.com/${BRAND.snippet_filename}" data-site-key="${siteId ?? "SITE_KEY"}" data-platform="salla"></script>\n<!-- End ${PRODUCT_NAME} Tag -->`,
                       )
                     }
                   >
@@ -930,8 +931,8 @@ export default function Page() {
                   <ol className="list-inside list-decimal space-y-0.5">
                     <li>Paste the snippet in Salla Twilight Custom Code Header.</li>
                     <li>
-                      Update product titles & meta descriptions in Products → SEO tab using
-                      QuardLink recommendations.
+                      Update product titles & meta descriptions in Products → SEO tab using{" "}
+                      {PRODUCT_NAME} recommendations.
                     </li>
                     <li>
                       Dynamic schema for FAQs and AI citations will automatically activate on your
@@ -1045,10 +1046,10 @@ export default function Page() {
                 </p>
                 <div className="relative">
                   <pre className="border-border bg-muted/60 overflow-auto rounded-md border p-3 font-mono text-xs select-all">
-                    {`<!-- QuardLink SEO & AI Visibility Tag -->
-<meta name="quardlink-verification" content="${siteId ?? "SITE_KEY"}" />
-<script defer src="https://quardlink.com/agent.js" data-site-key="${siteId ?? "SITE_KEY"}" data-platform="zid"></script>
-<!-- End QuardLink Tag -->`}
+                    {`<!-- ${PRODUCT_NAME} SEO & AI Visibility Tag -->
+<meta name="${BRAND.verification_meta_name}" content="${siteId ?? "SITE_KEY"}" />
+<script defer src="https://${BRAND.brand_slug}.com/${BRAND.snippet_filename}" data-site-key="${siteId ?? "SITE_KEY"}" data-platform="zid"></script>
+<!-- End ${PRODUCT_NAME} Tag -->`}
                   </pre>
                   <Button
                     variant="ghost"
@@ -1057,7 +1058,7 @@ export default function Page() {
                     onClick={() =>
                       handleCopy(
                         "zid-snippet",
-                        `<!-- QuardLink SEO & AI Visibility Tag -->\n<meta name="quardlink-verification" content="${siteId ?? "SITE_KEY"}" />\n<script defer src="https://quardlink.com/agent.js" data-site-key="${siteId ?? "SITE_KEY"}" data-platform="zid"></script>\n<!-- End QuardLink Tag -->`,
+                        `<!-- ${PRODUCT_NAME} SEO & AI Visibility Tag -->\n<meta name="${BRAND.verification_meta_name}" content="${siteId ?? "SITE_KEY"}" />\n<script defer src="https://${BRAND.brand_slug}.com/${BRAND.snippet_filename}" data-site-key="${siteId ?? "SITE_KEY"}" data-platform="zid"></script>\n<!-- End ${PRODUCT_NAME} Tag -->`,
                       )
                     }
                   >

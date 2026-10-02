@@ -1,6 +1,6 @@
 declare const process: { env?: Record<string, string | undefined> } | undefined;
 
-export interface QuardLinkFix {
+export interface OmniRankFix {
   id: string;
   type: "meta" | "schema" | "faq" | "content_block" | "technical";
   title: string;
@@ -12,6 +12,8 @@ export interface QuardLinkFix {
   };
 }
 
+export type QuardLinkFix = OmniRankFix;
+
 export interface GetMetadataOptions {
   siteKey: string;
   url: string;
@@ -20,20 +22,21 @@ export interface GetMetadataOptions {
   defaultMetadata?: Record<string, unknown>;
 }
 
-const DEFAULT_API_URL = "https://api.quardlink.com";
+const DEFAULT_API_URL = "https://api.omnirank.com";
 
 /**
  * Fetch approved SEO metadata fixes and merge them into Next.js App Router metadata.
  * Fail-open: returns defaultMetadata unchanged on network or parsing error.
  */
-export async function getQuardLinkMetadata(
+export async function getOmniRankMetadata(
   options: GetMetadataOptions,
 ): Promise<Record<string, unknown>> {
   const {
     siteKey,
     url,
     apiUrl = (typeof process !== "undefined" &&
-      process?.env?.NEXT_PUBLIC_QUARDLINK_API_URL) ||
+      (process?.env?.NEXT_PUBLIC_OMNIRANK_API_URL ||
+        process?.env?.NEXT_PUBLIC_QUARDLINK_API_URL)) ||
       DEFAULT_API_URL,
     revalidate = 300,
     defaultMetadata = {},
@@ -46,7 +49,7 @@ export async function getQuardLinkMetadata(
     // Pass Next.js revalidation options if running in Next.js environment
     const fetchOptions: RequestInit & { next?: { revalidate: number } } = {
       headers: {
-        "User-Agent": "QuardLink-SDK/1.0",
+        "User-Agent": "OmniRank-SDK/1.0",
       },
       next: { revalidate },
     };
@@ -56,7 +59,7 @@ export async function getQuardLinkMetadata(
       return defaultMetadata;
     }
 
-    const data = (await res.json()) as { fixes?: QuardLinkFix[] };
+    const data = (await res.json()) as { fixes?: OmniRankFix[] };
     const fixes = data.fixes || [];
 
     const metaFix = fixes.find((f) => f.type === "meta");
@@ -78,3 +81,5 @@ export async function getQuardLinkMetadata(
     return defaultMetadata;
   }
 }
+
+export const getQuardLinkMetadata = getOmniRankMetadata;

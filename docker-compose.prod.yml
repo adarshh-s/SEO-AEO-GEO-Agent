@@ -1,5 +1,5 @@
-# Production Docker Compose stack for QuardLink
-name: quardlink-prod
+# Production Docker Compose stack for OmniRank
+name: omnirank-prod
 
 x-python-prod-env: &python-prod-env
   env_file:

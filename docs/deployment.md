@@ -1,17 +1,17 @@
-# QuardLink Production Deployment Guide
+# OmniRank Production Deployment Guide
 
-This guide describes how to deploy and operate QuardLink in production. It covers both the primary PaaS architecture (**Railway + Vercel**, per architecture decision [D10](file:///Users/adarsh/Desktop/Projects/SEO%20agent/docs/decisions.md#L19)) and a self-hosted **Docker Compose** option for bare metal / VPS environments.
+This guide describes how to deploy and operate OmniRank in production. It covers both the primary PaaS architecture (**Railway + Vercel**, per architecture decision [D10](file:///Users/adarsh/Desktop/Projects/SEO%20agent/docs/decisions.md#L19)) and a self-hosted **Docker Compose** option for bare metal / VPS environments.
 
 ---
 
 ## 1. Architecture & Deployment Models
 
-QuardLink is built with a decoupled architecture designed for multi-tenant isolation, background crawling, and AI answer engine tracking:
+OmniRank is built with a decoupled architecture designed for multi-tenant isolation, background crawling, and AI answer engine tracking:
 
 ```
                       ┌───────────────────────────────────────┐
                       │            DNS / Cloudflare           │
-                      │  quardlink.com   app.   api.   cdn.   │
+                      │  omnirank.com   app.   api.   cdn.   │
                       └──────────┬─────────────────┬──────────┘
                                  │                 │
               HTTPS (Frontend)   │                 │ HTTPS (API)
@@ -69,15 +69,15 @@ Store these variables in your production secrets manager (Railway/Vercel dashboa
 
 | Variable       | Description                             | Example                                           |
 | -------------- | --------------------------------------- | ------------------------------------------------- |
-| `APP_URL`      | Base URL of the web dashboard           | `https://app.quardlink.com`                       |
-| `API_URL`      | Base URL of the API                     | `https://api.quardlink.com`                       |
-| `CORS_ORIGINS` | Comma-separated list of allowed origins | `https://app.quardlink.com,https://quardlink.com` |
+| `APP_URL`      | Base URL of the web dashboard           | `https://app.omnirank.com`                       |
+| `API_URL`      | Base URL of the API                     | `https://api.omnirank.com`                       |
+| `CORS_ORIGINS` | Comma-separated list of allowed origins | `https://app.omnirank.com,https://omnirank.com` |
 
 ### Databases
 
 | Variable       | Description                  | Example                                         |
 | -------------- | ---------------------------- | ----------------------------------------------- |
-| `DATABASE_URL` | PostgreSQL connection string | `postgresql://app:PASSWORD@host:5432/quardlink` |
+| `DATABASE_URL` | PostgreSQL connection string | `postgresql://app:PASSWORD@host:5432/omnirank` |
 | `REDIS_URL`    | Redis connection string      | `redis://default:PASSWORD@host:6379/0`          |
 
 ### External AI & SEO Providers
@@ -97,16 +97,16 @@ Store these variables in your production secrets manager (Railway/Vercel dashboa
 | ----------------- | ------------------------------------------------------------------------------------------------------------------------ | ------------------------ |
 | `EMAIL_PROVIDER`  | Provider adapter (`resend` or `smtp`)                                                                                    | `resend`                 |
 | `RESEND_API_KEY`  | Resend API key (if `EMAIL_PROVIDER=resend`)                                                                              | `re_123456789...`        |
-| `EMAIL_FROM`      | Sender address                                                                                                           | `noreply@quardlink.com`  |
+| `EMAIL_FROM`      | Sender address                                                                                                           | `noreply@omnirank.com`  |
 | `OPS_ALERT_EMAIL` | Operator address for cost ceiling alerts ([D8](file:///Users/adarsh/Desktop/Projects/SEO%20agent/docs/decisions.md#L17)) | `adarshs18400@gmail.com` |
 
 ### Frontend Build Arguments / Environment Variables
 
 | Variable             | Description                                   | Example                         |
 | -------------------- | --------------------------------------------- | ------------------------------- |
-| `VITE_API_URL`       | API base URL accessed by the browser          | `https://api.quardlink.com/api` |
+| `VITE_API_URL`       | API base URL accessed by the browser          | `https://api.omnirank.com/api` |
 | `VITE_CONTACT_EMAIL` | Contact email for pricing / support inquiries | `adarshs18400@gmail.com`        |
-| `VITE_CDN_URL`       | CDN base URL for hosted snippet JS            | `https://cdn.quardlink.com`     |
+| `VITE_CDN_URL`       | CDN base URL for hosted snippet JS            | `https://cdn.omnirank.com`     |
 
 ---
 
@@ -138,7 +138,7 @@ Store these variables in your production secrets manager (Railway/Vercel dashboa
    - Build using Dockerfile: `infra/docker/api.Dockerfile` (target: `prod`).
    - Set environment variables as listed in Section 2.
    - Expose port `8000`.
-   - Add custom domain: `api.quardlink.com`.
+   - Add custom domain: `api.omnirank.com`.
 
 4. **Deploy Celery Worker Service**:
    - Add a second service from the same repo.
@@ -173,11 +173,11 @@ Store these variables in your production secrets manager (Railway/Vercel dashboa
    - **Output Directory**: `dist`
    - **Install Command**: `pnpm install`
 3. Configure Environment Variables:
-   - `VITE_API_URL` = `https://api.quardlink.com/api`
+   - `VITE_API_URL` = `https://api.omnirank.com/api`
    - `VITE_CONTACT_EMAIL` = `adarshs18400@gmail.com`
 4. Add Custom Domains:
-   - `app.quardlink.com` (Main web dashboard)
-   - `quardlink.com` (Marketing landing & pricing pages)
+   - `app.omnirank.com` (Main web dashboard)
+   - `omnirank.com` (Marketing landing & pricing pages)
 
 ---
 
@@ -197,8 +197,8 @@ For deploying on a single VPS or dedicated Linux server (Ubuntu 22.04+ / Debian 
 
 1. Clone the repository to the server:
    ```bash
-   git clone <repo-url> /opt/quardlink
-   cd /opt/quardlink
+   git clone <repo-url> /opt/omnirank
+   cd /opt/omnirank
    ```
 2. Create `.env` from template:
    ```bash
@@ -214,8 +214,8 @@ For deploying on a single VPS or dedicated Linux server (Ubuntu 22.04+ / Debian 
    POSTGRES_PASSWORD=<strong-db-password>
    DATABASE_URL=postgresql://app:${POSTGRES_PASSWORD}@postgres:5432/app
    REDIS_URL=redis://redis:6379/0
-   APP_URL=https://app.quardlink.com
-   CORS_ORIGINS=https://app.quardlink.com,https://quardlink.com
+   APP_URL=https://app.omnirank.com
+   CORS_ORIGINS=https://app.omnirank.com,https://omnirank.com
    EMAIL_PROVIDER=resend
    RESEND_API_KEY=re_...
    OPS_ALERT_EMAIL=adarshs18400@gmail.com
@@ -260,7 +260,7 @@ If using Nginx directly, obtain a certificate via Certbot or place Cloudflare Or
 
 ```bash
 sudo apt-get install -y certbot python3-certbot-nginx
-sudo certbot --nginx -d quardlink.com -d app.quardlink.com -d api.quardlink.com
+sudo certbot --nginx -d omnirank.com -d app.omnirank.com -d api.omnirank.com
 ```
 
 ---
@@ -271,10 +271,10 @@ Configure the following DNS records at your registrar or Cloudflare:
 
 | Type      | Host                | Target                      | Proxy Status          |
 | --------- | ------------------- | --------------------------- | --------------------- |
-| A / CNAME | `quardlink.com`     | Vercel / Server IP          | Proxied               |
-| CNAME     | `app.quardlink.com` | Vercel / Server IP          | Proxied               |
-| CNAME     | `api.quardlink.com` | Railway / Server IP         | Proxied (or DNS only) |
-| CNAME     | `cdn.quardlink.com` | CDN origin / Storage bucket | Proxied               |
+| A / CNAME | `omnirank.com`     | Vercel / Server IP          | Proxied               |
+| CNAME     | `app.omnirank.com` | Vercel / Server IP          | Proxied               |
+| CNAME     | `api.omnirank.com` | Railway / Server IP         | Proxied (or DNS only) |
+| CNAME     | `cdn.omnirank.com` | CDN origin / Storage bucket | Proxied               |
 
 ### Cookie Security & Cross-Domain Auth
 
@@ -303,7 +303,7 @@ Run `python scripts/verify_prod_env.py` in your environment. It validates:
 Query the API health check:
 
 ```bash
-curl -f https://api.quardlink.com/healthz
+curl -f https://api.omnirank.com/healthz
 ```
 
 Expected output:
@@ -326,9 +326,9 @@ Set up a daily cron job to backup PostgreSQL:
 
 ```bash
 #!/bin/bash
-BACKUP_DIR="/var/backups/quardlink"
+BACKUP_DIR="/var/backups/omnirank"
 mkdir -p "$BACKUP_DIR"
-docker compose -f /opt/quardlink/docker-compose.prod.yml exec -T postgres \
+docker compose -f /opt/omnirank/docker-compose.prod.yml exec -T postgres \
   pg_dump -U app app | gzip > "$BACKUP_DIR/backup-$(date +\%Y\%m\%d_\%H\%M\%S).sql.gz"
 find "$BACKUP_DIR" -type f -mtime +30 -delete
 ```

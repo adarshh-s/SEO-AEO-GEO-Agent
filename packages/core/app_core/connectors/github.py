@@ -17,6 +17,7 @@ import re
 import urllib.parse
 from typing import Any
 
+from app_core.brand import BRAND
 from app_core.connectors.base import ConnectionTestResult, DeploymentResult, RollbackResult
 
 logger = logging.getLogger(__name__)
@@ -138,7 +139,7 @@ class GithubConnector:
         parsed = urllib.parse.urlparse(target_url)
         path = parsed.path.strip("/")
         short_id = f"{hash(target_url + title) % 100000:05d}"
-        new_branch = f"quardlink/fix-{short_id}"
+        new_branch = f"{BRAND['brand_slug']}/fix-{short_id}"
 
         # Target file resolution
         candidate_file = config.get("file_path") or payload.get("file_path")
@@ -217,7 +218,7 @@ class GithubConnector:
 
             # 5. Commit updated file
             commit_payload: dict[str, Any] = {
-                "message": f"QuardLink SEO Fix: {title}",
+                "message": f"{BRAND['product_name']} SEO Fix: {title}",
                 "content": base64.b64encode(new_content.encode("utf-8")).decode("utf-8"),
                 "branch": new_branch,
             }
@@ -236,7 +237,7 @@ class GithubConnector:
                 )
 
             # 6. Create Pull Request
-            pr_body = f"""## 🚀 QuardLink SEO & AEO Automated Fix
+            pr_body = f"""## 🚀 {BRAND["product_name"]} SEO & AEO Automated Fix
 
 ### Summary
 - **Target URL:** `{target_url}`
@@ -248,13 +249,13 @@ class GithubConnector:
 - All changes are non-destructive and preserve existing application code.
 
 ---
-*Created automatically by [QuardLink](https://quardlink.com). Please review the diff and merge when ready.*
+*Created automatically by [{BRAND["product_name"]}](https://{BRAND["brand_slug"]}.com). Please review the diff and merge when ready.*
 """
             pr_resp = requests.post(
                 f"https://api.github.com/repos/{owner}/{repo}/pulls",
                 headers=headers,
                 json={
-                    "title": f"QuardLink SEO: {title}",
+                    "title": f"{BRAND['product_name']} SEO: {title}",
                     "head": new_branch,
                     "base": base_branch,
                     "body": pr_body,

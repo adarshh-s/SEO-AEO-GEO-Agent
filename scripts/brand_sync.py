@@ -27,13 +27,34 @@ def load_brand() -> dict:
 
 
 def render_python(brand: dict) -> str:
-    body = json.dumps(brand, indent=4, ensure_ascii=False, sort_keys=True)
-    return f'"""{HEADER}"""\n\nfrom typing import Any\n\nBRAND: dict[str, Any] = {body}\n'
+    items = []
+    for k in sorted(brand.keys()):
+        v = brand[k]
+        if isinstance(v, dict):
+            inner = ", ".join(
+                f'"{ik}": {json.dumps(iv, ensure_ascii=False)}' for ik, iv in sorted(v.items())
+            )
+            items.append(f'    "{k}": {{{inner}}},')
+        else:
+            items.append(f'    "{k}": {json.dumps(v, ensure_ascii=False)},')
+    body = "\n".join(items)
+    return f'"""{HEADER}"""\n\nfrom typing import Any\n\nBRAND: dict[str, Any] = {{\n{body}\n}}\n'
 
 
 def render_typescript(brand: dict) -> str:
-    body = json.dumps(brand, indent=2, ensure_ascii=False, sort_keys=True)
-    return f"// {HEADER}\n\nexport const BRAND = {body} as const;\n\nexport type Brand = typeof BRAND;\n"
+    items = []
+    for k in sorted(brand.keys()):
+        v = brand[k]
+        if isinstance(v, dict):
+            inner_lines = [
+                f"    {ik}: {json.dumps(iv, ensure_ascii=False)}," for ik, iv in sorted(v.items())
+            ]
+            inner = "\n".join(inner_lines)
+            items.append(f"  {k}: {{\n{inner}\n  }},")
+        else:
+            items.append(f"  {k}: {json.dumps(v, ensure_ascii=False)},")
+    body = "\n".join(items)
+    return f"// {HEADER}\n\nexport const BRAND = {{\n{body}\n}} as const;\n\nexport type Brand = typeof BRAND;\n"
 
 
 TARGETS: list[tuple[str, Callable[[dict], str]]] = [

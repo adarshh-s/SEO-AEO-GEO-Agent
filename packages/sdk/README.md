@@ -1,15 +1,15 @@
-# @quardlink/sdk
+# @omnirank/sdk
 
-Official developer package for server-side SEO and AI search visibility (AEO) in Next.js, React, and modern web frameworks.
+Official developer package for server-side SEO, Answer Engine Optimization (AEO), and Generative Engine Optimization (GEO) in Next.js, React, and modern web frameworks.
 
 ## Installation
 
 ```bash
-npm install @quardlink/sdk
+npm install @omnirank/sdk
 # or
-pnpm add @quardlink/sdk
+pnpm add @omnirank/sdk
 # or
-yarn add @quardlink/sdk
+yarn add @omnirank/sdk
 ```
 
 ## Quick Start (Next.js App Router)
@@ -20,7 +20,7 @@ In your Next.js App Router `page.tsx` or `layout.tsx`:
 
 ```tsx
 import type { Metadata } from "next";
-import { getQuardLinkMetadata } from "@quardlink/sdk";
+import { getOmniRankMetadata } from "@omnirank/sdk";
 
 export async function generateMetadata(): Promise<Metadata> {
   const defaultMeta: Metadata = {
@@ -28,8 +28,8 @@ export async function generateMetadata(): Promise<Metadata> {
     description: "Our awesome products",
   };
 
-  return await getQuardLinkMetadata({
-    siteKey: process.env.NEXT_PUBLIC_QUARDLINK_SITE_KEY!,
+  return await getOmniRankMetadata({
+    siteKey: process.env.NEXT_PUBLIC_OMNIRANK_SITE_KEY!,
     url: "https://example.com/products/headphones",
     defaultMetadata: defaultMeta,
     revalidate: 300, // Stale-while-revalidate (5 minutes)
@@ -41,20 +41,20 @@ export default function Page() {
 }
 ```
 
-### 2. Server-side Structured Data (`QuardLinkSchema`)
+### 2. Server-side Structured Data (`OmniRankSchema`)
 
-Render JSON-LD schema server-side so Google and AI search crawlers (GPTBot, PerplexityBot, ClaudeBot) read it without requiring JavaScript execution:
+Render JSON-LD schema server-side so Google and AI search crawlers (GPTBot, PerplexityBot, ClaudeBot, Google-Extended) read it without requiring client JavaScript execution:
 
 ```tsx
-import { QuardLinkSchema } from "@quardlink/sdk";
+import { OmniRankSchema } from "@omnirank/sdk";
 
 export default function Page() {
   return (
     <main>
       <h1>Product Details</h1>
       {/* Renders <script type="application/ld+json"> server-side */}
-      <QuardLinkSchema
-        siteKey={process.env.NEXT_PUBLIC_QUARDLINK_SITE_KEY!}
+      <OmniRankSchema
+        siteKey={process.env.NEXT_PUBLIC_OMNIRANK_SITE_KEY!}
         url="https://example.com/products/headphones"
       />
     </main>
@@ -64,4 +64,4 @@ export default function Page() {
 
 ## Resilience & Fail-Open Guarantee
 
-`@quardlink/sdk` is strictly fail-open: if network issues or outages occur between your server and the QuardLink API, your application continues rendering with default metadata and existing templates without crashing or slowing down page requests.
+`@omnirank/sdk` is strictly fail-open: if network issues or outages occur between your server and the OmniRank API, your application continues rendering with default metadata and existing templates without crashing or slowing down page requests.

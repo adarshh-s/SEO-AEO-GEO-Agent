@@ -92,7 +92,7 @@ describe("OnboardingPage", () => {
 
     expect(await screen.findByText("Connect your website")).toBeInTheDocument();
     expect(screen.getByText(/data-site="qls_abc123"/)).toBeInTheDocument();
-    expect(screen.getByText(/quardlink-verification/)).toBeInTheDocument();
+    expect(screen.getByText(/omnirank-verification/)).toBeInTheDocument();
     expect(screen.getByText(/Many AI crawlers don't run JavaScript/)).toBeInTheDocument();
   });
 

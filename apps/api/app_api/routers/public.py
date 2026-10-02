@@ -10,6 +10,7 @@ from sqlalchemy import select
 
 from app_api.deps import SystemDb
 from app_api.errors import not_found
+from app_core.brand import BRAND
 from app_core.models import AiReferralEvent, Fix, Site
 
 router = APIRouter(prefix="/public/v1", tags=["public"])
@@ -55,7 +56,9 @@ def get_agent_script() -> Response:
 
 @router.get("/fixes", response_model=PublicFixesResponse)
 def get_public_fixes(
-    site_key: str = Query(..., description="The site's public key (qls_...)"),
+    site_key: str = Query(
+        ..., description=f"The site's public key ({BRAND['site_key_prefix']}_...)"
+    ),
     url: str = Query(..., description="The current page URL"),
     db: SystemDb = None,
 ) -> PublicFixesResponse:

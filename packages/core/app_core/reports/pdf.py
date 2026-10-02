@@ -39,7 +39,7 @@ def generate_audit_pdf(
     styles = getSampleStyleSheet()
 
     # Custom styles
-    brand_color = colors.HexColor("#2563EB")  # QuardLink Blue
+    brand_color = colors.HexColor(BRAND.get("colors", {}).get("primary", "#2563EB"))
     dark_text = colors.HexColor("#0F172A")
     muted_text = colors.HexColor("#64748B")
     border_color = colors.HexColor("#E2E8F0")
@@ -249,7 +249,7 @@ def generate_audit_pdf(
     # 5. Footer notice
     footer_text = (
         f"<font color='#94A3B8' size=8>This executive report was compiled by {BRAND['product_name']} "
-        f"(https://quardlink.com) for {domain}. Confidential. All rights reserved.</font>"
+        f"(https://{BRAND['brand_slug']}.com) for {domain}. Confidential. All rights reserved.</font>"
     )
     story.append(Paragraph(footer_text, body_style))
 

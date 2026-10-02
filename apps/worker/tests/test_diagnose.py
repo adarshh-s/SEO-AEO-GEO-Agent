@@ -107,8 +107,8 @@ def test_generate_schema_fix():
 def test_generate_meta_fix():
     fix_meta = generate_meta_fix(
         target_query="best accounting software",
-        site_name="QuardLink",
-        domain="quardlink.com",
+        site_name="OmniRank",
+        domain="omnirank.com",
         platform="shopify",
         language="en",
     )

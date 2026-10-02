@@ -6,6 +6,7 @@ import zipfile
 
 import pytest
 
+from app_core.brand import BRAND
 from app_core.connectors import (
     CloudflareConnector,
     GithubConnector,
@@ -37,8 +38,9 @@ def test_wordpress_connector_and_generator():
     assert "plugin_sync" in res.details["mode"]
 
     # Plugin php & zip generation
+    wp_slug = BRAND.get("wp_plugin_slug", BRAND["brand_slug"])
     php = generate_wordpress_plugin_php("test_site_key_123", "https://api.example.com")
-    assert "QuardLink_SEO" in php
+    assert f"{BRAND['product_name']}_SEO" in php
     assert "test_site_key_123" in php
     assert "wpseo_schema_graph" in php
     assert "rank_math/json_ld" in php
@@ -47,8 +49,8 @@ def test_wordpress_connector_and_generator():
     zip_bytes = generate_wordpress_plugin_zip("test_key", "https://api.example.com")
     with zipfile.ZipFile(io.BytesIO(zip_bytes)) as zf:
         names = zf.namelist()
-        assert "quardlink-seo/quardlink-seo.php" in names
-        assert "quardlink-seo/readme.txt" in names
+        assert f"{wp_slug}-seo/{wp_slug}-seo.php" in names
+        assert f"{wp_slug}-seo/readme.txt" in names
 
     # Deploy meta fix
     meta_deploy = wp.deploy_fix(
@@ -117,7 +119,7 @@ def test_shopify_connector():
         site_key="test_key",
     )
     assert schema_res.ok
-    assert "quardlink" in schema_res.details["namespace"]
+    assert BRAND["brand_slug"] in schema_res.details["namespace"]
 
     # Draft blog article for content fix
     blog_res = shopify.deploy_fix(
@@ -149,7 +151,7 @@ def test_github_connector():
     )
     assert deploy_res.ok
     assert "https://github.com/acme/web/pull/" in deploy_res.external_reference
-    assert deploy_res.details["branch"].startswith("quardlink/fix-")
+    assert deploy_res.details["branch"].startswith(f"{BRAND['brand_slug']}/fix-")
 
     rollback_res = gh.rollback_fix(
         target_url="https://example.com/about",

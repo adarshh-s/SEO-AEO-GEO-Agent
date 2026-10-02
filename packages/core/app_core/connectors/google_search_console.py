@@ -15,6 +15,7 @@ import urllib.parse
 from datetime import UTC, datetime, timedelta
 from typing import Any
 
+from app_core.brand import BRAND
 from app_core.connectors.base import ConnectionTestResult, DeploymentResult, RollbackResult
 
 logger = logging.getLogger(__name__)
@@ -193,7 +194,7 @@ class GoogleSearchConsoleConnector:
         # GSC is an analytics and indexing connector, not a fix deployment target
         return DeploymentResult(
             ok=False,
-            message="Google Search Console is a monitoring and indexing integration. Fixes should be deployed via platform connectors or the QuardLink snippet.",
+            message=f"Google Search Console is a monitoring and indexing integration. Fixes should be deployed via platform connectors or the {BRAND['product_name']} snippet.",
         )
 
     def rollback_fix(

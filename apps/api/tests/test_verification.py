@@ -3,6 +3,7 @@
 import uuid
 from unittest.mock import MagicMock, patch
 
+from app_core.brand import BRAND
 from app_core.db import system_session
 from app_core.models import AuditLogEntry, Site
 from conftest import SITE, signup
@@ -19,8 +20,11 @@ def test_get_verification_status(app):
     assert data["verified"] is False
     assert data["domain"] == "example.com"
     assert "token" in data
-    assert f'<meta name="quardlink-verification" content="{data["token"]}">' in data["meta_tag"]
-    assert f"quardlink-verification={data['token']}" in data["dns_txt_record"]
+    assert (
+        f'<meta name="{BRAND["verification_meta_name"]}" content="{data["token"]}">'
+        in data["meta_tag"]
+    )
+    assert f"{BRAND['dns_txt_prefix']}{data['token']}" in data["dns_txt_record"]
 
 
 def test_verify_via_meta_tag(app):
@@ -35,7 +39,7 @@ def test_verify_via_meta_tag(app):
     <html>
       <head>
         <title>Test Page</title>
-        <meta name="quardlink-verification" content="{token}">
+        <meta name="{BRAND["verification_meta_name"]}" content="{token}">
       </head>
       <body><h1>Welcome</h1></body>
     </html>
@@ -77,7 +81,7 @@ def test_verify_via_dns_txt(app):
 
     # DNS mock record
     mock_txt_item = MagicMock()
-    mock_txt_item.strings = [f"quardlink-verification={token}".encode()]
+    mock_txt_item.strings = [f"{BRAND['dns_txt_prefix']}{token}".encode()]
 
     with (
         patch("requests.get", return_value=mock_resp),
