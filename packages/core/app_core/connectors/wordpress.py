@@ -17,6 +17,7 @@ from typing import Any
 
 from app_core.brand import BRAND
 from app_core.connectors.base import ConnectionTestResult, DeploymentResult, RollbackResult
+from app_core.net import safe_get, safe_post, safe_request  # customer-controlled host: SSRF-safe
 
 logger = logging.getLogger(__name__)
 
@@ -340,10 +341,9 @@ class WordpressConnector:
             )
 
         try:
-            import requests
             from requests.auth import HTTPBasicAuth
 
-            resp = requests.get(
+            resp = safe_get(
                 f"{site_url}/wp-json/wp/v2/users/me",
                 auth=HTTPBasicAuth(app_user, app_pass),
                 timeout=10,
@@ -406,10 +406,9 @@ class WordpressConnector:
                 )
 
             try:
-                import requests
                 from requests.auth import HTTPBasicAuth
 
-                resp = requests.post(
+                resp = safe_post(
                     f"{site_url}/wp-json/wp/v2/posts",
                     auth=HTTPBasicAuth(app_user, app_pass),
                     json={
@@ -446,7 +445,6 @@ class WordpressConnector:
         post_id = config.get("post_id_map", {}).get(path)
         if app_user and app_pass and post_id:
             try:
-                import requests
                 from requests.auth import HTTPBasicAuth
 
                 meta_updates: dict[str, Any] = {}
@@ -460,7 +458,7 @@ class WordpressConnector:
                 elif fix_type == "schema":
                     meta_updates[f"_{BRAND['brand_slug']}_schema"] = json.dumps(payload)
 
-                resp = requests.post(
+                resp = safe_post(
                     f"{site_url}/wp-json/wp/v2/posts/{post_id}",
                     auth=HTTPBasicAuth(app_user, app_pass),
                     json={"meta": meta_updates},
@@ -507,12 +505,12 @@ class WordpressConnector:
             post_id = external_reference.replace("wp-draft-", "").replace("wp-post-", "")
             if app_user and app_pass and post_id.isdigit():
                 try:
-                    import requests
                     from requests.auth import HTTPBasicAuth
 
                     if fix_type in ("content_block", "faq"):
                         # Trashing the draft
-                        requests.delete(
+                        safe_request(
+                            "DELETE",
                             f"{site_url}/wp-json/wp/v2/posts/{post_id}",
                             auth=HTTPBasicAuth(app_user, app_pass),
                             timeout=10,
@@ -528,7 +526,7 @@ class WordpressConnector:
                             meta_updates["_yoast_wpseo_metadesc"] = previous_state[
                                 "_yoast_wpseo_metadesc"
                             ]
-                        requests.post(
+                        safe_post(
                             f"{site_url}/wp-json/wp/v2/posts/{post_id}",
                             auth=HTTPBasicAuth(app_user, app_pass),
                             json={"meta": meta_updates},

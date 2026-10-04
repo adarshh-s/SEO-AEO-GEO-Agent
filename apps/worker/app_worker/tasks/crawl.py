@@ -50,9 +50,9 @@ def crawl_site(site_id_str: str) -> dict:
                 js_only_content_detected=render_res.js_only_content_detected,
                 js_only_text=render_res.js_only_text,
                 raw_text=fetch_res.raw_text[:50000] if fetch_res.raw_text else None,
-                rendered_text=render_res.rendered_text[:50000]
-                if render_res.rendered_text
-                else None,
+                rendered_text=(
+                    render_res.rendered_text[:50000] if render_res.rendered_text else None
+                ),
                 meta_title=fetch_res.meta_title,
                 meta_description=fetch_res.meta_description,
                 ai_robots_allowed=robots_status,

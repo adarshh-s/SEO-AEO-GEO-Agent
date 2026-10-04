@@ -76,12 +76,16 @@ def test_update_fix(app):
 
     patch_res = owner.client.patch(
         f"/sites/{site_id}/fixes/{f1}",
-        json={"title": "New Title", "payload": {"extra_key": "val"}},
+        json={
+            "title": "New Title",
+            "payload": {"extra_key": "val", "title": "<b>Better</b> title"},
+        },
     )
     assert patch_res.status_code == 200
     data = patch_res.json()
     assert data["title"] == "New Title"
-    assert data["payload"]["extra_key"] == "val"
+    assert "extra_key" not in data["payload"]  # unknown keys are dropped by the sanitizer
+    assert data["payload"]["title"] == "Better title"  # tags stripped
 
 
 def test_approve_fix_verified_vs_unverified(app):

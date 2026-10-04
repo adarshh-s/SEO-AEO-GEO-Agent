@@ -26,10 +26,12 @@ from app_api.schemas.integrations import (
     SiteIntegrationUpdateIn,
     SnippetInfoOut,
     TestConnectionOut,
+    WebhookCreatedOut,
     WebhookCreateIn,
     WebhookOut,
 )
 from app_api.services import audit
+from app_api.services.urls import normalize_site_url
 from app_core.brand import BRAND
 from app_core.connectors import (
     GoogleSearchConsoleConnector,
@@ -466,23 +468,26 @@ def delete_api_key(
 
 
 @router.get("/org/webhooks", response_model=list[WebhookOut])
-def list_webhooks(ctx: Tenant, db: TenantDb) -> list[Webhook]:
+def list_webhooks(ctx: Admin, db: TenantDb) -> list[Webhook]:
     return list(
         db.scalars(scoped(select(Webhook), Webhook, ctx).order_by(desc(Webhook.created_at)))
     )
 
 
-@router.post("/org/webhooks", response_model=WebhookOut, status_code=201)
+@router.post("/org/webhooks", response_model=WebhookCreatedOut, status_code=201)
 def create_webhook(
     body: WebhookCreateIn,
     ctx: Admin,
     db: TenantDb,
 ) -> Webhook:
+    if not body.url.lower().startswith("https://"):
+        raise ApiError(422, "invalid_url", "Webhook URLs must use https://.")
+    normalize_site_url(body.url)  # rejects IPs, localhost and internal hostnames
     secret = secrets.token_hex(24)
     wh = Webhook(
         id=uuid.uuid4(),
         org_id=ctx.org_id,
-        url=body.url,
+        url=body.url.strip(),
         secret=secret,
         events=body.events,
         status="active",

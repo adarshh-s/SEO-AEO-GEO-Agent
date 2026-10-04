@@ -25,7 +25,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { PageLoader } from "@/components/ui/spinner";
 import { EmptyState, ErrorState, PageHeader } from "@/components/ui/states";
-import type { ApiKeyCreatedOut } from "@/lib/api-types";
+import type { ApiKeyCreatedOut, WebhookCreatedOut, WebhookEvent } from "@/lib/api-types";
 import { BRAND, PRODUCT_NAME } from "@/lib/brand";
 import {
   useApiKeys,
@@ -109,11 +109,12 @@ export function IntegrationsPage() {
 
   const [showWebhookModal, setShowWebhookModal] = useState(false);
   const [webhookUrl, setWebhookUrl] = useState("");
-  const [webhookEvents, setWebhookEvents] = useState<string[]>([
-    "fix.created",
+  const [webhookEvents, setWebhookEvents] = useState<WebhookEvent[]>([
+    "fix.proposed",
     "fix.approved",
     "fix.deployed",
   ]);
+  const [createdWebhook, setCreatedWebhook] = useState<WebhookCreatedOut | null>(null);
 
   const activeIntegration = siteIntegrations.data?.find((i) => i.provider === deepPlatformTab);
   const gscInteg = siteIntegrations.data?.find((i) => i.provider === "google_search_console");
@@ -161,8 +162,9 @@ export function IntegrationsPage() {
     createWebhook.mutate(
       { url: webhookUrl.trim(), events: webhookEvents },
       {
-        onSuccess: () => {
-          setShowWebhookModal(false);
+        onSuccess: (data) => {
+          // Keep the dialog open to show the signing secret once.
+          setCreatedWebhook(data);
           setWebhookUrl("");
         },
       },
@@ -612,10 +614,10 @@ export function IntegrationsPage() {
                     2. App Router generateMetadata &amp; Schema Component
                   </span>
                   <pre className="border-border bg-muted/60 mt-2 overflow-auto rounded-md border p-2.5 font-mono text-xs select-all">
-                    {`import { getOmniRankMetadata, OmniRankSchema } from "${BRAND.sdk_package}";
+                    {`import { getSeoMetadata, StructuredData } from "${BRAND.sdk_package}";
 
 export async function generateMetadata() {
-  return await getOmniRankMetadata({
+  return await getSeoMetadata({
     siteKey: "${currentSite?.site_key ?? "YOUR_SITE_KEY"}",
     url: "https://${currentSite?.domain ?? "example.com"}/",
     defaultMetadata: { title: "Home" },
@@ -625,7 +627,7 @@ export async function generateMetadata() {
 export default function Page() {
   return (
     <>
-      <OmniRankSchema siteKey="${currentSite?.site_key ?? "YOUR_SITE_KEY"}" url="https://${currentSite?.domain ?? "example.com"}/" />
+      <StructuredData siteKey="${currentSite?.site_key ?? "YOUR_SITE_KEY"}" url="https://${currentSite?.domain ?? "example.com"}/" />
       <main>Page Content</main>
     </>
   );
@@ -1393,53 +1395,99 @@ export default function Page() {
           <div className="border-border bg-card w-full max-w-md space-y-4 rounded-xl border p-5 shadow-lg">
             <h3 className="text-base font-semibold">{t("integrations.addWebhook")}</h3>
 
-            <div className="space-y-3">
-              <div className="space-y-1">
-                <label className="text-muted-foreground text-xs font-medium">
-                  {t("integrations.webhookUrl")}
-                </label>
-                <Input
-                  value={webhookUrl}
-                  onChange={(e) => setWebhookUrl(e.target.value)}
-                  placeholder="https://example.com/api/webhook"
-                  className="text-xs"
-                />
-              </div>
-
-              <div className="space-y-1">
-                <label className="text-muted-foreground text-xs font-medium">
-                  {t("integrations.subscribedEvents")}
-                </label>
-                <div className="flex flex-col gap-1.5">
-                  {["fix.proposed", "fix.approved", "fix.deployed"].map((event) => (
-                    <label key={event} className="flex items-center gap-1.5 text-xs">
-                      <input
-                        type="checkbox"
-                        checked={webhookEvents.includes(event)}
-                        onChange={(e) => {
-                          if (e.target.checked) setWebhookEvents([...webhookEvents, event]);
-                          else setWebhookEvents(webhookEvents.filter((ev) => ev !== event));
-                        }}
-                      />
-                      <span>{event}</span>
-                    </label>
-                  ))}
+            {createdWebhook ? (
+              <div className="space-y-3">
+                <Alert tone="warning">
+                  <p className="text-xs font-semibold">{t("integrations.webhookSecretNotice")}</p>
+                </Alert>
+                <div className="bg-muted/40 flex items-center justify-between rounded-md border p-2">
+                  <span className="font-mono text-xs break-all select-all" dir="ltr">
+                    {createdWebhook.secret}
+                  </span>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="ms-2 h-7 shrink-0 text-xs"
+                    onClick={() => handleCopy("webhook-secret", createdWebhook.secret)}
+                  >
+                    {copiedKey === "webhook-secret" ? (
+                      <Check className="h-3 w-3 text-emerald-600" />
+                    ) : (
+                      <Copy className="h-3 w-3" />
+                    )}
+                  </Button>
+                </div>
+                <div className="flex justify-end pt-2">
+                  <Button
+                    size="sm"
+                    onClick={() => {
+                      setCreatedWebhook(null);
+                      setShowWebhookModal(false);
+                    }}
+                  >
+                    {t("integrations.done")}
+                  </Button>
                 </div>
               </div>
+            ) : (
+              <div className="space-y-3">
+                <div className="space-y-1">
+                  <label className="text-muted-foreground text-xs font-medium">
+                    {t("integrations.webhookUrl")}
+                  </label>
+                  <Input
+                    value={webhookUrl}
+                    onChange={(e) => setWebhookUrl(e.target.value)}
+                    placeholder="https://example.com/api/webhook"
+                    className="text-xs"
+                  />
+                </div>
 
-              <div className="flex items-center justify-end gap-2 pt-2">
-                <Button variant="ghost" size="sm" onClick={() => setShowWebhookModal(false)}>
-                  {t("common.cancel") ?? "Cancel"}
-                </Button>
-                <Button
-                  size="sm"
-                  onClick={handleCreateWebhook}
-                  disabled={createWebhook.isPending || !webhookUrl.trim()}
-                >
-                  {createWebhook.isPending ? "Adding..." : "Add Subscription"}
-                </Button>
+                <div className="space-y-1">
+                  <label className="text-muted-foreground text-xs font-medium">
+                    {t("integrations.subscribedEvents")}
+                  </label>
+                  <div className="flex flex-col gap-1.5">
+                    {(
+                      [
+                        "fix.proposed",
+                        "fix.approved",
+                        "fix.deployed",
+                        "audit.completed",
+                        "score.changed",
+                      ] as WebhookEvent[]
+                    ).map((event) => (
+                      <label key={event} className="flex items-center gap-1.5 text-xs">
+                        <input
+                          type="checkbox"
+                          checked={webhookEvents.includes(event)}
+                          onChange={(e) => {
+                            if (e.target.checked) setWebhookEvents([...webhookEvents, event]);
+                            else setWebhookEvents(webhookEvents.filter((ev) => ev !== event));
+                          }}
+                        />
+                        <span>{event}</span>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-end gap-2 pt-2">
+                  <Button variant="ghost" size="sm" onClick={() => setShowWebhookModal(false)}>
+                    {t("integrations.cancel")}
+                  </Button>
+                  <Button
+                    size="sm"
+                    onClick={handleCreateWebhook}
+                    disabled={createWebhook.isPending || !webhookUrl.trim()}
+                  >
+                    {createWebhook.isPending
+                      ? t("integrations.addingWebhook")
+                      : t("integrations.addWebhook")}
+                  </Button>
+                </div>
               </div>
-            </div>
+            )}
           </div>
         </div>
       )}

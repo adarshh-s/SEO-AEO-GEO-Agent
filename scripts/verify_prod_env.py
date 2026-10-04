@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Production environment validator for OmniRank.
+"""Production environment validator.
 
 Verifies:
 1. Production secrets: JWT_SECRET must not be the development secret.
@@ -95,7 +95,7 @@ def check_urls(settings) -> list[str]:
     app_url = getattr(settings, "app_url", "")
     if not app_url or "localhost" in app_url:
         errors.append(
-            f"APP_URL is '{app_url}'. Production requires your live domain (e.g. https://app.omnirank.com)."
+            f"APP_URL is '{app_url}'. Production requires your live domain (e.g. https://app.<your-domain>)."
         )
 
     cors_origins = getattr(settings, "cors_origins", [])

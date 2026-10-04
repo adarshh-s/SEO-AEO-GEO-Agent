@@ -10,6 +10,8 @@ dependencies = [
     "pydantic-settings>=2.6",
     "email-validator>=2.2",
     "structlog>=24.4",
+    "nh3>=0.2.18",
+    "cryptography>=43.0",
     "reportlab>=5.0.1",
 ]
 

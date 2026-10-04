@@ -1,67 +1,37 @@
-# @omnirank/sdk
+# SDK for Next.js / React
 
-Official developer package for server-side SEO, Answer Engine Optimization (AEO), and Generative Engine Optimization (GEO) in Next.js, React, and modern web frameworks.
+Generated package name and branding come from `config/brand.json` (see `scripts/brand_sync.py`).
 
-## Installation
+Loads the fixes you approved in the dashboard **on the server**, so search engines and AI
+crawlers that don't run JavaScript still see them.
 
 ```bash
-npm install @omnirank/sdk
-# or
-pnpm add @omnirank/sdk
-# or
-yarn add @omnirank/sdk
+npm install <sdk_package from config/brand.json>
 ```
 
-## Quick Start (Next.js App Router)
-
-### 1. Dynamic Page Metadata (`generateMetadata`)
-
-In your Next.js App Router `page.tsx` or `layout.tsx`:
+## Next.js App Router
 
 ```tsx
-import type { Metadata } from "next";
-import { getOmniRankMetadata } from "@omnirank/sdk";
+import { getSeoMetadata, StructuredData } from "<sdk_package>";
 
-export async function generateMetadata(): Promise<Metadata> {
-  const defaultMeta: Metadata = {
-    title: "Default Store Title",
-    description: "Our awesome products",
-  };
-
-  return await getOmniRankMetadata({
-    siteKey: process.env.NEXT_PUBLIC_OMNIRANK_SITE_KEY!,
-    url: "https://example.com/products/headphones",
-    defaultMetadata: defaultMeta,
-    revalidate: 300, // Stale-while-revalidate (5 minutes)
+export async function generateMetadata() {
+  return getSeoMetadata({
+    siteKey: process.env.SITE_KEY!,
+    url: "https://example.com/pricing",
+    defaultMetadata: { title: "Pricing" },
   });
 }
 
 export default function Page() {
-  return <h1>Product Details</h1>;
-}
-```
-
-### 2. Server-side Structured Data (`OmniRankSchema`)
-
-Render JSON-LD schema server-side so Google and AI search crawlers (GPTBot, PerplexityBot, ClaudeBot, Google-Extended) read it without requiring client JavaScript execution:
-
-```tsx
-import { OmniRankSchema } from "@omnirank/sdk";
-
-export default function Page() {
   return (
-    <main>
-      <h1>Product Details</h1>
-      {/* Renders <script type="application/ld+json"> server-side */}
-      <OmniRankSchema
-        siteKey={process.env.NEXT_PUBLIC_OMNIRANK_SITE_KEY!}
-        url="https://example.com/products/headphones"
-      />
-    </main>
+    <>
+      <StructuredData siteKey={process.env.SITE_KEY!} url="https://example.com/pricing" />
+      <main>…</main>
+    </>
   );
 }
 ```
 
-## Resilience & Fail-Open Guarantee
-
-`@omnirank/sdk` is strictly fail-open: if network issues or outages occur between your server and the OmniRank API, your application continues rendering with default metadata and existing templates without crashing or slowing down page requests.
+- API URL: `apiUrl` option, else env `<BRAND_SLUG>_API_URL` (e.g. `OMNIRANK_API_URL`), else the public API.
+- Fail-open: if the API is unreachable your page renders with its own metadata.
+- JSON-LD is escaped so it can never close the `<script>` element.

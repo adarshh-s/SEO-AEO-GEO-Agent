@@ -49,7 +49,7 @@ def test_verify_via_meta_tag(app):
     mock_resp.status_code = 200
     mock_resp.text = html_page
 
-    with patch("requests.get", return_value=mock_resp):
+    with patch("app_api.routers.verification.safe_get", return_value=mock_resp):
         res = owner.client.post(f"/sites/{site_id}/verify")
         assert res.status_code == 200
         data = res.json()
@@ -84,7 +84,7 @@ def test_verify_via_dns_txt(app):
     mock_txt_item.strings = [f"{BRAND['dns_txt_prefix']}{token}".encode()]
 
     with (
-        patch("requests.get", return_value=mock_resp),
+        patch("app_api.routers.verification.safe_get", return_value=mock_resp),
         patch("dns.resolver.resolve", return_value=[mock_txt_item]),
     ):
         res = owner.client.post(f"/sites/{site_id}/verify")
@@ -104,7 +104,7 @@ def test_verification_failed_when_both_missing(app):
     mock_resp.text = "<html><head></head><body>Nothing</body></html>"
 
     with (
-        patch("requests.get", return_value=mock_resp),
+        patch("app_api.routers.verification.safe_get", return_value=mock_resp),
         patch("dns.resolver.resolve", side_effect=Exception("No TXT records")),
     ):
         res = owner.client.post(f"/sites/{site_id}/verify")

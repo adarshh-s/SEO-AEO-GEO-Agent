@@ -1,83 +1,36 @@
 import React from "react";
-import type { OmniRankFix } from "./metadata.js";
+import { fetchFixes, type FetchOptions } from "./metadata.js";
 
-declare const process: { env?: Record<string, string | undefined> } | undefined;
-
-export interface OmniRankSchemaProps {
-  siteKey: string;
-  url: string;
-  apiUrl?: string;
-  revalidate?: number;
+export interface StructuredDataProps extends FetchOptions {
+  /** Rendered when no approved schema exists for the page (or on error). */
   fallbackSchema?: Record<string, unknown>;
 }
 
-export type QuardLinkSchemaProps = OmniRankSchemaProps;
-
-const DEFAULT_API_URL = "https://api.omnirank.com";
-
-/**
- * Server component that fetches approved JSON-LD schema for a URL and renders it server-side.
- * Fully compatible with Next.js App Router and React Server Components.
- */
-export async function OmniRankSchema({
-  siteKey,
-  url,
-  apiUrl = (typeof process !== "undefined" &&
-    (process?.env?.NEXT_PUBLIC_OMNIRANK_API_URL ||
-      process?.env?.NEXT_PUBLIC_QUARDLINK_API_URL)) ||
-    DEFAULT_API_URL,
-  revalidate = 300,
-  fallbackSchema,
-}: OmniRankSchemaProps): Promise<React.JSX.Element | null> {
-  try {
-    const cleanApi = apiUrl.replace(/\/+$/, "");
-    const endpoint = `${cleanApi}/public/v1/fixes?site_key=${encodeURIComponent(siteKey)}&url=${encodeURIComponent(url)}`;
-
-    const fetchOptions: RequestInit & { next?: { revalidate: number } } = {
-      headers: { "User-Agent": "OmniRank-SDK/1.0" },
-      next: { revalidate },
-    };
-
-    const res = await fetch(endpoint, fetchOptions);
-
-    if (!res.ok) {
-      if (fallbackSchema) {
-        return (
-          <script
-            type="application/ld+json"
-            dangerouslySetInnerHTML={{ __html: JSON.stringify(fallbackSchema) }}
-          />
-        );
-      }
-      return null;
-    }
-
-    const data = (await res.json()) as { fixes?: OmniRankFix[] };
-    const fixes = data.fixes || [];
-    const schemaFix = fixes.find((f) => f.type === "schema");
-
-    const schemaToRender = schemaFix?.payload || fallbackSchema;
-    if (!schemaToRender) {
-      return null;
-    }
-
-    return (
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(schemaToRender) }}
-      />
-    );
-  } catch (_e) {
-    if (fallbackSchema) {
-      return (
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(fallbackSchema) }}
-        />
-      );
-    }
-    return null;
-  }
+/** JSON for an HTML <script> element: escape <, > and & so it can never close the tag. */
+export function jsonLdScriptText(value: unknown): string {
+  return JSON.stringify(value)
+    .replace(/</g, "\\u003c")
+    .replace(/>/g, "\\u003e")
+    .replace(/&/g, "\\u0026");
 }
 
-export const QuardLinkSchema = OmniRankSchema;
+function JsonLd({ value }: { value: unknown }) {
+  return <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLdScriptText(value) }} />;
+}
+
+/**
+ * Server component rendering approved JSON-LD for a page server-side, so AI crawlers
+ * that don't run JavaScript still see it. Works with the Next.js App Router / RSC.
+ */
+export async function StructuredData({ fallbackSchema, ...options }: StructuredDataProps) {
+  const fixes = await fetchFixes(options);
+  const schemas = fixes.flatMap((f) => (f.payload.json_ld ? [f.payload.json_ld] : []));
+  if (schemas.length === 0) return fallbackSchema ? <JsonLd value={fallbackSchema} /> : null;
+  return (
+    <>
+      {schemas.map((schema, i) => (
+        <JsonLd key={i} value={schema} />
+      ))}
+    </>
+  );
+}

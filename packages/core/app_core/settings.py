@@ -1,16 +1,26 @@
 """Runtime configuration. Every value comes from env; see .env.example for docs."""
 
+import os
 from functools import lru_cache
 from typing import Annotated, Literal
 
 from pydantic import Field, field_validator, model_validator
 from pydantic_settings import BaseSettings, NoDecode, SettingsConfigDict
 
-DEV_JWT_SECRET = "local-dev-only-jwt-secret-change-me-in-env"  # noqa: S105 (rejected outside local/test)
+DEV_JWT_SECRET = (
+    "local-dev-only-jwt-secret-change-me-in-env"  # noqa: S105 (rejected outside local/test)
+)
+
+
+# Dev-only Fernet key; rejected outside local/test like the dev JWT secret.
+DEV_ENCRYPTION_KEY = "bG9jYWwtZGV2LW9ubHktZW5jcnlwdGlvbi1rZXkhIT0="  # noqa: S105
 
 
 class Settings(BaseSettings):
-    model_config = SettingsConfigDict(env_file=".env", extra="ignore")
+    # APP_ENV_FILE lets tests ignore a developer's .env (set it to an empty string).
+    model_config = SettingsConfigDict(
+        env_file=os.environ.get("APP_ENV_FILE", ".env") or None, extra="ignore"
+    )
 
     env: Literal["local", "test", "staging", "production"] = "local"
 
@@ -38,6 +48,9 @@ class Settings(BaseSettings):
     google_oauth_client_secret: str | None = None
     auth_rate_limit_per_minute: int = 10
 
+    # Encryption at rest for third-party credentials (comma-separated Fernet keys; first encrypts)
+    app_encryption_key: str = DEV_ENCRYPTION_KEY
+
     # Email (D19)
     email_provider: Literal["console", "smtp", "resend"] = "console"
     email_from_address: str = "no-reply@localhost"
@@ -63,8 +76,33 @@ class Settings(BaseSettings):
     retention_raw_ai_answers_days: int = 395
     retention_html_snapshots_days: int = 90
 
+    # AI + data providers. Model IDs come only from env (CLAUDE.md §4), never from code.
+    anthropic_api_key: str | None = None
+    claude_model_main: str | None = None  # diagnosis, content
+    claude_model_fast: str | None = None  # parsing, extraction, classification
+    openai_api_key: str | None = None
+    openai_model: str | None = None
+    perplexity_api_key: str | None = None
+    perplexity_model: str | None = None
+    gemini_api_key: str | None = None
+    gemini_model: str | None = None
+    dataforseo_login: str | None = None
+    dataforseo_password: str | None = None
+    google_api_key: str | None = None  # PageSpeed Insights + CrUX
+
+    # Mock AI/SERP providers return fake sample data. Allowed only in local/test, or with
+    # USE_MOCK_PROVIDERS=true outside production (never in production).
+    use_mock_providers: bool = False
+
     # AI visibility
     ai_runs_per_prompt: int = 3
+
+    @field_validator("app_encryption_key", mode="before")
+    @classmethod
+    def _default_encryption_key(cls, v: object) -> object:
+        # An empty value means "not configured": fall back to the dev key, which the
+        # staging/production check below rejects.
+        return v if isinstance(v, str) and v.strip() else DEV_ENCRYPTION_KEY
 
     @field_validator("cors_origins", mode="before")
     @classmethod
@@ -80,7 +118,15 @@ class Settings(BaseSettings):
                 raise ValueError("JWT_SECRET must be set to a random value of 32+ characters")
             if not self.cookie_secure:
                 raise ValueError("COOKIE_SECURE must be true outside local development")
+            if self.env == "production" and self.use_mock_providers:
+                raise ValueError("USE_MOCK_PROVIDERS must not be enabled in production")
+            if not self.app_encryption_key or DEV_ENCRYPTION_KEY in self.app_encryption_key:
+                raise ValueError("APP_ENCRYPTION_KEY must be set to a real Fernet key")
         return self
+
+    @property
+    def mock_providers_allowed(self) -> bool:
+        return self.env in ("local", "test") or (self.use_mock_providers and not self.is_production)
 
     @property
     def is_production(self) -> bool:

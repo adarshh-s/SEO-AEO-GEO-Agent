@@ -68,15 +68,16 @@ def test_webhooks_lifecycle(app):
     wh = create_res.json()
     assert wh["url"] == "https://api.myclient.com/webhook"
     assert wh["status"] == "active"
-    assert "secret" in wh
+    assert len(wh["secret"]) >= 32  # shown once, at creation
     webhook_id = wh["id"]
 
-    # 2. List Webhooks
+    # 2. List Webhooks: the signing secret is never returned again
     list_res = owner.client.get("/org/webhooks")
     assert list_res.status_code == 200
     whs = list_res.json()
     assert len(whs) == 1
     assert whs[0]["id"] == webhook_id
+    assert "secret" not in whs[0]
 
     # 3. Delete Webhook
     del_res = owner.client.delete(f"/org/webhooks/{webhook_id}")

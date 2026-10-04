@@ -1,4 +1,4 @@
-# Production Dockerfile for OmniRank Web SPA
+# Production Dockerfile for the web SPA
 FROM node:22-alpine AS build
 WORKDIR /repo
 RUN corepack enable && corepack prepare pnpm@10.13.1 --activate

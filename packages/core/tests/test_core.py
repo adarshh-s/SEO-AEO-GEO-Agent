@@ -46,7 +46,16 @@ def test_production_refuses_dev_secrets():
         Settings(env="production", cookie_secure=True, jwt_secret=DEV_JWT_SECRET)
     with pytest.raises(ValidationError, match="COOKIE_SECURE"):
         Settings(env="production", jwt_secret="x" * 40, cookie_secure=False)
-    assert Settings(env="production", jwt_secret="x" * 40, cookie_secure=True).is_production
+    with pytest.raises(ValidationError, match="USE_MOCK_PROVIDERS"):
+        Settings(env="production", jwt_secret="x" * 40, cookie_secure=True, use_mock_providers=True)
+    from cryptography.fernet import Fernet
+
+    real_key = Fernet.generate_key().decode()
+    with pytest.raises(ValidationError, match="APP_ENCRYPTION_KEY"):
+        Settings(env="production", jwt_secret="x" * 40, cookie_secure=True, app_encryption_key="")
+    assert Settings(
+        env="production", jwt_secret="x" * 40, cookie_secure=True, app_encryption_key=real_key
+    ).is_production
 
 
 def test_cors_origins_accepts_comma_separated_env(monkeypatch):

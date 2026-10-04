@@ -1,5 +1,6 @@
 /**
- * OmniRank Universal SEO & AI Optimization Snippet (agent.js)
+ * __BRAND_GLOBAL__ universal snippet. Served by /public/v1/agent.js with brand names filled in
+ * from config/brand.json (never hard-code the product name here).
  * Zero dependencies, fail-safe, cookieless telemetry and fix injection.
  */
 (function () {
@@ -7,10 +8,7 @@
 
   try {
     // Prevent double execution
-    if (
-      (window.OmniRank && window.OmniRank.loaded) ||
-      (window.QuardLink && window.QuardLink.loaded)
-    ) {
+    if (window.__BRAND_GLOBAL__ && window.__BRAND_GLOBAL__.loaded) {
       return;
     }
 
@@ -39,13 +37,12 @@
       apiOrigin = a.protocol + "//" + a.host;
     }
 
-    window.OmniRank = {
+    window.__BRAND_GLOBAL__ = {
       version: "1.0.0",
       loaded: true,
       siteKey: siteKey,
       appliedFixes: [],
     };
-    window.QuardLink = window.OmniRank;
 
     // 1. Cookieless AI Referral & Bot Traffic Tracking
     var referrer = (document.referrer || "").toLowerCase();
@@ -119,11 +116,11 @@
               if (fix.type === "schema" && fix.payload && fix.payload.json_ld) {
                 var scriptTag = document.createElement("script");
                 scriptTag.type = "application/ld+json";
-                scriptTag.setAttribute("data-quardlink-injected", "true");
+                scriptTag.setAttribute("data-__BRAND_SLUG__-injected", "true");
                 scriptTag.setAttribute("data-fix-id", fix.id);
                 scriptTag.textContent = JSON.stringify(fix.payload.json_ld);
                 document.head.appendChild(scriptTag);
-                window.QuardLink.appliedFixes.push(fix.id);
+                window.__BRAND_GLOBAL__.appliedFixes.push(fix.id);
               } else if (fix.type === "meta" && fix.payload) {
                 if (fix.payload.title) {
                   document.title = fix.payload.title;
@@ -142,25 +139,27 @@
                     fix.payload.meta_description,
                   );
                 }
-                window.QuardLink.appliedFixes.push(fix.id);
+                window.__BRAND_GLOBAL__.appliedFixes.push(fix.id);
               } else if (
                 (fix.type === "faq" || fix.type === "content_block") &&
                 fix.payload &&
                 fix.payload.html
               ) {
-                var containerSelector =
-                  fix.payload.container_selector ||
-                  (fix.type === "faq"
-                    ? "[data-quardlink-faq]"
-                    : "[data-quardlink-container]");
-                var targetEl = document.querySelector(containerSelector);
+                // Content blocks render only inside a container the customer placed
+                // on the page (decision D15); a payload can't choose where HTML goes.
+                // The HTML was sanitized by the server with an allowlist.
+                var targetEl = document.querySelector(
+                  fix.type === "faq"
+                    ? "[data-__BRAND_SLUG__-faq]"
+                    : "[data-__BRAND_SLUG__-content]",
+                );
                 if (targetEl) {
                   var wrapper = document.createElement("div");
-                  wrapper.setAttribute("data-quardlink-injected", "true");
+                  wrapper.setAttribute("data-__BRAND_SLUG__-injected", "true");
                   wrapper.setAttribute("data-fix-id", fix.id);
                   wrapper.innerHTML = fix.payload.html;
                   targetEl.appendChild(wrapper);
-                  window.QuardLink.appliedFixes.push(fix.id);
+                  window.__BRAND_GLOBAL__.appliedFixes.push(fix.id);
                 }
               }
             } catch (err) {
@@ -170,8 +169,8 @@
 
           // Trigger custom event for advanced client integrations
           if (window.CustomEvent) {
-            var evt = new CustomEvent("quardlink:fixes-applied", {
-              detail: { count: window.QuardLink.appliedFixes.length },
+            var evt = new CustomEvent("__BRAND_SLUG__:fixes-applied", {
+              detail: { count: window.__BRAND_GLOBAL__.appliedFixes.length },
             });
             window.dispatchEvent(evt);
           }

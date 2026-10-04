@@ -1,85 +1,68 @@
+import { BRAND } from "./brand.gen.js";
+
 declare const process: { env?: Record<string, string | undefined> } | undefined;
 
-export interface OmniRankFix {
+export interface Fix {
   id: string;
   type: "meta" | "schema" | "faq" | "content_block" | "technical";
-  title: string;
+  target_url: string;
   payload: {
     title?: string;
     meta_description?: string;
+    json_ld?: Record<string, unknown> | Record<string, unknown>[];
     html?: string;
-    [key: string]: unknown;
   };
 }
 
-export type QuardLinkFix = OmniRankFix;
-
-export interface GetMetadataOptions {
+export interface FetchOptions {
   siteKey: string;
   url: string;
+  /** Defaults to env `<BRAND_SLUG>_API_URL`, then the public API. */
   apiUrl?: string;
+  /** Next.js ISR revalidation in seconds. */
   revalidate?: number;
-  defaultMetadata?: Record<string, unknown>;
 }
 
-const DEFAULT_API_URL = "https://api.omnirank.com";
+export function resolveApiUrl(apiUrl?: string): string {
+  const envName = `${BRAND.brand_slug.toUpperCase()}_API_URL`;
+  const fromEnv = typeof process !== "undefined" ? process?.env?.[envName] : undefined;
+  return (apiUrl || fromEnv || BRAND.public_api_url).replace(/\/+$/, "");
+}
 
-/**
- * Fetch approved SEO metadata fixes and merge them into Next.js App Router metadata.
- * Fail-open: returns defaultMetadata unchanged on network or parsing error.
- */
-export async function getOmniRankMetadata(
-  options: GetMetadataOptions,
-): Promise<Record<string, unknown>> {
-  const {
-    siteKey,
-    url,
-    apiUrl = (typeof process !== "undefined" &&
-      (process?.env?.NEXT_PUBLIC_OMNIRANK_API_URL ||
-        process?.env?.NEXT_PUBLIC_QUARDLINK_API_URL)) ||
-      DEFAULT_API_URL,
-    revalidate = 300,
-    defaultMetadata = {},
-  } = options;
-
+/** Approved fixes for a page. Fail-open: returns [] on any error. */
+export async function fetchFixes({ siteKey, url, apiUrl, revalidate = 300 }: FetchOptions): Promise<Fix[]> {
   try {
-    const cleanApi = apiUrl.replace(/\/+$/, "");
-    const endpoint = `${cleanApi}/public/v1/fixes?site_key=${encodeURIComponent(siteKey)}&url=${encodeURIComponent(url)}`;
-
-    // Pass Next.js revalidation options if running in Next.js environment
-    const fetchOptions: RequestInit & { next?: { revalidate: number } } = {
-      headers: {
-        "User-Agent": "OmniRank-SDK/1.0",
-      },
+    const endpoint =
+      `${resolveApiUrl(apiUrl)}/public/v1/fixes` +
+      `?site_key=${encodeURIComponent(siteKey)}&url=${encodeURIComponent(url)}`;
+    const init: RequestInit & { next?: { revalidate: number } } = {
+      headers: { "User-Agent": `${BRAND.product_name}-SDK/1.0` },
       next: { revalidate },
     };
-
-    const res = await fetch(endpoint, fetchOptions);
-    if (!res.ok) {
-      return defaultMetadata;
-    }
-
-    const data = (await res.json()) as { fixes?: OmniRankFix[] };
-    const fixes = data.fixes || [];
-
-    const metaFix = fixes.find((f) => f.type === "meta");
-    if (!metaFix || !metaFix.payload) {
-      return defaultMetadata;
-    }
-
-    const merged: Record<string, unknown> = { ...defaultMetadata };
-    if (metaFix.payload.title) {
-      merged.title = metaFix.payload.title;
-    }
-    if (metaFix.payload.meta_description) {
-      merged.description = metaFix.payload.meta_description;
-    }
-
-    return merged;
-  } catch (_e) {
-    // Fail-open: network errors never break page generation
-    return defaultMetadata;
+    const res = await fetch(endpoint, init);
+    if (!res.ok) return [];
+    const data = (await res.json()) as { fixes?: Fix[] };
+    return data.fixes ?? [];
+  } catch {
+    return [];
   }
 }
 
-export const getQuardLinkMetadata = getOmniRankMetadata;
+export interface GetMetadataOptions extends FetchOptions {
+  defaultMetadata?: Record<string, unknown>;
+}
+
+/**
+ * Merge approved title/description fixes into Next.js App Router metadata
+ * (use inside `generateMetadata`). Fail-open: returns defaultMetadata on error.
+ */
+export async function getSeoMetadata({
+  defaultMetadata = {},
+  ...options
+}: GetMetadataOptions): Promise<Record<string, unknown>> {
+  const metaFix = (await fetchFixes(options)).find((f) => f.type === "meta");
+  const merged: Record<string, unknown> = { ...defaultMetadata };
+  if (metaFix?.payload.title) merged.title = metaFix.payload.title;
+  if (metaFix?.payload.meta_description) merged.description = metaFix.payload.meta_description;
+  return merged;
+}

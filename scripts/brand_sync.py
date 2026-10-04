@@ -57,9 +57,21 @@ def render_typescript(brand: dict) -> str:
     return f"// {HEADER}\n\nexport const BRAND = {{\n{body}\n}} as const;\n\nexport type Brand = typeof BRAND;\n"
 
 
+def render_sdk_package(brand: dict) -> str:
+    """packages/sdk/package.json with name/description/author from the brand."""
+    path = ROOT / "packages/sdk/package.json"
+    pkg = json.loads(path.read_text(encoding="utf-8"))
+    pkg["name"] = brand["sdk_package"]
+    pkg["description"] = f"{brand['product_name']} SDK for Next.js, React and other frameworks"
+    pkg["author"] = brand["company_name"]
+    return json.dumps(pkg, indent=2, ensure_ascii=False) + "\n"
+
+
 TARGETS: list[tuple[str, Callable[[dict], str]]] = [
     ("packages/core/app_core/brand_gen.py", render_python),
     ("apps/web/src/lib/brand.gen.ts", render_typescript),
+    ("packages/sdk/src/brand.gen.ts", render_typescript),
+    ("packages/sdk/package.json", render_sdk_package),
 ]
 
 

@@ -4986,7 +4986,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/WebhookOut"
+                  "$ref": "#/components/schemas/WebhookCreatedOut"
                 }
               }
             }
@@ -5630,6 +5630,7 @@
             "required": true,
             "schema": {
               "type": "string",
+              "maxLength": 64,
               "description": "The site's public key (ors_...)",
               "title": "Site Key"
             },
@@ -5641,6 +5642,7 @@
             "required": true,
             "schema": {
               "type": "string",
+              "maxLength": 2000,
               "description": "The current page URL",
               "title": "Url"
             },
@@ -5677,35 +5679,17 @@
           "public"
         ],
         "summary": "Record Ai Referral",
-        "description": "Cookieless endpoint recording traffic referred by AI answer engines.",
+        "description": "Cookieless endpoint recording traffic referred by AI answer engines. No personal data.",
         "operationId": "record_ai_referral_public_v1_telemetry_referral_post",
-        "parameters": [
-          {
-            "name": "User-Agent",
-            "in": "header",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "User-Agent"
-            }
-          }
-        ],
         "requestBody": {
-          "required": true,
           "content": {
             "application/json": {
               "schema": {
                 "$ref": "#/components/schemas/TelemetryReferralIn"
               }
             }
-          }
+          },
+          "required": true
         },
         "responses": {
           "200": {
@@ -5713,10 +5697,10 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
                   "additionalProperties": {
                     "type": "boolean"
                   },
+                  "type": "object",
                   "title": "Response Record Ai Referral Public V1 Telemetry Referral Post"
                 }
               }
@@ -9382,14 +9366,24 @@
         "properties": {
           "site_key": {
             "type": "string",
+            "maxLength": 64,
             "title": "Site Key"
           },
           "url": {
             "type": "string",
+            "maxLength": 2000,
             "title": "Url"
           },
           "referrer_engine": {
             "type": "string",
+            "enum": [
+              "chatgpt",
+              "perplexity",
+              "gemini",
+              "claude",
+              "copilot",
+              "other_ai"
+            ],
             "title": "Referrer Engine"
           }
         },
@@ -9637,19 +9631,29 @@
         "properties": {
           "url": {
             "type": "string",
+            "maxLength": 2000,
+            "minLength": 8,
             "title": "Url"
           },
           "events": {
             "items": {
-              "type": "string"
+              "type": "string",
+              "enum": [
+                "fix.created",
+                "fix.proposed",
+                "fix.approved",
+                "fix.rejected",
+                "fix.deployed",
+                "fix.rolled_back",
+                "audit.triggered",
+                "audit.completed",
+                "report.generated",
+                "score.changed"
+              ]
             },
             "type": "array",
-            "title": "Events",
-            "default": [
-              "fix.proposed",
-              "fix.approved",
-              "fix.deployed"
-            ]
+            "minItems": 1,
+            "title": "Events"
           }
         },
         "type": "object",
@@ -9657,6 +9661,75 @@
           "url"
         ],
         "title": "WebhookCreateIn"
+      },
+      "WebhookCreatedOut": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "url": {
+            "type": "string",
+            "title": "Url"
+          },
+          "events": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Events"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "last_delivery_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Delivery At"
+          },
+          "last_status_code": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Status Code"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "secret": {
+            "type": "string",
+            "title": "Secret"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "url",
+          "events",
+          "status",
+          "last_delivery_at",
+          "last_status_code",
+          "created_at",
+          "secret"
+        ],
+        "title": "WebhookCreatedOut",
+        "description": "Returned once at creation: the signing secret is never shown again."
       },
       "WebhookOut": {
         "properties": {
@@ -9668,10 +9741,6 @@
           "url": {
             "type": "string",
             "title": "Url"
-          },
-          "secret": {
-            "type": "string",
-            "title": "Secret"
           },
           "events": {
             "items": {
@@ -9717,7 +9786,6 @@
         "required": [
           "id",
           "url",
-          "secret",
           "events",
           "status",
           "last_delivery_at",

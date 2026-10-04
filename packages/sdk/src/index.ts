@@ -1,14 +1,10 @@
 export {
-  getOmniRankMetadata,
-  getQuardLinkMetadata,
+  fetchFixes,
+  getSeoMetadata,
+  resolveApiUrl,
+  type FetchOptions,
+  type Fix,
   type GetMetadataOptions,
-  type OmniRankFix,
-  type QuardLinkFix,
 } from "./metadata.js";
-
-export {
-  OmniRankSchema,
-  QuardLinkSchema,
-  type OmniRankSchemaProps,
-  type QuardLinkSchemaProps,
-} from "./schema.js";
+export { jsonLdScriptText, StructuredData, type StructuredDataProps } from "./schema.js";
+export { BRAND } from "./brand.gen.js";

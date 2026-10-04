@@ -14,6 +14,7 @@
   "api_key_prefix": "or",
   "site_key_prefix": "ors",
   "email_from_name": "OmniRank",
+  "public_api_url": "https://api.omnirank.com",
   "colors": {
     "primary": "#2563eb",
     "primary_foreground": "#ffffff"
@@ -27,6 +28,7 @@
     "npm_scope",
     "sdk_package",
     "api_key_prefix",
-    "site_key_prefix"
+    "site_key_prefix",
+    "public_api_url"
   ]
 }

@@ -10,6 +10,10 @@ from app_core.enums import AnswerEngineId
 from app_core.settings import get_settings
 
 
+class ProviderNotConfigured(RuntimeError):
+    """A real provider is missing its API key or model (set them in env)."""
+
+
 @dataclass
 class AiAnswerResult:
     engine: str
@@ -117,7 +121,7 @@ class OpenAiAnswerProvider:
     def __init__(self, api_key: str | None = None, model: str | None = None) -> None:
         s = get_settings()
         self.api_key = api_key or s.openai_api_key
-        self.model = model or s.openai_model or "gpt-4o"
+        self.model = model or s.openai_model
 
     def query(
         self,
@@ -128,14 +132,8 @@ class OpenAiAnswerProvider:
         competitors: list[str],
         language: str = "en",
     ) -> AiAnswerResult:
-        if not self.api_key:
-            return MockAnswerEngineProvider(AnswerEngineId.CHATGPT).query(
-                prompt=prompt,
-                brand_names=brand_names,
-                target_domain=target_domain,
-                competitors=competitors,
-                language=language,
-            )
+        if not self.api_key or not self.model:
+            raise ProviderNotConfigured(self.__class__.__name__)
 
         import requests
 
@@ -177,7 +175,7 @@ class GeminiAnswerProvider:
     def __init__(self, api_key: str | None = None, model: str | None = None) -> None:
         s = get_settings()
         self.api_key = api_key or s.gemini_api_key
-        self.model = model or s.gemini_model or "gemini-2.5-flash"
+        self.model = model or s.gemini_model
 
     def query(
         self,
@@ -188,14 +186,8 @@ class GeminiAnswerProvider:
         competitors: list[str],
         language: str = "en",
     ) -> AiAnswerResult:
-        if not self.api_key:
-            return MockAnswerEngineProvider(AnswerEngineId.GEMINI).query(
-                prompt=prompt,
-                brand_names=brand_names,
-                target_domain=target_domain,
-                competitors=competitors,
-                language=language,
-            )
+        if not self.api_key or not self.model:
+            raise ProviderNotConfigured(self.__class__.__name__)
 
         import requests
 
@@ -237,7 +229,7 @@ class PerplexityAnswerProvider:
     def __init__(self, api_key: str | None = None, model: str | None = None) -> None:
         s = get_settings()
         self.api_key = api_key or s.perplexity_api_key
-        self.model = model or s.perplexity_model or "sonar"
+        self.model = model or s.perplexity_model
 
     def query(
         self,
@@ -248,14 +240,8 @@ class PerplexityAnswerProvider:
         competitors: list[str],
         language: str = "en",
     ) -> AiAnswerResult:
-        if not self.api_key:
-            return MockAnswerEngineProvider(AnswerEngineId.PERPLEXITY).query(
-                prompt=prompt,
-                brand_names=brand_names,
-                target_domain=target_domain,
-                competitors=competitors,
-                language=language,
-            )
+        if not self.api_key or not self.model:
+            raise ProviderNotConfigured(self.__class__.__name__)
 
         import requests
 
@@ -296,7 +282,7 @@ class AnthropicAnswerProvider:
     def __init__(self, api_key: str | None = None, model: str | None = None) -> None:
         s = get_settings()
         self.api_key = api_key or s.anthropic_api_key
-        self.model = model or s.claude_model_fast or "claude-3-5-haiku-latest"
+        self.model = model or s.claude_model_fast
 
     def query(
         self,
@@ -307,14 +293,8 @@ class AnthropicAnswerProvider:
         competitors: list[str],
         language: str = "en",
     ) -> AiAnswerResult:
-        if not self.api_key:
-            return MockAnswerEngineProvider(AnswerEngineId.CLAUDE).query(
-                prompt=prompt,
-                brand_names=brand_names,
-                target_domain=target_domain,
-                competitors=competitors,
-                language=language,
-            )
+        if not self.api_key or not self.model:
+            raise ProviderNotConfigured(self.__class__.__name__)
 
         import requests
 
@@ -417,12 +397,26 @@ class MockAnswerEngineProvider:
 
 
 def get_answer_engine(engine_id: str) -> AnswerEngineProvider:
-    if engine_id == AnswerEngineId.CHATGPT:
-        return OpenAiAnswerProvider()
-    if engine_id == AnswerEngineId.GEMINI:
-        return GeminiAnswerProvider()
-    if engine_id == AnswerEngineId.PERPLEXITY:
-        return PerplexityAnswerProvider()
-    if engine_id == AnswerEngineId.CLAUDE:
-        return AnthropicAnswerProvider()
-    return MockAnswerEngineProvider(engine_id)
+    """The real provider for an engine, or the mock where allowed (local/test only).
+
+    Raises ProviderNotConfigured when the engine's API key or model is missing outside
+    local/test, so production never stores made-up answers.
+    """
+    s = get_settings()
+    real: dict[str, tuple[type, str | None, str | None]] = {
+        AnswerEngineId.CHATGPT: (OpenAiAnswerProvider, s.openai_api_key, s.openai_model),
+        AnswerEngineId.GEMINI: (GeminiAnswerProvider, s.gemini_api_key, s.gemini_model),
+        AnswerEngineId.PERPLEXITY: (
+            PerplexityAnswerProvider,
+            s.perplexity_api_key,
+            s.perplexity_model,
+        ),
+        AnswerEngineId.CLAUDE: (AnthropicAnswerProvider, s.anthropic_api_key, s.claude_model_fast),
+    }
+    if engine_id in real:
+        cls, key, model = real[engine_id]
+        if key and model:
+            return cls()
+    if s.mock_providers_allowed:
+        return MockAnswerEngineProvider(engine_id)
+    raise ProviderNotConfigured(f"{engine_id}: set its API key and model in env")

@@ -20,7 +20,7 @@ class Audit(UUIDPk, OrgOwned, Timestamps, Base):
         index=True,
     )
     status: Mapped[str] = mapped_column(
-        String(30), default="pending"
+        String(30), default="pending", index=True
     )  # pending, running, completed, failed
     score: Mapped[int] = mapped_column(Integer, default=0)  # 0-100 overall score
     category_scores: Mapped[dict] = mapped_column(JSONB, default=dict)

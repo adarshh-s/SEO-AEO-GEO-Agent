@@ -1,5 +1,5 @@
 {
-  "name": "omnirank-monorepo",
+  "name": "seo-platform-monorepo",
   "private": true,
   "packageManager": "pnpm@10.13.1",
   "engines": { "node": ">=22" },

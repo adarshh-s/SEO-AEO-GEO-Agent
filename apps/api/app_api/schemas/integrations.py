@@ -1,8 +1,8 @@
 import uuid
 from datetime import datetime
-from typing import Any
+from typing import Any, Literal
 
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class SnippetInfoOut(BaseModel):
@@ -38,7 +38,6 @@ class WebhookOut(BaseModel):
 
     id: uuid.UUID
     url: str
-    secret: str
     events: list[str]
     status: str
     last_delivery_at: datetime | None
@@ -46,9 +45,31 @@ class WebhookOut(BaseModel):
     created_at: datetime
 
 
+WebhookEvent = Literal[
+    "fix.created",
+    "fix.proposed",
+    "fix.approved",
+    "fix.rejected",
+    "fix.deployed",
+    "fix.rolled_back",
+    "audit.triggered",
+    "audit.completed",
+    "report.generated",
+    "score.changed",
+]
+
+
 class WebhookCreateIn(BaseModel):
-    url: str
-    events: list[str] = ["fix.proposed", "fix.approved", "fix.deployed"]
+    url: str = Field(min_length=8, max_length=2000)
+    events: list[WebhookEvent] = Field(
+        default_factory=lambda: ["fix.proposed", "fix.approved", "fix.deployed"], min_length=1
+    )
+
+
+class WebhookCreatedOut(WebhookOut):
+    """Returned once at creation: the signing secret is never shown again."""
+
+    secret: str
 
 
 # --- Site Integrations ------------------------------------------------------------------------

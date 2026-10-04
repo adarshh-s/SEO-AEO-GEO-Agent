@@ -77,13 +77,15 @@ export default {
           }
         }
 
-        if (fix.type === "schema" && fix.payload) {
+        if (fix.payload && fix.payload.json_ld) {
+          // Escape <, > and & so the JSON can never close the <script> element.
+          const jsonLd = JSON.stringify(fix.payload.json_ld)
+            .replace(/</g, "\\u003c")
+            .replace(/>/g, "\\u003e")
+            .replace(/&/g, "\\u0026");
           rewriter = rewriter.on("head", {
             element(e) {
-              e.append(
-                `<script type="application/ld+json">${JSON.stringify(fix.payload)}</script>\n`,
-                { html: true },
-              );
+              e.append(`<script type="application/ld+json">${jsonLd}</script>\n`, { html: true });
             },
           });
         }

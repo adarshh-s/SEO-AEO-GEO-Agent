@@ -1,6 +1,6 @@
 # Local development stack. `docker compose up` → web :5173 (override with WEB_PORT), api :8000,
 # mailpit (emails) :8025, minio console :9001. SEED_DEMO defaults to true here.
-name: omnirank
+name: seo-platform
 
 x-python-env: &python-env
   env_file:

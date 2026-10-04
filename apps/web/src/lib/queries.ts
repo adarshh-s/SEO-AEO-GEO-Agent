@@ -39,6 +39,7 @@ import type {
   VerificationStatusOut,
   VerifyAttemptOut,
   WebhookCreateIn,
+  WebhookCreatedOut,
   WebhookOut,
 } from "./api-types";
 
@@ -505,7 +506,7 @@ export function useCreateWebhook() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: (body: WebhookCreateIn) =>
-      api<WebhookOut>("/org/webhooks", { method: "POST", body }),
+      api<WebhookCreatedOut>("/org/webhooks", { method: "POST", body }),
     onSuccess: () => {
       void qc.invalidateQueries({ queryKey: ["webhooks"] });
     },

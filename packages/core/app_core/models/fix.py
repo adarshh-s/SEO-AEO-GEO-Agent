@@ -3,10 +3,11 @@ from datetime import datetime
 
 from sqlalchemy import CheckConstraint, DateTime, ForeignKey, Index, String, Text
 from sqlalchemy.dialects.postgresql import JSONB, UUID
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, validates
 
 from app_core.db import Base
 from app_core.models.base import OrgOwned, Timestamps, UUIDPk
+from app_core.sanitize import sanitize_payload
 
 
 class Fix(UUIDPk, OrgOwned, Timestamps, Base):
@@ -57,3 +58,8 @@ class Fix(UUIDPk, OrgOwned, Timestamps, Base):
     previous_state: Mapped[dict | None] = mapped_column(JSONB, nullable=True)
     # External reference (e.g. GitHub PR URL, Shopify mutation ID, WordPress post ID)
     external_reference: Mapped[str | None] = mapped_column(Text, nullable=True)
+
+    @validates("payload")
+    def _sanitize_payload(self, _key: str, value: dict) -> dict:
+        """Every write path (worker generation, API edits) stores a sanitized payload."""
+        return sanitize_payload(value or {})

@@ -60,9 +60,11 @@ def generate_schema_fix(
         "@type": schema_type,
         "name": site_name or domain,
         "url": target_url,
-        "description": f"{site_name} specializes in {industry or 'professional services'}."
-        if language == "en"
-        else f"يقدم {site_name} خدمات متخصصة في مجال {industry or 'الأعمال والخدمات المهنية'}.",
+        "description": (
+            f"{site_name} specializes in {industry or 'professional services'}."
+            if language == "en"
+            else f"يقدم {site_name} خدمات متخصصة في مجال {industry or 'الأعمال والخدمات المهنية'}."
+        ),
     }
     if city:
         schema_data["address"] = {
@@ -200,14 +202,11 @@ def generate_faq_fix(
     }
 
     # HTML markup
-    items_html = "".join(
-        f"""
+    items_html = "".join(f"""
         <div class="ql-faq-item" style="margin-bottom: 1rem; border-bottom: 1px solid #e5e7eb; padding-bottom: 0.75rem;">
           <h3 style="font-size: 1.1rem; font-weight: 600; margin-bottom: 0.5rem;">{html.escape(item["question"])}</h3>
           <p style="color: #4b5563; line-height: 1.5;">{html.escape(item["answer"])}</p>
-        </div>"""
-        for item in faqs
-    )
+        </div>""" for item in faqs)
     faq_html = sanitize_html(
         f'<div class="ql-faq-container" style="margin-top: 2rem;">{items_html}</div>'
     )

@@ -189,9 +189,12 @@
     "connectGsc": "Connect Google Search Console",
     "gscVerifiedOwner": "Site Ownership Verified via Google Search Console",
     "gscPerformance": "Google Search Console Performance",
-    "saveConfig": "Save Configuration"
+    "saveConfig": "Save Configuration",
+    "webhookSecretNotice": "Copy this signing secret now. It won't be shown again. Use it to verify the signature header on every delivery.",
+    "addingWebhook": "Adding…",
+    "cancel": "Cancel",
+    "done": "Done"
   },
-
   "diagnosis": {
     "button": "Diagnose Gaps",
     "diagnosing": "Diagnosing...",
@@ -202,7 +205,6 @@
     "viewFixes": "View Recommended Fixes in Inbox",
     "noGaps": "No critical optimization gaps detected for this query."
   },
-
   "audits": {
     "title": "Website Audits",
     "description": "Comprehensive technical, content, AI readiness, and Core Web Vitals audit.",
@@ -239,7 +241,6 @@
     "recommendation": "Recommendation",
     "affectedPages": "Affected pages"
   },
-
   "reports": {
     "title": "Reports & Digests",
     "description": "Generate executive PDF reports and manage weekly automated email digests.",

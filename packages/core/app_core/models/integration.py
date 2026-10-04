@@ -14,6 +14,7 @@ from sqlalchemy import (
 from sqlalchemy.dialects.postgresql import JSONB, UUID
 from sqlalchemy.orm import Mapped, mapped_column
 
+from app_core.crypto import EncryptedJSON, EncryptedText
 from app_core.db import Base
 from app_core.models.base import OrgOwned, Timestamps, UUIDPk
 
@@ -37,7 +38,7 @@ class Webhook(UUIDPk, OrgOwned, Timestamps, Base):
     __tablename__ = "webhooks"
 
     url: Mapped[str] = mapped_column(Text)
-    secret: Mapped[str] = mapped_column(String(64))  # HMAC signing secret
+    secret: Mapped[str] = mapped_column(EncryptedText)  # HMAC signing secret, encrypted at rest
     events: Mapped[list[str]] = mapped_column(
         ARRAY(String(50)),
         default=lambda: ["fix.proposed", "fix.approved", "fix.deployed"],
@@ -70,6 +71,7 @@ class SiteIntegration(UUIDPk, OrgOwned, Timestamps, Base):
     provider: Mapped[str] = mapped_column(String(40), index=True)
     status: Mapped[str] = mapped_column(String(20), default="active", server_default="active")
     config: Mapped[dict] = mapped_column(JSONB, default=dict, server_default="{}")
-    credentials: Mapped[dict] = mapped_column(JSONB, default=dict, server_default="{}")
+    # OAuth tokens / API keys for the platform, encrypted at rest (CLAUDE.md §11).
+    credentials: Mapped[dict] = mapped_column(EncryptedJSON, default=dict)
     last_synced_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     last_error: Mapped[str | None] = mapped_column(Text, nullable=True)

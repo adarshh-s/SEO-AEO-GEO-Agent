@@ -14,6 +14,7 @@ from sqlalchemy.engine import make_url
 BASE_URL = os.environ.get(
     "TEST_DATABASE_URL", "postgresql+psycopg://app:app@localhost:5432/app_test"
 )
+os.environ["APP_ENV_FILE"] = ""  # never read the developer's .env in tests
 os.environ["DATABASE_URL"] = BASE_URL
 os.environ.setdefault("ENV", "test")
 os.environ["EMAIL_PROVIDER"] = "console"

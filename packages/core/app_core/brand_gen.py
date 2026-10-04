@@ -12,6 +12,7 @@ BRAND: dict[str, Any] = {
     "email_from_name": "OmniRank",
     "npm_scope": "@omnirank",
     "product_name": "OmniRank",
+    "public_api_url": "https://api.omnirank.com",
     "sdk_package": "@omnirank/sdk",
     "site_key_prefix": "ors",
     "snippet_filename": "agent.js",

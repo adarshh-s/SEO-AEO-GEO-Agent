@@ -108,12 +108,16 @@ def run_comprehensive_audit(
                 "ar": "تشفير HTTPS وشهادة SSL",
             },
             description={
-                "en": "Website serves content securely over HTTPS."
-                if is_https
-                else "Website is not served over a secure HTTPS connection.",
-                "ar": "الموقع يقدّم المحتوى بأمان عبر بروتوكول HTTPS."
-                if is_https
-                else "الموقع لا يعمل عبر اتصال HTTPS الآمن والمشفّر.",
+                "en": (
+                    "Website serves content securely over HTTPS."
+                    if is_https
+                    else "Website is not served over a secure HTTPS connection."
+                ),
+                "ar": (
+                    "الموقع يقدّم المحتوى بأمان عبر بروتوكول HTTPS."
+                    if is_https
+                    else "الموقع لا يعمل عبر اتصال HTTPS الآمن والمشفّر."
+                ),
             },
             recommendation={
                 "en": "Ensure all traffic is redirected to HTTPS with an active SSL certificate.",
@@ -137,12 +141,16 @@ def run_comprehensive_audit(
                 "ar": "حالة استجابة خادم HTTP",
             },
             description={
-                "en": f"Server responded with status code {fetch_res.status_code}."
-                if status_ok
-                else f"Server responded with an unexpected status code {fetch_res.status_code}.",
-                "ar": f"استجاب الخادم برمز الحالة {fetch_res.status_code} بنجاح."
-                if status_ok
-                else f"استجاب الخادم برمز غير متوقع {fetch_res.status_code}.",
+                "en": (
+                    f"Server responded with status code {fetch_res.status_code}."
+                    if status_ok
+                    else f"Server responded with an unexpected status code {fetch_res.status_code}."
+                ),
+                "ar": (
+                    f"استجاب الخادم برمز الحالة {fetch_res.status_code} بنجاح."
+                    if status_ok
+                    else f"استجاب الخادم برمز غير متوقع {fetch_res.status_code}."
+                ),
             },
             recommendation={
                 "en": "Ensure homepage returns a clean 200 OK HTTP status code.",
@@ -168,16 +176,24 @@ def run_comprehensive_audit(
                 "ar": "تحسين وسم العنوان (Title Tag)",
             },
             description={
-                "en": f"Page title length is optimal ({title_len} characters)."
-                if title_ok
-                else f"Page title is suboptimal ({title_len} characters; ideal is 30-70 characters)."
-                if title_len > 0
-                else "Page is missing a `<title>` tag.",
-                "ar": f"طول عنوان الصفحة مثالي ({title_len} حرفاً)."
-                if title_ok
-                else f"طول العنوان غير مثالي ({title_len} حرفاً؛ الموصى به 30-70 حرفاً)."
-                if title_len > 0
-                else "الصفحة تفتقر إلى وسم `<title>` بالكامل.",
+                "en": (
+                    f"Page title length is optimal ({title_len} characters)."
+                    if title_ok
+                    else (
+                        f"Page title is suboptimal ({title_len} characters; ideal is 30-70 characters)."
+                        if title_len > 0
+                        else "Page is missing a `<title>` tag."
+                    )
+                ),
+                "ar": (
+                    f"طول عنوان الصفحة مثالي ({title_len} حرفاً)."
+                    if title_ok
+                    else (
+                        f"طول العنوان غير مثالي ({title_len} حرفاً؛ الموصى به 30-70 حرفاً)."
+                        if title_len > 0
+                        else "الصفحة تفتقر إلى وسم `<title>` بالكامل."
+                    )
+                ),
             },
             recommendation={
                 "en": "Craft a unique title between 30 and 70 characters with brand and primary keyword.",
@@ -203,16 +219,24 @@ def run_comprehensive_audit(
                 "ar": "وسم الوصف (Meta Description)",
             },
             description={
-                "en": f"Meta description is well-formed ({desc_len} characters)."
-                if desc_ok
-                else f"Meta description length is {desc_len} characters (recommended 100-165)."
-                if desc_len > 0
-                else "Page is missing a `<meta name='description'>` tag.",
-                "ar": f"الوصف التعريفي مكتمل ومثالي ({desc_len} حرفاً)."
-                if desc_ok
-                else f"طول الوصف الحالي {desc_len} حرفاً (الموصى به 100-165 حرفاً)."
-                if desc_len > 0
-                else "الصفحة لا تحتوي على وسم `<meta name='description'>`.",
+                "en": (
+                    f"Meta description is well-formed ({desc_len} characters)."
+                    if desc_ok
+                    else (
+                        f"Meta description length is {desc_len} characters (recommended 100-165)."
+                        if desc_len > 0
+                        else "Page is missing a `<meta name='description'>` tag."
+                    )
+                ),
+                "ar": (
+                    f"الوصف التعريفي مكتمل ومثالي ({desc_len} حرفاً)."
+                    if desc_ok
+                    else (
+                        f"طول الوصف الحالي {desc_len} حرفاً (الموصى به 100-165 حرفاً)."
+                        if desc_len > 0
+                        else "الصفحة لا تحتوي على وسم `<meta name='description'>`."
+                    )
+                ),
             },
             recommendation={
                 "en": "Add an engaging meta description between 100 and 165 characters to improve click-through rate.",
@@ -238,12 +262,16 @@ def run_comprehensive_audit(
                 "ar": "وسم الرابط الأساسي (Canonical URL)",
             },
             description={
-                "en": f"Canonical URL is declared: {canonical_tag.get('href')}"
-                if has_canonical
-                else "Page lacks a `<link rel='canonical'>` tag, risking duplicate content.",
-                "ar": f"تم تحديد الرابط الأساسي: {canonical_tag.get('href')}"
-                if has_canonical
-                else "الصفحة لا تحدد رابطاً أساسياً canonical، مما قد يسبب مشاكل المحتوى المكرر.",
+                "en": (
+                    f"Canonical URL is declared: {canonical_tag.get('href')}"
+                    if has_canonical
+                    else "Page lacks a `<link rel='canonical'>` tag, risking duplicate content."
+                ),
+                "ar": (
+                    f"تم تحديد الرابط الأساسي: {canonical_tag.get('href')}"
+                    if has_canonical
+                    else "الصفحة لا تحدد رابطاً أساسياً canonical، مما قد يسبب مشاكل المحتوى المكرر."
+                ),
             },
             recommendation={
                 "en": "Add a self-referencing canonical tag to avoid duplicate content penalties.",
@@ -268,12 +296,16 @@ def run_comprehensive_audit(
                 "ar": "تهيئة العرض للهواتف الذكية (Viewport)",
             },
             description={
-                "en": "Mobile viewport meta tag is properly configured."
-                if has_viewport
-                else "Page lacks a mobile viewport tag, impairing mobile search usability.",
-                "ar": "وسم العرض للهواتف مهيأ بشكل صحيح."
-                if has_viewport
-                else "تفتقر الصفحة إلى وسم viewport، مما يضر بتجربة مستخدمي الهواتف ومؤشرات الجوال.",
+                "en": (
+                    "Mobile viewport meta tag is properly configured."
+                    if has_viewport
+                    else "Page lacks a mobile viewport tag, impairing mobile search usability."
+                ),
+                "ar": (
+                    "وسم العرض للهواتف مهيأ بشكل صحيح."
+                    if has_viewport
+                    else "تفتقر الصفحة إلى وسم viewport، مما يضر بتجربة مستخدمي الهواتف ومؤشرات الجوال."
+                ),
             },
             recommendation={
                 "en": "Add `<meta name='viewport' content='width=device-width, initial-scale=1'>`.",
@@ -298,12 +330,16 @@ def run_comprehensive_audit(
                 "ar": "عنوان رئيسي أحادي (H1)",
             },
             description={
-                "en": f"Page has exactly one clear H1 heading: '{h1_tags[0].get_text().strip()[:50]}...'"
-                if has_single_h1
-                else f"Page has {len(h1_tags)} H1 headings (should have exactly 1).",
-                "ar": f"تحتوي الصفحة على وسم H1 واحد مميز: '{h1_tags[0].get_text().strip()[:50]}...'"
-                if has_single_h1
-                else f"تحتوي الصفحة على {len(h1_tags)} وسوم H1 (يجب أن تحتوي على وسم رئيسي واحد).",
+                "en": (
+                    f"Page has exactly one clear H1 heading: '{h1_tags[0].get_text().strip()[:50]}...'"
+                    if has_single_h1
+                    else f"Page has {len(h1_tags)} H1 headings (should have exactly 1)."
+                ),
+                "ar": (
+                    f"تحتوي الصفحة على وسم H1 واحد مميز: '{h1_tags[0].get_text().strip()[:50]}...'"
+                    if has_single_h1
+                    else f"تحتوي الصفحة على {len(h1_tags)} وسوم H1 (يجب أن تحتوي على وسم رئيسي واحد)."
+                ),
             },
             recommendation={
                 "en": "Use exactly one clear H1 tag per page to establish topic hierarchy.",
@@ -330,12 +366,16 @@ def run_comprehensive_audit(
                 "ar": "النصوص البديلة للصور (Image Alt Tags)",
             },
             description={
-                "en": f"All {len(images)} images have descriptive alt attributes."
-                if images_ok
-                else f"{len(missing_alt)} of {len(images)} images are missing alt attributes.",
-                "ar": f"جميع الصور ({len(images)}) تحتوي على نصوص بديلة واضحة."
-                if images_ok
-                else f"{len(missing_alt)} من أصل {len(images)} صور تفتقر للنص البديل alt.",
+                "en": (
+                    f"All {len(images)} images have descriptive alt attributes."
+                    if images_ok
+                    else f"{len(missing_alt)} of {len(images)} images are missing alt attributes."
+                ),
+                "ar": (
+                    f"جميع الصور ({len(images)}) تحتوي على نصوص بديلة واضحة."
+                    if images_ok
+                    else f"{len(missing_alt)} من أصل {len(images)} صور تفتقر للنص البديل alt."
+                ),
             },
             recommendation={
                 "en": "Add descriptive alt attributes to all content images for accessibility and image search.",
@@ -362,12 +402,16 @@ def run_comprehensive_audit(
                 "ar": "وسوم الشبكات الاجتماعية (Open Graph)",
             },
             description={
-                "en": "Open Graph title and preview image tags are present."
-                if has_og
-                else "Missing og:title or og:image tags for rich social sharing previews.",
-                "ar": "وسوم og:title وصورة المشاركة موجودة بنجاح."
-                if has_og
-                else "تفتقر الصفحة إلى وسوم og:title أو og:image للمعاينة الغنية عند المشاركة.",
+                "en": (
+                    "Open Graph title and preview image tags are present."
+                    if has_og
+                    else "Missing og:title or og:image tags for rich social sharing previews."
+                ),
+                "ar": (
+                    "وسوم og:title وصورة المشاركة موجودة بنجاح."
+                    if has_og
+                    else "تفتقر الصفحة إلى وسوم og:title أو og:image للمعاينة الغنية عند المشاركة."
+                ),
             },
             recommendation={
                 "en": "Add og:title, og:description, and og:image tags.",
@@ -397,12 +441,16 @@ def run_comprehensive_audit(
                 "ar": "عمق المحتوى وعدد الكلمات",
             },
             description={
-                "en": f"Page contains substantial content ({word_count} words)."
-                if word_count_ok
-                else f"Page has thin content ({word_count} words; minimum recommended is 300 words).",
-                "ar": f"تحتوي الصفحة على محتوى وافٍ ({word_count} كلمة)."
-                if word_count_ok
-                else f"المحتوى ضعيف وقصير ({word_count} كلمة؛ الحد الأدنى الموصى به 300 كلمة).",
+                "en": (
+                    f"Page contains substantial content ({word_count} words)."
+                    if word_count_ok
+                    else f"Page has thin content ({word_count} words; minimum recommended is 300 words)."
+                ),
+                "ar": (
+                    f"تحتوي الصفحة على محتوى وافٍ ({word_count} كلمة)."
+                    if word_count_ok
+                    else f"المحتوى ضعيف وقصير ({word_count} كلمة؛ الحد الأدنى الموصى به 300 كلمة)."
+                ),
             },
             recommendation={
                 "en": "Expand page content to thoroughly answer user search intent with at least 300-500 words.",
@@ -428,12 +476,16 @@ def run_comprehensive_audit(
                 "ar": "تحديد لغة المستند (HTML Lang)",
             },
             description={
-                "en": f"Language declared as '{html_tag.get('lang')}'."
-                if has_lang
-                else "The `<html>` element is missing a `lang` attribute.",
-                "ar": f"تم تحديد لغة الصفحة بنجاح: '{html_tag.get('lang')}'."
-                if has_lang
-                else "عنصر `<html>` يفتقر إلى سمة `lang` لتحديد لغة المستند.",
+                "en": (
+                    f"Language declared as '{html_tag.get('lang')}'."
+                    if has_lang
+                    else "The `<html>` element is missing a `lang` attribute."
+                ),
+                "ar": (
+                    f"تم تحديد لغة الصفحة بنجاح: '{html_tag.get('lang')}'."
+                    if has_lang
+                    else "عنصر `<html>` يفتقر إلى سمة `lang` لتحديد لغة المستند."
+                ),
             },
             recommendation={
                 "en": "Add `<html lang='en'>` or `<html lang='ar' dir='rtl'>` to assist search engines and screen readers.",
@@ -458,12 +510,16 @@ def run_comprehensive_audit(
                 "ar": "هيكلية الفقرات وسهولة القراءة",
             },
             description={
-                "en": f"Content is structured with {len(paragraphs)} readable paragraph blocks."
-                if has_structured_content
-                else f"Content structure is sparse ({len(paragraphs)} paragraphs detected).",
-                "ar": f"المحتوى مهيكل بشكل ممتاز عبر {len(paragraphs)} فقرات واضحة."
-                if has_structured_content
-                else f"هيكلية النص تحتاج تحسيناً ({len(paragraphs)} فقرات مكتشفة).",
+                "en": (
+                    f"Content is structured with {len(paragraphs)} readable paragraph blocks."
+                    if has_structured_content
+                    else f"Content structure is sparse ({len(paragraphs)} paragraphs detected)."
+                ),
+                "ar": (
+                    f"المحتوى مهيكل بشكل ممتاز عبر {len(paragraphs)} فقرات واضحة."
+                    if has_structured_content
+                    else f"هيكلية النص تحتاج تحسيناً ({len(paragraphs)} فقرات مكتشفة)."
+                ),
             },
             recommendation={
                 "en": "Break content into scannable paragraphs and bullet points for better reader retention.",
@@ -495,12 +551,16 @@ def run_comprehensive_audit(
                 "ar": "أذونات زواحف الذكاء الاصطناعي في robots.txt",
             },
             description={
-                "en": "All AI search crawlers (GPTBot, ClaudeBot, Perplexity, Google-Extended) have access."
-                if aeo_robots_ok
-                else f"AI crawlers blocked in robots.txt: {', '.join(bots_blocked)}.",
-                "ar": "جميع زواحف الذكاء الاصطناعي مسموح لها بالوصول لأرشفة محتواك."
-                if aeo_robots_ok
-                else f"تم حظر زواحف الذكاء الاصطناعي التالية في robots.txt: {', '.join(bots_blocked)}.",
+                "en": (
+                    "All AI search crawlers (GPTBot, ClaudeBot, Perplexity, Google-Extended) have access."
+                    if aeo_robots_ok
+                    else f"AI crawlers blocked in robots.txt: {', '.join(bots_blocked)}."
+                ),
+                "ar": (
+                    "جميع زواحف الذكاء الاصطناعي مسموح لها بالوصول لأرشفة محتواك."
+                    if aeo_robots_ok
+                    else f"تم حظر زواحف الذكاء الاصطناعي التالية في robots.txt: {', '.join(bots_blocked)}."
+                ),
             },
             recommendation={
                 "en": "Allow GPTBot, ClaudeBot, and PerplexityBot in robots.txt to ensure your brand appears in AI answers.",
@@ -540,12 +600,16 @@ def run_comprehensive_audit(
                 "ar": "البيانات المنظمة Schema.org (JSON-LD)",
             },
             description={
-                "en": f"Found structured schema types: {', '.join(set(schema_types))}"
-                if has_schema
-                else "No JSON-LD structured data detected on the page.",
-                "ar": f"تم العثور على أنواع Schema: {', '.join(set(schema_types))}"
-                if has_schema
-                else "لم يتم العثور على أي بيانات منظمة JSON-LD في الصفحة.",
+                "en": (
+                    f"Found structured schema types: {', '.join(set(schema_types))}"
+                    if has_schema
+                    else "No JSON-LD structured data detected on the page."
+                ),
+                "ar": (
+                    f"تم العثور على أنواع Schema: {', '.join(set(schema_types))}"
+                    if has_schema
+                    else "لم يتم العثور على أي بيانات منظمة JSON-LD في الصفحة."
+                ),
             },
             recommendation={
                 "en": "Inject Organization, WebSite, and entity schemas so AI engines can disambiguate your brand.",
@@ -574,12 +638,16 @@ def run_comprehensive_audit(
                 "ar": "جاهزية الأسئلة الشائعة والإجابات المباشرة (FAQ)",
             },
             description={
-                "en": "Page includes structured FAQ or direct Q&A content blocks."
-                if faq_ok
-                else "Page lacks direct Q&A blocks or FAQPage schema, limiting AI citation potential.",
-                "ar": "تتضمن الصفحة فقرات أسئلة شائعة أو إجابات مباشرة."
-                if faq_ok
-                else "تفتقر الصفحة لفقرات الأسئلة والأجوبة أو مخطط FAQPage، مما يقلل فرص الاستشهاد بك.",
+                "en": (
+                    "Page includes structured FAQ or direct Q&A content blocks."
+                    if faq_ok
+                    else "Page lacks direct Q&A blocks or FAQPage schema, limiting AI citation potential."
+                ),
+                "ar": (
+                    "تتضمن الصفحة فقرات أسئلة شائعة أو إجابات مباشرة."
+                    if faq_ok
+                    else "تفتقر الصفحة لفقرات الأسئلة والأجوبة أو مخطط FAQPage، مما يقلل فرص الاستشهاد بك."
+                ),
             },
             recommendation={
                 "en": "Add an FAQ section with clear, 40-60 word answers directly addressing high-intent user questions.",
@@ -603,12 +671,16 @@ def run_comprehensive_audit(
                 "ar": "رندرة المحتوى بالخادم (Server-Side Rendering)",
             },
             description={
-                "en": "Key content is present in raw HTML and directly indexable by LLMs without executing JavaScript."
-                if not is_js_only
-                else "Substantial content is client-rendered via JavaScript and invisible to basic AI crawlers.",
-                "ar": "المحتوى الأساسي موجود مباشرة في شفرة HTML ومقروء لروبوتات الذكاء الاصطناعي دون تشغيل جافاسكريبت."
-                if not is_js_only
-                else "جزء كبير من المحتوى يعتمد على جافاسكريبت بالمتصفح ولا تراه زواحف الذكاء الاصطناعي البسيطة.",
+                "en": (
+                    "Key content is present in raw HTML and directly indexable by LLMs without executing JavaScript."
+                    if not is_js_only
+                    else "Substantial content is client-rendered via JavaScript and invisible to basic AI crawlers."
+                ),
+                "ar": (
+                    "المحتوى الأساسي موجود مباشرة في شفرة HTML ومقروء لروبوتات الذكاء الاصطناعي دون تشغيل جافاسكريبت."
+                    if not is_js_only
+                    else "جزء كبير من المحتوى يعتمد على جافاسكريبت بالمتصفح ولا تراه زواحف الذكاء الاصطناعي البسيطة."
+                ),
             },
             recommendation={
                 "en": "Render critical metadata and headings server-side (SSR/SSG) or use our Cloudflare edge worker.",
@@ -638,12 +710,16 @@ def run_comprehensive_audit(
                 "ar": "حجم مستند HTML الأولي",
             },
             description={
-                "en": f"Initial HTML document size is lightweight ({size_kb} KB)."
-                if size_ok
-                else f"Initial HTML document is large ({size_kb} KB; target is under 200 KB).",
-                "ar": f"حجم شفرة HTML الأولي خفيف ومثالي ({size_kb} كيلوبايت)."
-                if size_ok
-                else f"شفرة HTML الأولية كبيرة ({size_kb} كيلوبايت؛ المستهدف أقل من 200 كيلوبايت).",
+                "en": (
+                    f"Initial HTML document size is lightweight ({size_kb} KB)."
+                    if size_ok
+                    else f"Initial HTML document is large ({size_kb} KB; target is under 200 KB)."
+                ),
+                "ar": (
+                    f"حجم شفرة HTML الأولي خفيف ومثالي ({size_kb} كيلوبايت)."
+                    if size_ok
+                    else f"شفرة HTML الأولية كبيرة ({size_kb} كيلوبايت؛ المستهدف أقل من 200 كيلوبايت)."
+                ),
             },
             recommendation={
                 "en": "Minify HTML and defer large inline scripts or SVGs.",
@@ -669,12 +745,16 @@ def run_comprehensive_audit(
                 "ar": "عدد ملفات جافاسكريبت الخارجية",
             },
             description={
-                "en": f"Page loads {len(scripts)} external scripts."
-                if scripts_ok
-                else f"Page loads {len(scripts)} external scripts, which may delay Total Blocking Time (TBT).",
-                "ar": f"تحمل الصفحة {len(scripts)} ملفات جافاسكريبت خارجية."
-                if scripts_ok
-                else f"تحمل الصفحة {len(scripts)} ملفات سكربت خارجية، مما قد يسبب تأخيراً في التفاعل (TBT).",
+                "en": (
+                    f"Page loads {len(scripts)} external scripts."
+                    if scripts_ok
+                    else f"Page loads {len(scripts)} external scripts, which may delay Total Blocking Time (TBT)."
+                ),
+                "ar": (
+                    f"تحمل الصفحة {len(scripts)} ملفات جافاسكريبت خارجية."
+                    if scripts_ok
+                    else f"تحمل الصفحة {len(scripts)} ملفات سكربت خارجية، مما قد يسبب تأخيراً في التفاعل (TBT)."
+                ),
             },
             recommendation={
                 "en": "Consolidate or defer non-critical tracking scripts and third-party widgets.",
@@ -699,12 +779,16 @@ def run_comprehensive_audit(
                 "ar": "سرعة استجابة الخادم الأولية (TTFB)",
             },
             description={
-                "en": f"Server response time is fast ({fetch_latency_ms} ms)."
-                if latency_ok
-                else f"Server response is slow ({fetch_latency_ms} ms; ideal is under 600 ms).",
-                "ar": f"استجابة الخادم الأولية سريعة ({fetch_latency_ms} مللي ثانية)."
-                if latency_ok
-                else f"استجابة الخادم الأولية بطيئة ({fetch_latency_ms} مللي ثانية؛ المستهدف أقل من 600ms).",
+                "en": (
+                    f"Server response time is fast ({fetch_latency_ms} ms)."
+                    if latency_ok
+                    else f"Server response is slow ({fetch_latency_ms} ms; ideal is under 600 ms)."
+                ),
+                "ar": (
+                    f"استجابة الخادم الأولية سريعة ({fetch_latency_ms} مللي ثانية)."
+                    if latency_ok
+                    else f"استجابة الخادم الأولية بطيئة ({fetch_latency_ms} مللي ثانية؛ المستهدف أقل من 600ms)."
+                ),
             },
             recommendation={
                 "en": "Leverage a CDN (e.g. Cloudflare) and edge caching to reduce server response latency.",

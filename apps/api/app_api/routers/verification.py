@@ -13,6 +13,9 @@ from app_api.routers.sites import get_site
 from app_api.schemas.verification import VerificationStatusOut, VerifyAttemptOut
 from app_api.services import audit
 from app_core.brand import BRAND
+from app_core.net import safe_get  # SSRF-safe, thread-safe (runs in the API)
+
+VERIFIER_UA = f"{BRAND['product_name']}-Verifier/1.0"
 
 router = APIRouter(prefix="/sites/{site_id}", tags=["verification"])
 
@@ -24,8 +27,8 @@ def get_verification_status(
     db: TenantDb,
 ) -> VerificationStatusOut:
     site = get_site(db, ctx, site_id)
-    meta_name = BRAND.get("verification_meta_name", "quardlink-verification")
-    dns_prefix = BRAND.get("dns_txt_prefix", "quardlink-verification=")
+    meta_name = BRAND["verification_meta_name"]
+    dns_prefix = BRAND["dns_txt_prefix"]
 
     return VerificationStatusOut(
         domain=site.domain,
@@ -46,18 +49,14 @@ def verify_site_ownership(
     db: TenantDb,
 ) -> VerifyAttemptOut:
     site = get_site(db, ctx, site_id)
-    meta_name = BRAND.get("verification_meta_name", "quardlink-verification")
-    dns_prefix = BRAND.get("dns_txt_prefix", "quardlink-verification=")
+    meta_name = BRAND["verification_meta_name"]
+    dns_prefix = BRAND["dns_txt_prefix"]
     token = site.verification_token
 
     # 1. Check HTML Meta tag
     meta_verified = False
     try:
-        import requests
-
-        resp = requests.get(
-            site.homepage_url, timeout=10, headers={"User-Agent": "QuardLinkVerifier/1.0"}
-        )
+        resp = safe_get(site.homepage_url, timeout=10, headers={"User-Agent": VERIFIER_UA})
         if resp.status_code == 200:
             pattern = re.compile(
                 rf'<meta[^>]+name=["\']{re.escape(meta_name)}["\'][^>]+content=["\']{re.escape(token)}["\']',

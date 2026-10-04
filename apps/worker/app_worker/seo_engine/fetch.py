@@ -9,10 +9,12 @@ try:
 except ImportError:
     BeautifulSoup = None
 
-from app_core.brand import BRAND
+from app_core.brand import crawler_user_agent
+from app_core.settings import get_settings
 from app_worker.seo_engine.url_safety import safe_requests_get
 
-USER_AGENT = f"{BRAND['crawler_user_agent_token']}/1.0 (+https://{BRAND['brand_slug']}.com/bot)"
+# Clear, honest crawler identity (CLAUDE.md §5) with a page explaining the bot.
+USER_AGENT = crawler_user_agent(f"{get_settings().app_url}/bot")
 
 
 @dataclass

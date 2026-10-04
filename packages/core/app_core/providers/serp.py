@@ -6,7 +6,49 @@ from dataclasses import dataclass, field
 from decimal import Decimal
 from typing import Any, Protocol
 
+from app_core.providers.ai_answer import ProviderNotConfigured
 from app_core.settings import get_settings
+
+# ISO 3166-1 numeric codes. Google Ads / DataForSEO country location codes are 2000 + this.
+_ISO_NUMERIC = {
+    "SA": 682,
+    "AE": 784,
+    "KW": 414,
+    "QA": 634,
+    "BH": 48,
+    "OM": 512,
+    "EG": 818,
+    "JO": 400,
+    "US": 840,
+    "GB": 826,
+    "CA": 124,
+    "AU": 36,
+    "IN": 356,
+    "PK": 586,
+    "TR": 792,
+    "DE": 276,
+    "FR": 250,
+    "ES": 724,
+    "IT": 380,
+    "NL": 528,
+    "IE": 372,
+    "NZ": 554,
+    "SG": 702,
+    "MY": 458,
+}
+
+
+class UnsupportedCountry(ValueError):
+    pass
+
+
+def country_location_code(country: str) -> int:
+    try:
+        return 2000 + _ISO_NUMERIC[country.upper()]
+    except KeyError:
+        raise UnsupportedCountry(
+            f"No DataForSEO location mapping for country '{country}'"
+        ) from None
 
 
 @dataclass
@@ -51,10 +93,7 @@ class DataForSeoSerpProvider:
         device: str = "desktop",
     ) -> SerpResult:
         if not self.login or not self.password:
-            # Fall back to mock if credentials not provided
-            return MockSerpProvider().check_ranking(
-                keyword=keyword, domain=domain, country=country, language=language, device=device
-            )
+            raise ProviderNotConfigured("DataForSEO: set DATAFORSEO_LOGIN and DATAFORSEO_PASSWORD")
 
         import requests
         from requests.auth import HTTPBasicAuth
@@ -62,7 +101,7 @@ class DataForSeoSerpProvider:
         payload = [
             {
                 "keyword": keyword,
-                "location_code": 2840 if country == "US" else 2682,  # SA is 2682, US is 2840
+                "location_code": country_location_code(country),
                 "language_code": language,
                 "device": device,
                 "depth": 100,
@@ -184,3 +223,13 @@ class MockSerpProvider:
             cost_usd=Decimal("0.0000"),
             raw_response={"mock": True},
         )
+
+
+def get_serp_provider() -> "DataForSeoSerpProvider | MockSerpProvider":
+    """Real DataForSEO provider, or the mock where allowed (local/test only)."""
+    s = get_settings()
+    if s.dataforseo_login and s.dataforseo_password:
+        return DataForSeoSerpProvider()
+    if s.mock_providers_allowed:
+        return MockSerpProvider()
+    raise ProviderNotConfigured("DataForSEO: set DATAFORSEO_LOGIN and DATAFORSEO_PASSWORD")

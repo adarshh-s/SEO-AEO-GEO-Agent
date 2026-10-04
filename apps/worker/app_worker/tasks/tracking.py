@@ -23,10 +23,9 @@ from app_core.models import (
     Site,
     VisibilityScore,
 )
-from app_core.providers import (
-    DataForSeoSerpProvider,
-    get_answer_engine,
-)
+from app_core.providers import get_answer_engine
+from app_core.providers.ai_answer import ProviderNotConfigured
+from app_core.providers.serp import UnsupportedCountry, get_serp_provider
 from app_core.settings import get_settings
 from app_worker.celery_app import app
 
@@ -63,14 +62,19 @@ def run_keyword_rank_check(keyword_id_str: str, is_scheduled: bool = False) -> d
         prev_pos = prev.position if prev else None
 
         # 3. Query SERP provider
-        provider = DataForSeoSerpProvider()
-        res = provider.check_ranking(
-            keyword=keyword.keyword,
-            domain=site.domain,
-            country=keyword.country,
-            language=keyword.language,
-            device=keyword.device,
-        )
+        # Never store made-up rankings: a missing provider skips the check.
+        try:
+            provider = get_serp_provider()
+            res = provider.check_ranking(
+                keyword=keyword.keyword,
+                domain=site.domain,
+                country=keyword.country,
+                language=keyword.language,
+                device=keyword.device,
+            )
+        except (ProviderNotConfigured, UnsupportedCountry) as e:
+            logger.warning("rank_check_skipped", keyword_id=keyword_id_str, reason=str(e))
+            return {"status": "skipped", "reason": str(e)}
 
         now = datetime.now(UTC)
         rank_check = RankCheck(
@@ -144,7 +148,12 @@ def run_ai_prompt_check(prompt_id_str: str, is_scheduled: bool = False) -> dict:
         brand_mentions = 0
 
         for engine_id in allowed_engines:
-            provider = get_answer_engine(engine_id)
+            try:
+                provider = get_answer_engine(engine_id)
+            except ProviderNotConfigured as e:
+                # Never store made-up answers: skip engines that aren't configured.
+                logger.warning("ai_engine_skipped", engine=engine_id, reason=str(e))
+                continue
             for run_idx in range(runs_per_prompt):
                 try:
                     res = provider.query(

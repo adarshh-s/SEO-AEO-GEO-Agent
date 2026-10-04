@@ -10,12 +10,27 @@ Supports:
 
 import json
 import logging
+import re
 from typing import Any
 
 from app_core.brand import BRAND
 from app_core.connectors.base import ConnectionTestResult, DeploymentResult, RollbackResult
 
 logger = logging.getLogger(__name__)
+
+
+_SHOP_RE = re.compile(r"^[a-z0-9][a-z0-9-]{0,62}\.myshopify\.com$")
+
+
+def shopify_shop_domain(value: str) -> str:
+    """Normalize to `<shop>.myshopify.com`; anything else is rejected (the admin token must
+    never be sent to another host)."""
+    host = value.strip().lower().removeprefix("https://").removeprefix("http://").split("/")[0]
+    if "." not in host:
+        host = f"{host}.myshopify.com"
+    if not _SHOP_RE.match(host):
+        raise ValueError("Enter your shop's .myshopify.com domain, e.g. my-store.myshopify.com")
+    return host
 
 
 class ShopifyConnector:
@@ -33,9 +48,7 @@ class ShopifyConnector:
     ) -> dict[str, Any]:
         import requests
 
-        clean_domain = shop_domain.replace("https://", "").replace("http://", "").rstrip("/")
-        if not clean_domain.endswith(".myshopify.com") and "." not in clean_domain:
-            clean_domain = f"{clean_domain}.myshopify.com"
+        clean_domain = shopify_shop_domain(shop_domain)
 
         url = f"https://{clean_domain}/admin/api/{self.api_version}/graphql.json"
         headers = {

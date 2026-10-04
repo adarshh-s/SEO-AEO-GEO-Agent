@@ -15,6 +15,7 @@ from app_api.services import audit
 from app_api.task_dispatcher import dispatch_task
 from app_core.connectors import get_connector
 from app_core.models import Fix, Site, SiteIntegration, Webhook
+from app_core.sanitize import PayloadError
 from app_core.tenancy import TenantContext, scoped
 
 router = APIRouter(prefix="/sites/{site_id}/fixes", tags=["fixes"])
@@ -86,13 +87,18 @@ def update_fix(
     db: TenantDb,
 ) -> Fix:
     fix = _get_site_fix(db, ctx, site_id, fix_id)
+    if fix.status not in ("draft", "proposed"):
+        # Approved/deployed content must not change without a new review.
+        raise ApiError(409, "fix_locked", "Only fixes that are not approved yet can be edited.")
     if body.title is not None:
         fix.title = body.title
     if body.description is not None:
         fix.description = body.description
     if body.payload is not None:
-        # Shallow merge or replace payload
-        fix.payload = {**fix.payload, **body.payload}
+        try:
+            fix.payload = {**fix.payload, **body.payload}
+        except PayloadError as exc:
+            raise ApiError(422, "invalid_payload", str(exc)) from exc
     db.commit()
     return fix
 

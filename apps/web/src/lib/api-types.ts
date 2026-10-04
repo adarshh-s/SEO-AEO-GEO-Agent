@@ -44,6 +44,10 @@ export type SnippetInfoOut = S["SnippetInfoOut"];
 export type ApiKeyOut = S["ApiKeyOut"];
 export type ApiKeyCreateIn = S["ApiKeyCreateIn"];
 export type ApiKeyCreatedOut = S["ApiKeyCreatedOut"];
+export type WebhookCreatedOut = S["WebhookCreatedOut"];
+export type WebhookEvent = S["WebhookCreateIn"]["events"] extends (infer E)[] | undefined
+  ? E
+  : never;
 export type WebhookOut = S["WebhookOut"];
 export type WebhookCreateIn = S["WebhookCreateIn"];
 

@@ -51,7 +51,13 @@ def test_public_fixes_delivery(app):
             language="en",
             target_url="https://example.com/blog/article-1",
             title="Article Schema",
-            payload={"@type": "Article", "headline": "Test"},
+            payload={
+                "json_ld": {
+                    "@context": "https://schema.org",
+                    "@type": "Article",
+                    "headline": "Test",
+                }
+            },
         )
         # Deployed fix for another URL (SHOULD be returned if querying that URL)
         f_deployed = Fix(
@@ -77,7 +83,9 @@ def test_public_fixes_delivery(app):
     data1 = res1.json()
     assert len(data1["fixes"]) == 1
     assert data1["fixes"][0]["id"] == str(f_approved.id)
-    assert data1["fixes"][0]["payload"] == {"@type": "Article", "headline": "Test"}
+    assert data1["fixes"][0]["payload"] == {
+        "json_ld": {"@context": "https://schema.org", "@type": "Article", "headline": "Test"}
+    }
 
     # 2. Query for /about
     res2 = anon.get(f"/public/v1/fixes?site_key={site_key}&url=https://example.com/about")

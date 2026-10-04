@@ -1,7 +1,7 @@
 {
   "name": "@omnirank/sdk",
   "version": "0.1.0",
-  "description": "OmniRank SDK for Next.js, React, and Modern Web Frameworks",
+  "description": "OmniRank SDK for Next.js, React and other frameworks",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
   "types": "dist/index.d.ts",

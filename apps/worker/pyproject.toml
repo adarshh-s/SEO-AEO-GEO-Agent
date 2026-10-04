@@ -9,8 +9,11 @@ dependencies = [
     "sentry-sdk[celery]>=2.19",
     "requests>=2.31",
     "beautifulsoup4>=4.12",
-    "fastapi>=0.115",
-    "uvicorn[standard]>=0.32",
+    # claude-seo (vendor/) runtime needs + headless Chromium for raw-vs-rendered checks
+    "playwright>=1.55",
+    "lxml>=6.0",
+    "trafilatura>=2.0",
+    "htmldate>=1.9",
 ]
 
 [build-system]

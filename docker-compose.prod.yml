@@ -1,5 +1,5 @@
-# Production Docker Compose stack for OmniRank
-name: omnirank-prod
+# Production Docker Compose stack
+name: seo-platform-prod
 
 x-python-prod-env: &python-prod-env
   env_file:

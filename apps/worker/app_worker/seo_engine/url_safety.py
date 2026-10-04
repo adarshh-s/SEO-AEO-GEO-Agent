@@ -1,96 +1,40 @@
-"""SSRF and URL safety adapter.
+"""SSRF protection for every outbound fetch of a customer-supplied URL (CLAUDE.md §9, §11).
 
-Wraps vendor/claude-seo/scripts/url_safety.py with our typed signatures.
+Thin re-export of vendor/claude-seo/scripts/url_safety.py (DNS-pinned requests, redirect
+re-validation, private/reserved/metadata IP blocking). There is deliberately no fallback:
+if the vendored module is missing, importing this module fails, so a worker can never run
+with weaker protection. The worker image must include vendor/claude-seo.
+
+The vendored module patches DNS resolution process-wide, so only call it from Celery
+prefork workers (one task per process), never from threads or the API.
 """
 
-import ipaddress
-import socket
-from typing import Any
-from urllib.parse import urlparse
-
-import app_worker.seo_engine._vendor_path  # noqa: F401
+import app_worker.seo_engine._vendor_path  # noqa: F401  (puts vendor scripts on sys.path)
 
 try:
     import url_safety as _vendor_safety
+except ImportError as exc:  # pragma: no cover - deployment error, not a runtime branch
+    raise ImportError(
+        "vendor/claude-seo is missing (run `git submodule update --init`); refusing to fetch "
+        "customer URLs without SSRF protection"
+    ) from exc
 
-    URLSafetyError = _vendor_safety.URLSafetyError
-    validate_url = _vendor_safety.validate_url
-    validate_url_strict = _vendor_safety.validate_url_strict
-    safe_requests_get = _vendor_safety.safe_requests_get
-    safe_requests_head = _vendor_safety.safe_requests_head
-    safe_requests_session = _vendor_safety.safe_requests_session
-    is_safe_ip = _vendor_safety.is_safe_ip
-except ImportError:
+URLSafetyError = _vendor_safety.URLSafetyError
+is_safe_ip = _vendor_safety.is_safe_ip
+validate_url = _vendor_safety.validate_url
+validate_url_strict = _vendor_safety.validate_url_strict
+safe_requests_get = _vendor_safety.safe_requests_get
+safe_requests_head = _vendor_safety.safe_requests_head
+safe_requests_session = _vendor_safety.safe_requests_session
+make_safe_playwright_route_handler = _vendor_safety.make_safe_playwright_route_handler
 
-    class URLSafetyError(ValueError):
-        pass
-
-    def is_safe_ip(ip_str: str) -> bool:
-        try:
-            ip = ipaddress.ip_address(ip_str)
-            return not (
-                ip.is_private
-                or ip.is_loopback
-                or ip.is_reserved
-                or ip.is_link_local
-                or ip.is_multicast
-                or ip.is_unspecified
-            )
-        except ValueError:
-            return False
-
-    def validate_url(url: str) -> bool:
-        try:
-            parsed = urlparse(url)
-            if parsed.scheme not in ("http", "https"):
-                return False
-            host = parsed.hostname
-            return bool(host and host not in ("localhost", "127.0.0.1", "::1", "169.254.169.254"))
-        except Exception:
-            return False
-
-    def validate_url_strict(url: str) -> tuple[str, str]:
-        if not validate_url(url):
-            raise URLSafetyError(f"Invalid URL: {url}")
-        parsed = urlparse(url)
-        host = parsed.hostname or ""
-        try:
-            infos = socket.getaddrinfo(host, parsed.port or 80, socket.AF_INET)
-            ips = [info[4][0] for info in infos]
-            for ip in ips:
-                if not is_safe_ip(ip):
-                    raise URLSafetyError(f"Hostname resolves to unsafe IP: {ip}")
-            pinned_ip = ips[0] if ips else "127.0.0.1"
-            return url, pinned_ip
-        except socket.gaierror as e:
-            raise URLSafetyError(f"DNS resolution failed: {e}") from e
-
-    def safe_requests_get(url: str, **kwargs: Any) -> Any:
-        import requests
-
-        validate_url_strict(url)
-        timeout = kwargs.pop("timeout", 15)
-        return requests.get(url, timeout=timeout, **kwargs)
-
-    def safe_requests_head(url: str, **kwargs: Any) -> Any:
-        import requests
-
-        validate_url_strict(url)
-        timeout = kwargs.pop("timeout", 10)
-        return requests.head(url, timeout=timeout, **kwargs)
-
-    def safe_requests_session(url: str) -> Any:
-        from contextlib import contextmanager
-
-        import requests
-
-        @contextmanager
-        def _session():
-            validate_url_strict(url)
-            s = requests.Session()
-            try:
-                yield s
-            finally:
-                s.close()
-
-        return _session()
+__all__ = [
+    "URLSafetyError",
+    "is_safe_ip",
+    "make_safe_playwright_route_handler",
+    "safe_requests_get",
+    "safe_requests_head",
+    "safe_requests_session",
+    "validate_url",
+    "validate_url_strict",
+]

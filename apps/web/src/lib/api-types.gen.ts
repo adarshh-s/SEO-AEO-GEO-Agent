@@ -1431,7 +1431,7 @@ export interface paths {
     put?: never;
     /**
      * Record Ai Referral
-     * @description Cookieless endpoint recording traffic referred by AI answer engines.
+     * @description Cookieless endpoint recording traffic referred by AI answer engines. No personal data.
      */
     post: operations["record_ai_referral_public_v1_telemetry_referral_post"];
     delete?: never;
@@ -2861,8 +2861,11 @@ export interface components {
       site_key: string;
       /** Url */
       url: string;
-      /** Referrer Engine */
-      referrer_engine: string;
+      /**
+       * Referrer Engine
+       * @enum {string}
+       */
+      referrer_engine: "chatgpt" | "perplexity" | "gemini" | "claude" | "copilot" | "other_ai";
     };
     /** TestConnectionOut */
     TestConnectionOut: {
@@ -2955,15 +2958,47 @@ export interface components {
     WebhookCreateIn: {
       /** Url */
       url: string;
+      /** Events */
+      events?: (
+        | "fix.created"
+        | "fix.proposed"
+        | "fix.approved"
+        | "fix.rejected"
+        | "fix.deployed"
+        | "fix.rolled_back"
+        | "audit.triggered"
+        | "audit.completed"
+        | "report.generated"
+        | "score.changed"
+      )[];
+    };
+    /**
+     * WebhookCreatedOut
+     * @description Returned once at creation: the signing secret is never shown again.
+     */
+    WebhookCreatedOut: {
       /**
-       * Events
-       * @default [
-       *       "fix.proposed",
-       *       "fix.approved",
-       *       "fix.deployed"
-       *     ]
+       * Id
+       * Format: uuid
        */
+      id: string;
+      /** Url */
+      url: string;
+      /** Events */
       events: string[];
+      /** Status */
+      status: string;
+      /** Last Delivery At */
+      last_delivery_at: string | null;
+      /** Last Status Code */
+      last_status_code: number | null;
+      /**
+       * Created At
+       * Format: date-time
+       */
+      created_at: string;
+      /** Secret */
+      secret: string;
     };
     /** WebhookOut */
     WebhookOut: {
@@ -2974,8 +3009,6 @@ export interface components {
       id: string;
       /** Url */
       url: string;
-      /** Secret */
-      secret: string;
       /** Events */
       events: string[];
       /** Status */
@@ -5870,7 +5903,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["WebhookOut"];
+          "application/json": components["schemas"]["WebhookCreatedOut"];
         };
       };
       /** @description Validation Error */
@@ -6249,9 +6282,7 @@ export interface operations {
   record_ai_referral_public_v1_telemetry_referral_post: {
     parameters: {
       query?: never;
-      header?: {
-        "User-Agent"?: string | null;
-      };
+      header?: never;
       path?: never;
       cookie?: never;
     };
