@@ -13,6 +13,7 @@ dependencies = [
     "httpx>=0.28",
     "redis>=5.2",
     "sentry-sdk[fastapi]>=2.19",
+    "celery[redis]>=5.4",  # enqueue background jobs (task_dispatcher)
 ]
 
 [build-system]

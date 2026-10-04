@@ -1,5 +1,5 @@
 # Local development stack. `docker compose up` → web :5173 (override with WEB_PORT), api :8000,
-# mailpit (emails) :8025, minio console :9001. SEED_DEMO defaults to true here.
+# mailpit (emails) :8025. SEED_DEMO defaults to true here.
 name: seo-platform
 
 x-python-env: &python-env
@@ -13,7 +13,6 @@ x-python-env: &python-env
     SMTP_PORT: "1025"
     EMAIL_PROVIDER: ${EMAIL_PROVIDER:-smtp}
     SEED_DEMO: ${SEED_DEMO:-true}
-    S3_ENDPOINT_URL: http://minio:9000
     APP_URL: http://localhost:${WEB_PORT:-5173}
     CORS_ORIGINS: http://localhost:${WEB_PORT:-5173}
 
@@ -81,17 +80,8 @@ services:
     image: axllent/mailpit:latest
     ports: ["8025:8025", "1025:1025"]
 
-  minio:
-    image: minio/minio:latest
-    command: server /data --console-address ":9001"
-    environment:
-      MINIO_ROOT_USER: minio
-      MINIO_ROOT_PASSWORD: minio-password
-    ports: ["9000:9000", "9001:9001"]
-    volumes: [miniodata:/data]
 
 volumes:
   pgdata:
   pnpm_store:
-  miniodata:
   web_node_modules:

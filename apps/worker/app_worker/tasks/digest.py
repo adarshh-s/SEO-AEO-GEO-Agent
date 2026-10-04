@@ -5,8 +5,8 @@ import uuid
 import structlog
 from sqlalchemy import func, select
 
-from app_api.providers.email import Email, get_email_provider
 from app_core.db import system_session
+from app_core.email import Email, get_email_provider
 from app_core.models import (
     AiCheck,
     Audit,
