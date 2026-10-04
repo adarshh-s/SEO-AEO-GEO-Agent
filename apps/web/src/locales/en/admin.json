@@ -73,5 +73,7 @@
     "target": "Target",
     "details": "Details",
     "time": "Timestamp"
-  }
+  },
+  "orgCount_one": "{{count}} organization",
+  "orgCount_other": "{{count}} organizations"
 }

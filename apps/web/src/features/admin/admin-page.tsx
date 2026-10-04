@@ -1,3 +1,4 @@
+import { T } from "@/components/ui/t";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   AlertTriangle,
@@ -167,7 +168,7 @@ export function AdminPage() {
               />
             </div>
             <div className="text-muted-foreground text-xs">
-              {filteredOrgs.length} {t("columns.org")}
+              {t("orgCount", { count: filteredOrgs.length })}
             </div>
           </div>
 
@@ -289,8 +290,9 @@ export function AdminPage() {
                     {t("actions.editCeiling")}: {editingOrg.name}
                   </h4>
                   <p className="text-muted-foreground text-xs">
-                    Plan default: ${editingOrg.effective_ceiling_usd ?? "None"}. Set a specific
-                    override or clear it.
+                    <T k="admin.plan_default" />
+                    {editingOrg.effective_ceiling_usd ?? "None"}
+                    <T k="admin.set_a_specific_override_or_clear_it" />
                   </p>
                 </div>
                 <div className="flex items-center gap-2">
@@ -335,8 +337,10 @@ export function AdminPage() {
                     {t("costs.topTenants")}: {orgCostDetails.data?.org_name}
                   </CardTitle>
                   <CardDescription className="text-xs">
-                    Current Spend: ${Number(orgCostDetails.data?.current_spend_usd ?? 0).toFixed(4)}{" "}
-                    / Ceiling: ${orgCostDetails.data?.effective_ceiling_usd ?? "None"}
+                    <T k="admin.current_spend" />
+                    {Number(orgCostDetails.data?.current_spend_usd ?? 0).toFixed(4)}{" "}
+                    <T k="admin.ceiling" />
+                    {orgCostDetails.data?.effective_ceiling_usd ?? "None"}
                   </CardDescription>
                 </div>
                 <div className="flex items-center gap-2">
@@ -372,18 +376,28 @@ export function AdminPage() {
                     <table className="w-full text-xs">
                       <thead className="bg-muted/50 border-b text-start">
                         <tr>
-                          <th className="px-3 py-2 text-start font-medium">Period</th>
-                          <th className="px-3 py-2 text-start font-medium">Category</th>
-                          <th className="px-3 py-2 text-start font-medium">Provider</th>
-                          <th className="px-3 py-2 text-start font-medium">Units</th>
-                          <th className="px-3 py-2 text-end font-medium">Cost ($)</th>
+                          <th className="px-3 py-2 text-start font-medium">
+                            <T k="admin.period" />
+                          </th>
+                          <th className="px-3 py-2 text-start font-medium">
+                            <T k="admin.category" />
+                          </th>
+                          <th className="px-3 py-2 text-start font-medium">
+                            <T k="admin.provider" />
+                          </th>
+                          <th className="px-3 py-2 text-start font-medium">
+                            <T k="admin.units" />
+                          </th>
+                          <th className="px-3 py-2 text-end font-medium">
+                            <T k="admin.cost" />
+                          </th>
                         </tr>
                       </thead>
                       <tbody className="divide-y">
                         {(orgCostDetails.data?.counters ?? []).length === 0 ? (
                           <tr>
                             <td colSpan={5} className="text-muted-foreground py-4 text-center">
-                              No usage counters recorded yet for this organization.
+                              <T k="admin.no_usage_counters_recorded_yet_for_this_" />
                             </td>
                           </tr>
                         ) : (
@@ -490,7 +504,7 @@ export function AdminPage() {
                   <CardContent className="space-y-3">
                     {Object.entries(costSummary.data.provider_breakdown).length === 0 ? (
                       <p className="text-muted-foreground py-4 text-center text-xs">
-                        No provider usage recorded yet.
+                        <T k="admin.no_provider_usage_recorded_yet" />
                       </p>
                     ) : (
                       Object.entries(costSummary.data.provider_breakdown).map(([prov, amt]) => (
@@ -526,7 +540,7 @@ export function AdminPage() {
                   <CardContent className="space-y-3">
                     {Object.entries(costSummary.data.category_breakdown).length === 0 ? (
                       <p className="text-muted-foreground py-4 text-center text-xs">
-                        No category usage recorded yet.
+                        <T k="admin.no_category_usage_recorded_yet" />
                       </p>
                     ) : (
                       Object.entries(costSummary.data.category_breakdown).map(([cat, amt]) => (
@@ -768,7 +782,7 @@ export function AdminPage() {
                           colSpan={5}
                           className="text-muted-foreground py-4 text-center font-sans"
                         >
-                          No audit entries recorded yet.
+                          <T k="admin.no_audit_entries_recorded_yet" />
                         </td>
                       </tr>
                     ) : (

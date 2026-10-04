@@ -1,3 +1,4 @@
+import { T } from "@/components/ui/t";
 import { useSelectedSite } from "@/lib/use-selected-site";
 import {
   AlertTriangle,
@@ -241,7 +242,7 @@ export function IntegrationsPage() {
         {sites.data.length > 1 && (
           <div className="flex items-center gap-2">
             <span className="text-muted-foreground text-xs font-medium">
-              {t("nav.website") ?? "Website"}:
+              {t("overview.sites")}:
             </span>
             <select
               value={siteId}
@@ -308,7 +309,7 @@ export function IntegrationsPage() {
                     ) : (
                       <>
                         <Copy className="me-1 h-3 w-3" />
-                        {t("fixes.copySchema")}
+                        {t("integrations.copyCode")}
                       </>
                     )}
                   </Button>
@@ -337,7 +338,7 @@ export function IntegrationsPage() {
                     ) : (
                       <>
                         <Copy className="me-1 h-3 w-3" />
-                        {t("fixes.copySchema")}
+                        {t("integrations.copyCode")}
                       </>
                     )}
                   </Button>
@@ -350,17 +351,20 @@ export function IntegrationsPage() {
 
               {verifySite.isError && (
                 <Alert tone="error">
-                  <p className="font-semibold">Verification check failed</p>
+                  <p className="font-semibold">
+                    <T k="integrations.verification_check_failed" />
+                  </p>
                   <p>
-                    We could not find the meta tag or DNS TXT record on your site. Please ensure it
-                    is published, purge any CDN/caching layer, and try again.
+                    <T k="integrations.we_could_not_find_the_meta_tag_or_dns_tx" />
                   </p>
                 </Alert>
               )}
 
               {verifySite.isSuccess && (
                 <Alert tone="success">
-                  <p className="font-semibold">Verification Successful</p>
+                  <p className="font-semibold">
+                    <T k="integrations.verification_successful" />
+                  </p>
                   <p>{verifySite.data?.message}</p>
                 </Alert>
               )}
@@ -426,7 +430,9 @@ export function IntegrationsPage() {
 
           {testResult && (
             <Alert tone={testResult.ok ? "success" : "error"}>
-              <p className="font-semibold">{testResult.ok ? "Success" : "Notice"}</p>
+              <p className="font-semibold">
+                {testResult.ok ? <T k="integrations.success" /> : <T k="integrations.notice" />}
+              </p>
               <p>{testResult.message}</p>
             </Alert>
           )}
@@ -436,10 +442,11 @@ export function IntegrationsPage() {
             <div className="space-y-4">
               <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                 <div>
-                  <h4 className="text-sm font-semibold">{PRODUCT_NAME} WordPress Plugin</h4>
+                  <h4 className="text-sm font-semibold">
+                    {PRODUCT_NAME} <T k="integrations.wordpress_plugin" />
+                  </h4>
                   <p className="text-muted-foreground text-xs">
-                    Server-side title, description, schema injection, and AI referral tracking.
-                    Cooperates with Yoast SEO & Rank Math.
+                    <T k="integrations.server_side_title_description_schema_inj" />
                   </p>
                 </div>
                 <Button variant="outline" size="sm" asChild className="h-8 shrink-0 text-xs">
@@ -454,7 +461,7 @@ export function IntegrationsPage() {
                 <div className="grid gap-3 sm:grid-cols-2">
                   <div className="space-y-1">
                     <label className="text-muted-foreground text-xs font-medium">
-                      Site REST URL
+                      <T k="integrations.site_rest_url" />
                     </label>
                     <Input
                       placeholder="https://example.com"
@@ -465,7 +472,7 @@ export function IntegrationsPage() {
                   </div>
                   <div className="space-y-1">
                     <label className="text-muted-foreground text-xs font-medium">
-                      Application Username
+                      <T k="integrations.application_username" />
                     </label>
                     <Input
                       placeholder="admin"
@@ -476,7 +483,7 @@ export function IntegrationsPage() {
                   </div>
                   <div className="space-y-1 sm:col-span-2">
                     <label className="text-muted-foreground text-xs font-medium">
-                      Application Password (for draft content creation)
+                      <T k="integrations.application_password_for_draft_content_c" />
                     </label>
                     <Input
                       type="password"
@@ -532,17 +539,18 @@ export function IntegrationsPage() {
           {deepPlatformTab === "shopify" && (
             <div className="space-y-4">
               <div>
-                <h4 className="text-sm font-semibold">Shopify GraphQL Admin & App Embed</h4>
+                <h4 className="text-sm font-semibold">
+                  <T k="integrations.shopify_graphql_admin_app_embed" />
+                </h4>
                 <p className="text-muted-foreground text-xs">
-                  Native SEO fields for products/pages + server-side JSON-LD via app metafields and
-                  Liquid theme app embed.
+                  <T k="integrations.native_seo_fields_for_products_pages_ser" />
                 </p>
               </div>
 
               <div className="border-border bg-muted/20 space-y-3 rounded-lg border p-4">
                 <div className="space-y-1">
                   <label className="text-muted-foreground text-xs font-medium">
-                    Store Domain (myshopify.com)
+                    <T k="integrations.store_domain_myshopify_com" />
                   </label>
                   <Input
                     placeholder="my-store.myshopify.com"
@@ -553,7 +561,7 @@ export function IntegrationsPage() {
                 </div>
                 <div className="space-y-1">
                   <label className="text-muted-foreground text-xs font-medium">
-                    Admin API Access Token
+                    <T k="integrations.admin_api_access_token" />
                   </label>
                   <Input
                     type="password"
@@ -593,17 +601,18 @@ export function IntegrationsPage() {
           {deepPlatformTab === "nextjs" && (
             <div className="space-y-4">
               <div>
-                <h4 className="text-sm font-semibold">{BRAND.sdk_package} for Next.js & React</h4>
+                <h4 className="text-sm font-semibold">
+                  {BRAND.sdk_package} <T k="integrations.for_next_js_react" />
+                </h4>
                 <p className="text-muted-foreground text-xs">
-                  First-class server-side rendering for App Router metadata and JSON-LD schema
-                  components. Fail-open with stale-while-revalidate caching.
+                  <T k="integrations.first_class_server_side_rendering_for_ap" />
                 </p>
               </div>
 
               <div className="space-y-3">
                 <div className="border-border bg-muted/20 rounded-lg border p-3.5">
                   <span className="text-muted-foreground text-xs font-semibold">
-                    1. Install Package
+                    <T k="integrations.1_install_package" />
                   </span>
                   <pre className="border-border bg-muted/60 mt-2 overflow-auto rounded-md border p-2.5 font-mono text-xs select-all">
                     npm install {BRAND.sdk_package}
@@ -612,7 +621,7 @@ export function IntegrationsPage() {
 
                 <div className="border-border bg-muted/20 rounded-lg border p-3.5">
                   <span className="text-muted-foreground text-xs font-semibold">
-                    2. App Router generateMetadata &amp; Schema Component
+                    <T k="integrations.2_app_router_generatemetadata_schema_com" />
                   </span>
                   <pre className="border-border bg-muted/60 mt-2 overflow-auto rounded-md border p-2.5 font-mono text-xs select-all">
                     {`import { getSeoMetadata, StructuredData } from "${BRAND.sdk_package}";
@@ -643,10 +652,11 @@ export default function Page() {
           {deepPlatformTab === "github" && (
             <div className="space-y-4">
               <div>
-                <h4 className="text-sm font-semibold">Automated GitHub Pull Requests</h4>
+                <h4 className="text-sm font-semibold">
+                  <T k="integrations.automated_github_pull_requests" />
+                </h4>
                 <p className="text-muted-foreground text-xs">
-                  {PRODUCT_NAME} patches target pages/components on an isolated branch and opens a
-                  Pull Request for your engineering team to review and merge.
+                  {PRODUCT_NAME} <T k="integrations.patches_target_pages_components_on_an_is" />
                 </p>
               </div>
 
@@ -654,7 +664,7 @@ export default function Page() {
                 <div className="grid gap-3 sm:grid-cols-3">
                   <div className="space-y-1">
                     <label className="text-muted-foreground text-xs font-medium">
-                      Repository Owner
+                      <T k="integrations.repository_owner" />
                     </label>
                     <Input
                       placeholder="acme-corp"
@@ -665,7 +675,7 @@ export default function Page() {
                   </div>
                   <div className="space-y-1">
                     <label className="text-muted-foreground text-xs font-medium">
-                      Repository Name
+                      <T k="integrations.repository_name" />
                     </label>
                     <Input
                       placeholder="website"
@@ -675,7 +685,9 @@ export default function Page() {
                     />
                   </div>
                   <div className="space-y-1">
-                    <label className="text-muted-foreground text-xs font-medium">Base Branch</label>
+                    <label className="text-muted-foreground text-xs font-medium">
+                      <T k="integrations.base_branch" />
+                    </label>
                     <Input
                       placeholder="main"
                       value={ghBranch}
@@ -686,7 +698,7 @@ export default function Page() {
                 </div>
                 <div className="space-y-1">
                   <label className="text-muted-foreground text-xs font-medium">
-                    Personal Access Token (contents:write, pull_requests:write)
+                    <T k="integrations.personal_access_token_contents_write_pul" />
                   </label>
                   <Input
                     type="password"
@@ -727,10 +739,12 @@ export default function Page() {
             <div className="space-y-4">
               <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                 <div>
-                  <h4 className="text-sm font-semibold">Cloudflare Edge Worker (HTMLRewriter)</h4>
+                  <h4 className="text-sm font-semibold">
+                    <T k="integrations.cloudflare_edge_worker_htmlrewriter" />
+                  </h4>
                   <p className="text-muted-foreground text-xs">
-                    Intercepts HTML responses on route <code>/*</code> and injects approved metadata
-                    and schema server-side with fail-open safety.
+                    <T k="integrations.intercepts_html_responses_on_route" /> <code>/*</code>{" "}
+                    <T k="integrations.and_injects_approved_metadata_and_schema" />
                   </p>
                 </div>
                 <Button variant="outline" size="sm" asChild className="h-8 shrink-0 text-xs">
@@ -743,9 +757,9 @@ export default function Page() {
 
               <div className="border-border bg-muted/20 rounded-lg border p-4">
                 <p className="text-muted-foreground text-xs leading-relaxed">
-                  Deploy this worker to your Cloudflare zone route (e.g. <code>example.com/*</code>
-                  ). It caches approved fixes at the edge and passes through origin responses
-                  untouched if any network issue occurs.
+                  <T k="integrations.deploy_this_worker_to_your_cloudflare_zo" />{" "}
+                  <code>example.com/*</code>
+                  <T k="integrations.it_caches_approved_fixes_at_the_edge_and" />
                 </p>
               </div>
             </div>
@@ -755,17 +769,20 @@ export default function Page() {
           {deepPlatformTab === "google_search_console" && (
             <div className="space-y-4">
               <div>
-                <h4 className="text-sm font-semibold">Google Search Console Integration</h4>
+                <h4 className="text-sm font-semibold">
+                  <T k="integrations.google_search_console_integration" />
+                </h4>
                 <p className="text-muted-foreground text-xs">
-                  Sync Google search performance metrics (clicks, impressions, position) and
-                  automatically verify site domain ownership.
+                  <T k="integrations.sync_google_search_performance_metrics_c" />
                 </p>
               </div>
 
               <div className="border-border bg-muted/20 space-y-4 rounded-lg border p-4">
                 <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                   <div className="space-y-1">
-                    <span className="text-xs font-medium">Search Console Property</span>
+                    <span className="text-xs font-medium">
+                      <T k="integrations.search_console_property" />
+                    </span>
                     <Input
                       placeholder={currentSite?.homepage_url || "https://example.com/"}
                       value={gscProperty}
@@ -803,9 +820,15 @@ export default function Page() {
                             {row.keys?.[0] || "Query"}
                           </span>
                           <div className="text-muted-foreground flex items-center gap-4">
-                            <span>{row.clicks} clicks</span>
-                            <span>{row.impressions} impr</span>
-                            <span>Pos: {row.position?.toFixed(1)}</span>
+                            <span>
+                              {row.clicks} <T k="integrations.clicks" />
+                            </span>
+                            <span>
+                              {row.impressions} <T k="integrations.impr" />
+                            </span>
+                            <span>
+                              <T k="integrations.pos" /> {row.position?.toFixed(1)}
+                            </span>
                           </div>
                         </div>
                       ))}
@@ -821,28 +844,33 @@ export default function Page() {
             <div className="space-y-4">
               <div className="flex flex-col gap-1">
                 <div className="flex items-center gap-2">
-                  <h4 className="text-sm font-semibold">Salla (سلة) E-Commerce Connector</h4>
+                  <h4 className="text-sm font-semibold">
+                    <T k="integrations.salla_e_commerce_connector" />
+                  </h4>
                   <Badge variant="outline" className="text-[10px] font-bold">
-                    Dual Mode
+                    <T k="integrations.dual_mode" />
                   </Badge>
                 </div>
                 <p className="text-muted-foreground text-xs leading-relaxed">
-                  Support both direct Partner App API automation (when approved) and immediate Theme
-                  Snippet + step-by-step product SEO optimization.
+                  <T k="integrations.support_both_direct_partner_app_api_auto" />
                 </p>
               </div>
 
               {/* Mode 1: App API Credentials */}
               <div className="border-border bg-muted/20 space-y-3 rounded-lg border p-4">
                 <div className="flex items-center justify-between">
-                  <h5 className="text-xs font-semibold">Option A: Salla Partner API Integration</h5>
+                  <h5 className="text-xs font-semibold">
+                    <T k="integrations.option_a_salla_partner_api_integration" />
+                  </h5>
                   <Badge variant="muted" className="text-[10px]">
-                    Direct API
+                    <T k="integrations.direct_api" />
                   </Badge>
                 </div>
                 <div className="grid gap-3 sm:grid-cols-2">
                   <div className="space-y-1">
-                    <label className="text-muted-foreground text-xs font-medium">Merchant ID</label>
+                    <label className="text-muted-foreground text-xs font-medium">
+                      <T k="integrations.merchant_id" />
+                    </label>
                     <Input
                       placeholder="e.g. 12345678"
                       value={sallaMerchantId}
@@ -852,7 +880,7 @@ export default function Page() {
                   </div>
                   <div className="space-y-1">
                     <label className="text-muted-foreground text-xs font-medium">
-                      Access Token
+                      <T k="integrations.access_token" />
                     </label>
                     <Input
                       type="password"
@@ -891,18 +919,21 @@ export default function Page() {
               <div className="border-border bg-muted/20 space-y-3 rounded-lg border p-4">
                 <div className="flex items-center justify-between">
                   <h5 className="text-xs font-semibold">
-                    Option B: Salla Twilight Snippet & SEO Guide (Ready Now)
+                    <T k="integrations.option_b_salla_twilight_snippet_seo_guid" />
                   </h5>
                   <Badge
                     variant="outline"
                     className="border-emerald-300 text-[10px] text-emerald-600"
                   >
-                    No App Review Required
+                    <T k="integrations.no_app_review_required" />
                   </Badge>
                 </div>
                 <p className="text-muted-foreground text-xs leading-relaxed">
-                  Inject the tracking and verification script into your Salla store via{" "}
-                  <strong>Store Settings → Store Options → Custom Code (Header Scripts)</strong>:
+                  <T k="integrations.inject_the_tracking_and_verification_scr" />{" "}
+                  <strong>
+                    <T k="integrations.store_settings_store_options_custom_code" />
+                  </strong>
+                  :
                 </p>
                 <div className="relative">
                   <pre className="border-border bg-muted/60 overflow-auto rounded-md border p-3 font-mono text-xs select-all">
@@ -930,16 +961,19 @@ export default function Page() {
                   </Button>
                 </div>
                 <div className="text-muted-foreground space-y-1 border-t pt-2 text-[11px]">
-                  <p className="text-foreground font-semibold">Salla Optimization Steps:</p>
+                  <p className="text-foreground font-semibold">
+                    <T k="integrations.salla_optimization_steps" />
+                  </p>
                   <ol className="list-inside list-decimal space-y-0.5">
-                    <li>Paste the snippet in Salla Twilight Custom Code Header.</li>
                     <li>
-                      Update product titles & meta descriptions in Products → SEO tab using{" "}
-                      {PRODUCT_NAME} recommendations.
+                      <T k="integrations.paste_the_snippet_in_salla_twilight_cust" />
                     </li>
                     <li>
-                      Dynamic schema for FAQs and AI citations will automatically activate on your
-                      store.
+                      <T k="integrations.update_product_titles_meta_descriptions_" /> {PRODUCT_NAME}{" "}
+                      <T k="integrations.recommendations" />
+                    </li>
+                    <li>
+                      <T k="integrations.dynamic_schema_for_faqs_and_ai_citations" />
                     </li>
                   </ol>
                 </div>
@@ -952,28 +986,33 @@ export default function Page() {
             <div className="space-y-4">
               <div className="flex flex-col gap-1">
                 <div className="flex items-center gap-2">
-                  <h4 className="text-sm font-semibold">Zid (زد) E-Commerce Connector</h4>
+                  <h4 className="text-sm font-semibold">
+                    <T k="integrations.zid_e_commerce_connector" />
+                  </h4>
                   <Badge variant="outline" className="text-[10px] font-bold">
-                    Dual Mode
+                    <T k="integrations.dual_mode" />
                   </Badge>
                 </div>
                 <p className="text-muted-foreground text-xs leading-relaxed">
-                  Connect your Zid store via direct Manager API or embed the storefront custom
-                  script tag for instantaneous indexing and AI referral tracking.
+                  <T k="integrations.connect_your_zid_store_via_direct_manage" />
                 </p>
               </div>
 
               {/* Mode 1: Zid API Credentials */}
               <div className="border-border bg-muted/20 space-y-3 rounded-lg border p-4">
                 <div className="flex items-center justify-between">
-                  <h5 className="text-xs font-semibold">Option A: Zid Partner API Integration</h5>
+                  <h5 className="text-xs font-semibold">
+                    <T k="integrations.option_a_zid_partner_api_integration" />
+                  </h5>
                   <Badge variant="muted" className="text-[10px]">
-                    Manager API
+                    <T k="integrations.manager_api" />
                   </Badge>
                 </div>
                 <div className="grid gap-3 sm:grid-cols-3">
                   <div className="space-y-1">
-                    <label className="text-muted-foreground text-xs font-medium">Store ID</label>
+                    <label className="text-muted-foreground text-xs font-medium">
+                      <T k="integrations.store_id" />
+                    </label>
                     <Input
                       placeholder="e.g. 54321"
                       value={zidStoreId}
@@ -983,7 +1022,7 @@ export default function Page() {
                   </div>
                   <div className="space-y-1">
                     <label className="text-muted-foreground text-xs font-medium">
-                      Access Token
+                      <T k="integrations.access_token" />
                     </label>
                     <Input
                       type="password"
@@ -995,7 +1034,7 @@ export default function Page() {
                   </div>
                   <div className="space-y-1">
                     <label className="text-muted-foreground text-xs font-medium">
-                      Manager Token
+                      <T k="integrations.manager_token" />
                     </label>
                     <Input
                       type="password"
@@ -1034,18 +1073,21 @@ export default function Page() {
               <div className="border-border bg-muted/20 space-y-3 rounded-lg border p-4">
                 <div className="flex items-center justify-between">
                   <h5 className="text-xs font-semibold">
-                    Option B: Zid Storefront Script & SEO Guide (Ready Now)
+                    <T k="integrations.option_b_zid_storefront_script_seo_guide" />
                   </h5>
                   <Badge
                     variant="outline"
                     className="border-emerald-300 text-[10px] text-emerald-600"
                   >
-                    Instant Setup
+                    <T k="integrations.instant_setup" />
                   </Badge>
                 </div>
                 <p className="text-muted-foreground text-xs leading-relaxed">
-                  Add this snippet to your store via{" "}
-                  <strong>Store Settings → Custom Scripts → &lt;head&gt;</strong>:
+                  <T k="integrations.add_this_snippet_to_your_store_via" />{" "}
+                  <strong>
+                    <T k="integrations.store_settings_custom_scripts_head" />
+                  </strong>
+                  :
                 </p>
                 <div className="relative">
                   <pre className="border-border bg-muted/60 overflow-auto rounded-md border p-3 font-mono text-xs select-all">
@@ -1073,15 +1115,18 @@ export default function Page() {
                   </Button>
                 </div>
                 <div className="text-muted-foreground space-y-1 border-t pt-2 text-[11px]">
-                  <p className="text-foreground font-semibold">Zid Store Optimization Steps:</p>
+                  <p className="text-foreground font-semibold">
+                    <T k="integrations.zid_store_optimization_steps" />
+                  </p>
                   <ol className="list-inside list-decimal space-y-0.5">
-                    <li>Paste the snippet into Zid Custom Scripts &lt;head&gt;.</li>
                     <li>
-                      Update your product & category SEO details via Products → Edit → SEO fields.
+                      <T k="integrations.paste_the_snippet_into_zid_custom_script" />
                     </li>
                     <li>
-                      AEO and Schema enhancements are automatically delivered to your visitors and
-                      crawlers.
+                      <T k="integrations.update_your_product_category_seo_details" />
+                    </li>
+                    <li>
+                      <T k="integrations.aeo_and_schema_enhancements_are_automati" />
                     </li>
                   </ol>
                 </div>
@@ -1108,7 +1153,9 @@ export default function Page() {
             <>
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
-                  <span className="text-muted-foreground text-xs font-semibold">Script Tag</span>
+                  <span className="text-muted-foreground text-xs font-semibold">
+                    <T k="integrations.script_tag" />
+                  </span>
                   <Button
                     variant="ghost"
                     size="sm"
@@ -1137,13 +1184,10 @@ export default function Page() {
               <div className="border-border space-y-1.5 rounded-lg border border-amber-500/20 bg-amber-500/10 p-3 text-xs text-amber-900 dark:text-amber-200">
                 <p className="flex items-center gap-1.5 font-semibold">
                   <AlertTriangle className="h-3.5 w-3.5" />
-                  Crawler Capability Note
+                  <T k="integrations.crawler_capability_note" />
                 </p>
                 <p className="leading-relaxed">
-                  The client-side JavaScript snippet works for browser visitors and Googlebot, but
-                  some LLM crawlers (GPTBot, PerplexityBot, ClaudeBot) do not execute heavy
-                  client-side JavaScript. For complete AI search optimization, use our WordPress
-                  plugin, Shopify app embed, Next.js SDK, or Cloudflare worker above.
+                  <T k="integrations.the_client_side_javascript_snippet_works" />
                 </p>
               </div>
 
@@ -1156,13 +1200,13 @@ export default function Page() {
                     onChange={(e) => setSelectedPlatform(e.target.value)}
                     className="border-input bg-background focus-visible:ring-ring rounded-md border px-2.5 py-1 text-xs focus-visible:ring-1 focus-visible:outline-none"
                   >
-                    <option value="wordpress">WordPress</option>
-                    <option value="shopify">Shopify</option>
-                    <option value="nextjs">Next.js</option>
-                    <option value="wix">Wix</option>
-                    <option value="webflow">Webflow</option>
-                    <option value="salla">Salla</option>
-                    <option value="custom">Custom / Static</option>
+                    <option value="wordpress">{t("integrations.wordpress", { ns: "ui" })}</option>
+                    <option value="shopify">{t("integrations.shopify", { ns: "ui" })}</option>
+                    <option value="nextjs">{t("integrations.next_js", { ns: "ui" })}</option>
+                    <option value="wix">{t("integrations.wix", { ns: "ui" })}</option>
+                    <option value="webflow">{t("integrations.webflow", { ns: "ui" })}</option>
+                    <option value="salla">{t("integrations.salla", { ns: "ui" })}</option>
+                    <option value="custom">{t("integrations.custom_static", { ns: "ui" })}</option>
                   </select>
                 </div>
 
@@ -1208,7 +1252,9 @@ export default function Page() {
           )}
 
           {apiKeys.data && apiKeys.data.length === 0 && (
-            <p className="text-muted-foreground text-xs">No active API keys found.</p>
+            <p className="text-muted-foreground text-xs">
+              <T k="integrations.no_active_api_keys_found" />
+            </p>
           )}
 
           {apiKeys.data && apiKeys.data.length > 0 && (
@@ -1268,7 +1314,9 @@ export default function Page() {
           )}
 
           {webhooks.data && webhooks.data.length === 0 && (
-            <p className="text-muted-foreground text-xs">No active webhooks configured.</p>
+            <p className="text-muted-foreground text-xs">
+              <T k="integrations.no_active_webhooks_configured" />
+            </p>
           )}
 
           {webhooks.data && webhooks.data.length > 0 && (
@@ -1353,7 +1401,11 @@ export default function Page() {
                     onClick={handleCreateApiKey}
                     disabled={createApiKey.isPending || !keyName.trim()}
                   >
-                    {createApiKey.isPending ? "Creating..." : "Generate Key"}
+                    {createApiKey.isPending ? (
+                      <T k="integrations.creating" />
+                    ) : (
+                      <T k="integrations.generate_key" />
+                    )}
                   </Button>
                 </div>
               </div>

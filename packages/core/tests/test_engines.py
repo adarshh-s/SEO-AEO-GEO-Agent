@@ -137,3 +137,27 @@ def test_citation_matching_uses_real_domain():
     assert aa.match_citations(["https://shop.oudhouse.example/a"], "oudhouse.example")
     assert not aa.match_citations(["https://notoudhouse.example/a"], "oudhouse.example")
     assert not aa.match_citations(["https://evil.com/?q=oudhouse.example"], "oudhouse.example")
+
+
+def test_city_level_location_codes(monkeypatch):
+    from app_core.providers import serp
+
+    serp._city_codes.cache_clear()
+    payload = {"tasks": [{"result": [
+        {"location_code": 2840, "location_name": "United States", "location_type": "Country"},
+        {"location_code": 1026201, "location_name": "Austin,Texas,United States",
+         "location_type": "City"},
+    ]}]}  # fmt: skip
+
+    class Resp:
+        def raise_for_status(self):
+            pass
+
+        def json(self):
+            return payload
+
+    monkeypatch.setattr("requests.get", lambda *a, **kw: Resp())
+    p = serp.DataForSeoSerpProvider(login="l", password="p")
+    assert p.location_code("US", "austin") == 1026201
+    assert p.location_code("US", "Nowhere") == 2840  # unknown city: country level
+    assert p.location_code("US", None) == 2840

@@ -71,6 +71,7 @@ def run_keyword_rank_check(keyword_id_str: str, is_scheduled: bool = False) -> d
                 country=keyword.country,
                 language=keyword.language,
                 device=keyword.device,
+                city=keyword.city or site.default_city,
             )
         except (ProviderNotConfigured, UnsupportedCountry) as e:
             logger.warning("rank_check_skipped", keyword_id=keyword_id_str, reason=str(e))

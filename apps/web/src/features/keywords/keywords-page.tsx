@@ -1,3 +1,4 @@
+import { T } from "@/components/ui/t";
 import { useSelectedSite } from "@/lib/use-selected-site";
 import {
   ArrowDown,
@@ -260,7 +261,7 @@ function KeywordRow({
               className="border-purple-300 bg-purple-50 text-purple-700 dark:bg-purple-950/40 dark:text-purple-300"
             >
               <Sparkles className="me-1 size-3" aria-hidden />
-              AI Overview
+              <T k="keywords.ai_overview" />
             </Badge>
             {item.ai_overview_cites_site && (
               <span className="text-[10px] font-medium text-emerald-600">

@@ -2,7 +2,7 @@
 
 Supports:
 - Product, collection, and page SEO title/description (native server-side)
-- JSON-LD schema via app-owned metafields (app.metafields.quardlink.schema)
+- JSON-LD schema via app-owned metafields (app.metafields.<brand_slug>.schema)
   rendered by theme app embed block in Liquid
 - Unpublished blog articles for content/FAQ fixes (isPublished: false)
 - Rollback restoring previous state

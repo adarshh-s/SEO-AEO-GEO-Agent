@@ -33,8 +33,8 @@ def _is_public(ip: str) -> bool:
     return addr.is_global and not addr.is_multicast
 
 
-def resolve_public(host: str, port: int) -> str:
-    """Return one public IP for host, or raise if any resolved address isn't public."""
+def resolve_public(host: str, port: int) -> list[str]:
+    """All of host's addresses (IPv4 first), or raise if any of them isn't public."""
     host = host.rstrip(".").lower()
     if host in _BLOCKED_HOSTS or host.endswith((".local", ".internal", ".localhost")):
         raise UnsafeUrlError(f"blocked host: {host}")
@@ -42,10 +42,10 @@ def resolve_public(host: str, port: int) -> str:
         infos = socket.getaddrinfo(host, port, type=socket.SOCK_STREAM)
     except socket.gaierror as exc:
         raise UnsafeUrlError(f"cannot resolve {host}") from exc
-    ips = sorted({info[4][0] for info in infos})
+    ips = sorted({info[4][0] for info in infos}, key=lambda ip: (":" in ip, ip))
     if not ips or not all(_is_public(ip) for ip in ips):
         raise UnsafeUrlError(f"{host} resolves to a non-public address")
-    return ips[0]
+    return ips
 
 
 class _PinnedAdapter(HTTPAdapter):
@@ -78,21 +78,29 @@ def safe_request(
         if parts.username or parts.password:
             raise UnsafeUrlError("credentials in URLs are not allowed")
         port = parts.port or (443 if parts.scheme == "https" else 80)
-        ip = resolve_public(parts.hostname, port)
-        ip_host = f"[{ip}]" if ":" in ip else ip
-        pinned = urlunsplit((parts.scheme, f"{ip_host}:{port}", parts.path or "/", parts.query, ""))
-
-        with requests.Session() as session:
-            session.mount(f"{parts.scheme}://", _PinnedAdapter(parts.hostname))
-            req_headers = {**(headers or {}), "Host": parts.netloc.rsplit("@", 1)[-1]}
-            resp = session.request(
-                method,
-                pinned,
-                headers=req_headers,
-                timeout=timeout,
-                allow_redirects=False,
-                **kwargs,
-            )
+        ips = resolve_public(parts.hostname, port)
+        resp = None
+        for i, ip in enumerate(ips[:4]):  # IPv4 first; next address if one is unreachable
+            ip_host = f"[{ip}]" if ":" in ip else ip
+            netloc = f"{ip_host}:{port}"
+            pinned = urlunsplit((parts.scheme, netloc, parts.path or "/", parts.query, ""))
+            try:
+                with requests.Session() as session:
+                    session.mount(f"{parts.scheme}://", _PinnedAdapter(parts.hostname))
+                    req_headers = {**(headers or {}), "Host": parts.netloc.rsplit("@", 1)[-1]}
+                    resp = session.request(
+                        method,
+                        pinned,
+                        headers=req_headers,
+                        timeout=timeout,
+                        allow_redirects=False,
+                        **kwargs,
+                    )
+                break
+            except requests.ConnectionError:
+                if i == len(ips[:4]) - 1:
+                    raise
+        assert resp is not None
         if resp.is_redirect and resp.headers.get("location"):
             url = urljoin(url, resp.headers["location"])
             method = "GET" if resp.status_code in (301, 302, 303) else method

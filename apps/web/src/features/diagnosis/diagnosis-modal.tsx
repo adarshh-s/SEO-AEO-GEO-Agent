@@ -1,3 +1,4 @@
+import { T } from "@/components/ui/t";
 import { ArrowRight, Bot, Sparkles, X } from "lucide-react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -78,9 +79,13 @@ export function DiagnosisModal({
             </div>
             <CardDescription className="text-xs">
               {targetType === "keyword" ? (
-                <span className="text-foreground font-semibold">Keyword: {targetText}</span>
+                <span className="text-foreground font-semibold">
+                  <T k="diagnosis.keyword" /> {targetText}
+                </span>
               ) : (
-                <span className="text-foreground font-semibold">AI Prompt: {targetText}</span>
+                <span className="text-foreground font-semibold">
+                  <T k="diagnosis.ai_prompt" /> {targetText}
+                </span>
               )}
             </CardDescription>
           </div>
@@ -125,7 +130,7 @@ export function DiagnosisModal({
                   className="h-7 text-xs"
                 >
                   <Sparkles className="me-1 h-3 w-3" />
-                  Re-run Diagnosis
+                  <T k="diagnosis.re_run_diagnosis" />
                 </Button>
               </div>
 
@@ -222,7 +227,7 @@ export function DiagnosisModal({
 
         <div className="bg-muted/20 flex items-center justify-between border-t p-4">
           <Button variant="ghost" size="sm" onClick={onClose} className="text-xs">
-            Close
+            <T k="diagnosis.close" />
           </Button>
 
           <Button asChild variant="default" size="sm" className="text-xs">

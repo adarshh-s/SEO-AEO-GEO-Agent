@@ -1,3 +1,4 @@
+import { T } from "@/components/ui/t";
 import { useSelectedSite } from "@/lib/use-selected-site";
 import {
   AlertCircle,
@@ -214,7 +215,8 @@ export function AuditsPage() {
               >
                 {auditList.map((a) => (
                   <option key={a.id} value={a.id}>
-                    {new Date(a.created_at).toLocaleString()} - Score: {a.score}/100 ({a.status})
+                    {new Date(a.created_at).toLocaleString()} <T k="audits.score" /> {a.score}/100 (
+                    {a.status})
                   </option>
                 ))}
               </select>
@@ -455,7 +457,9 @@ export function AuditsPage() {
                             {issue.affected_urls.slice(0, 3).join(", ")}
                           </span>
                           {issue.affected_urls.length > 3 && (
-                            <span className="ms-1">+{issue.affected_urls.length - 3} more</span>
+                            <span className="ms-1">
+                              +{issue.affected_urls.length - 3} <T k="audits.more" />
+                            </span>
                           )}
                         </div>
                       )}

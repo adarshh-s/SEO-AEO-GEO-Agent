@@ -1,3 +1,4 @@
+import { T } from "@/components/ui/t";
 import {
   ArrowRight,
   Bot,
@@ -40,7 +41,9 @@ export function LandingPage() {
       <section className="mx-auto max-w-5xl px-4 text-center">
         <div className="border-primary/20 bg-primary/5 text-primary mb-6 inline-flex items-center gap-2 rounded-full border px-3.5 py-1 text-xs font-semibold">
           <Sparkles className="h-3.5 w-3.5" />
-          <span>Next-Gen SEO & AI Engine Optimization (AEO)</span>
+          <span>
+            <T k="public_pages.next_gen_seo_ai_engine_optimization_aeo" />
+          </span>
         </div>
 
         <h1 className="text-foreground mx-auto max-w-4xl text-4xl leading-tight font-extrabold tracking-tight sm:text-6xl">
@@ -68,17 +71,33 @@ export function LandingPage() {
         {/* Platform support ticker / badges */}
         <div className="border-border/60 mt-14 border-t border-b py-6">
           <p className="text-muted-foreground mb-4 text-xs font-semibold tracking-wider uppercase">
-            Unified Optimization For Every Platform
+            <T k="public_pages.unified_optimization_for_every_platform" />
           </p>
           <div className="text-muted-foreground/80 flex flex-wrap items-center justify-center gap-6 text-sm font-medium sm:gap-10">
-            <span>WordPress</span>
-            <span>Shopify</span>
-            <span>Next.js / React</span>
-            <span>Cloudflare Edge</span>
-            <span>Salla (سلة)</span>
-            <span>Zid (زد)</span>
-            <span>Webflow</span>
-            <span>Wix</span>
+            <span>
+              <T k="public_pages.wordpress" />
+            </span>
+            <span>
+              <T k="public_pages.shopify" />
+            </span>
+            <span>
+              <T k="public_pages.next_js_react" />
+            </span>
+            <span>
+              <T k="public_pages.cloudflare_edge" />
+            </span>
+            <span>
+              <T k="public_pages.salla" />
+            </span>
+            <span>
+              <T k="public_pages.zid" />
+            </span>
+            <span>
+              <T k="public_pages.webflow" />
+            </span>
+            <span>
+              <T k="public_pages.wix" />
+            </span>
           </div>
         </div>
       </section>
@@ -86,10 +105,12 @@ export function LandingPage() {
       {/* 2. Core Pillars / Features Grid */}
       <section className="mx-auto max-w-6xl px-4">
         <div className="mx-auto mb-12 max-w-2xl text-center">
-          <h2 className="text-2xl font-bold sm:text-3xl">Comprehensive Search Intelligence</h2>
+          <h2 className="text-2xl font-bold sm:text-3xl">
+            <T k="public_pages.comprehensive_search_intelligence" />
+          </h2>
           <p className="text-muted-foreground mt-2 text-sm sm:text-base">
-            From classic Google rankings to modern LLM referral tracking, {PRODUCT_NAME} bridges
-            traditional SEO and generative AI answer visibility.
+            <T k="public_pages.from_classic_google_rankings_to_modern_l" /> {PRODUCT_NAME}{" "}
+            <T k="public_pages.bridges_traditional_seo_and_generative_a" />
           </p>
         </div>
 
@@ -117,10 +138,11 @@ export function LandingPage() {
       <section className="bg-muted/30 border-border border-y py-16">
         <div className="mx-auto max-w-6xl px-4">
           <div className="mx-auto mb-12 max-w-2xl text-center">
-            <h2 className="text-2xl font-bold sm:text-3xl">How {PRODUCT_NAME} Works</h2>
+            <h2 className="text-2xl font-bold sm:text-3xl">
+              <T k="public_pages.how" /> {PRODUCT_NAME} <T k="public_pages.works" />
+            </h2>
             <p className="text-muted-foreground mt-2 text-sm sm:text-base">
-              Automated, safe, and transparent workflow designed for modern web engineering and
-              marketing teams.
+              <T k="public_pages.automated_safe_and_transparent_workflow_" />
             </p>
           </div>
 
@@ -130,11 +152,12 @@ export function LandingPage() {
                 <span className="bg-primary text-primary-foreground flex size-8 items-center justify-center rounded-full text-sm font-bold">
                   1
                 </span>
-                <h3 className="text-base font-semibold">Connect Your Site</h3>
+                <h3 className="text-base font-semibold">
+                  <T k="public_pages.connect_your_site" />
+                </h3>
               </div>
               <p className="text-muted-foreground ps-11 text-sm leading-relaxed">
-                Install our lightweight cookieless snippet, deploy via WordPress/Shopify apps, or
-                bind our Cloudflare edge worker in minutes.
+                <T k="public_pages.install_our_lightweight_cookieless_snipp" />
               </p>
             </div>
 
@@ -143,11 +166,12 @@ export function LandingPage() {
                 <span className="bg-primary text-primary-foreground flex size-8 items-center justify-center rounded-full text-sm font-bold">
                   2
                 </span>
-                <h3 className="text-base font-semibold">Detect & Diagnose Gaps</h3>
+                <h3 className="text-base font-semibold">
+                  <T k="public_pages.detect_diagnose_gaps" />
+                </h3>
               </div>
               <p className="text-muted-foreground ps-11 text-sm leading-relaxed">
-                {PRODUCT_NAME} crawls your pages and benchmarks them against top ranking competitors
-                and AI citation patterns to uncover missing schema and content signals.
+                {PRODUCT_NAME} <T k="public_pages.crawls_your_pages_and_benchmarks_them_ag" />
               </p>
             </div>
 
@@ -156,11 +180,12 @@ export function LandingPage() {
                 <span className="bg-primary text-primary-foreground flex size-8 items-center justify-center rounded-full text-sm font-bold">
                   3
                 </span>
-                <h3 className="text-base font-semibold">Approve & Deploy Fixes</h3>
+                <h3 className="text-base font-semibold">
+                  <T k="public_pages.approve_deploy_fixes" />
+                </h3>
               </div>
               <p className="text-muted-foreground ps-11 text-sm leading-relaxed">
-                Review generated structured data and title/meta fixes in your inbox. Approve changes
-                with one click, or roll back at any time.
+                <T k="public_pages.review_generated_structured_data_and_tit" />
               </p>
             </div>
           </div>
@@ -205,11 +230,10 @@ export function LandingPage() {
       <section className="mx-auto max-w-5xl px-4 text-center">
         <Card className="border-primary/20 bg-primary/5 p-8 sm:p-12">
           <h2 className="text-foreground text-2xl font-bold sm:text-3xl">
-            Ready to expand your organic & AI search presence?
+            <T k="public_pages.ready_to_expand_your_organic_ai_search_p" />
           </h2>
           <p className="text-muted-foreground mx-auto mt-3 max-w-xl text-sm sm:text-base">
-            Start tracking rankings, measuring AI citations, and deploying technical optimizations
-            today.
+            <T k="public_pages.start_tracking_rankings_measuring_ai_cit" />
           </p>
           <div className="mt-8 flex justify-center gap-4">
             <Button asChild size="lg" className="h-11 px-8 font-semibold">
@@ -255,7 +279,7 @@ export function PricingPage() {
                         variant="default"
                         className="text-[11px] font-bold tracking-wider uppercase"
                       >
-                        Most Popular
+                        <T k="public_pages.most_popular" />
                       </Badge>
                     </div>
                   )}
@@ -263,11 +287,13 @@ export function PricingPage() {
                   <CardHeader className="pt-6">
                     <CardTitle className="text-xl font-bold">{p.name}</CardTitle>
                     <p className="text-muted-foreground mt-1 text-xs">
-                      {p.code === "starter"
-                        ? "Essential tracking for growing individual websites."
-                        : p.code === "growth"
-                          ? "Comprehensive search & AI intelligence for scaling brands."
-                          : "High-volume tracking and enterprise multi-domain coverage."}
+                      {p.code === "starter" ? (
+                        <T k="public_pages.essential_tracking_for_growing_individua" />
+                      ) : p.code === "growth" ? (
+                        "Comprehensive search & AI intelligence for scaling brands."
+                      ) : (
+                        "High-volume tracking and enterprise multi-domain coverage."
+                      )}
                     </p>
                   </CardHeader>
 
@@ -319,14 +345,17 @@ export function PricingPage() {
       </div>
 
       <div className="bg-muted/20 mx-auto max-w-2xl space-y-2 rounded-lg border p-6 text-center">
-        <h4 className="text-sm font-semibold">14-Day Full-Featured Trial</h4>
+        <h4 className="text-sm font-semibold">
+          <T k="public_pages.14_day_full_featured_trial" />
+        </h4>
         <p className="text-muted-foreground text-xs leading-relaxed">
-          {t("pricing.trial")} Experience Google rank tracking, LLM citation checks, gap diagnosis,
-          and executive PDF reports with zero upfront commitment.
+          {t("pricing.trial")} <T k="public_pages.experience_google_rank_tracking_llm_cita" />
         </p>
         <div className="pt-2">
           <Button asChild size="sm">
-            <Link to="/signup">Start Free Trial Now</Link>
+            <Link to="/signup">
+              <T k="public_pages.start_free_trial_now" />
+            </Link>
           </Button>
         </div>
       </div>

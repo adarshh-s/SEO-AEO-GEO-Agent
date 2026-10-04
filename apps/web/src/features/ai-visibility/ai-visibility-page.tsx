@@ -1,3 +1,4 @@
+import { T } from "@/components/ui/t";
 import { engineName } from "@/lib/engines";
 import { useSelectedSite } from "@/lib/use-selected-site";
 import {
@@ -287,12 +288,14 @@ export function AiVisibilityPage() {
                 <CardTitle className="text-base font-semibold">
                   {t("aiVisibility.leaderboard")}
                 </CardTitle>
-                <CardDescription>Competitors most frequently cited in answers</CardDescription>
+                <CardDescription>
+                  <T k="ai_visibility.competitors_most_frequently_cited_in_ans" />
+                </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 {!data?.competitor_leaderboard || data.competitor_leaderboard.length === 0 ? (
                   <p className="text-muted-foreground text-sm">
-                    No competitor mentions recorded yet.
+                    <T k="ai_visibility.no_competitor_mentions_recorded_yet" />
                   </p>
                 ) : (
                   <div className="space-y-3">

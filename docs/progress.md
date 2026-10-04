@@ -135,13 +135,29 @@ revert that broke imports was found in the working tree and stashed (`git stash 
   templated at serve time, SDK has neutral exports `getSeoMetadata` / `StructuredData`).
 - `.env.example` inline comments were parsed as values (Phase 1 bug); fixed, tests ignore `.env`.
 
-**Still open (not fixed in this review)**
-- AI checks don't use web search for ChatGPT/Claude (only Gemini grounding) — spec §8.
-- No LLM is used for diagnosis/fix generation or for parsing answers (spec §8: fast Claude model).
-- Cost guard only covers tracking; will need to cover LLM diagnosis once that exists.
-- ~50 hard-coded English UI strings (mostly the Integrations page) — not translated to Arabic.
-- City-level rank tracking (`keyword.city`) is ignored by the SERP request.
+**Still open after the review** — items 1-5 were done on 2026-10-04 (see next section).
 - WordPress plugin file/option names still hard-code the old "quardlink" slug.
+
+## Real data + AI (2026-10-04)
+
+- **Onboarding analysis**: real homepage fetch (SSRF-safe), platform fingerprint (shared
+  `app_core.platform_detect`), page facts (`app_core.page_facts`), Claude identifies brand,
+  industry, city, country, competitors; suggestions (~15 keywords + 30 questions per enabled
+  language) written from the site. Clear notices when the site is unreachable, AI is off or the
+  budget is used up. Live-tested on Allbirds (Shopify), wordpress.org, example.com.
+- **AI answers**: ChatGPT (Responses API + web_search + location), Claude (SDK + web_search tool),
+  Gemini (Interactions API + google_search), Perplexity (Agent API; Sonar was retired
+  2026-09-27). Claude reads every answer (mention, position, other businesses, sentiment);
+  citations matched on real hostnames; real costs.
+- **Diagnosis agent**: Claude explains why competitors win and writes up to 5 page-specific
+  fixes with platform steps; compares against pages that actually rank / get cited; no more
+  placeholder pages; sanitized payloads; cost-guarded and logged.
+- **Polish**: city-level rank tracking (DataForSEO city location codes), 149 hard-coded UI
+  strings moved to `locales/en/ui.json`, FAQ fixes no longer add FAQPage schema or promise rich
+  results (D2), raw i18n key + wrong copy labels on Integrations, plural on Admin, remaining
+  "QuardLink" leftovers in API/connectors, content-block preview styling, IPv6 fetch fallback.
+- `app_core.llm`: shared Claude client (official SDK, env-only models, structured output,
+  refusal fallback, untrusted-content wrapping, per-call cost).
 
 ## Phase 7: Billing & payments (not started)
 

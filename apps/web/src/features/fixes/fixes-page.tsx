@@ -1,3 +1,4 @@
+import { T } from "@/components/ui/t";
 import { useSelectedSite } from "@/lib/use-selected-site";
 import {
   Check,
@@ -146,9 +147,9 @@ export function FixesPage() {
           <p className="font-semibold">{t("fixes.emailVerificationRequired")}</p>
           <p>
             <Link to="/app/settings" className="font-medium underline">
-              Go to Settings to verify your email
+              <T k="fixes.go_to_settings_to_verify_your_email" />
             </Link>{" "}
-            before approving or deploying fixes to your website.
+            <T k="fixes.before_approving_or_deploying_fixes_to_y" />
           </p>
         </Alert>
       )}
@@ -196,8 +197,8 @@ export function FixesPage() {
             className="border-input bg-background rounded-md border px-2.5 py-1 text-xs"
           >
             <option value="all">{t("keywords.allLanguages")}</option>
-            <option value="en">English (EN)</option>
-            <option value="ar">العربية (AR)</option>
+            <option value="en">{t("fixes.english_en", { ns: "ui" })}</option>
+            <option value="ar">{t("fixes.ar", { ns: "ui" })}</option>
           </select>
         </div>
       </div>
@@ -278,7 +279,7 @@ export function FixesPage() {
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
                     <span className="text-muted-foreground text-xs font-semibold">
-                      JSON-LD Schema Markup
+                      <T k="fixes.json_ld_schema_markup" />
                     </span>
                     <Button
                       variant="ghost"
@@ -313,7 +314,7 @@ export function FixesPage() {
               {fix.type === "meta" && (
                 <div className="space-y-3">
                   <span className="text-muted-foreground text-xs font-semibold">
-                    Google Search Preview
+                    <T k="fixes.google_search_preview" />
                   </span>
                   <div className="border-border bg-card rounded-md border p-3 shadow-xs">
                     <div className="truncate text-xs text-emerald-700 dark:text-emerald-500">
@@ -332,7 +333,7 @@ export function FixesPage() {
               {fix.type === "faq" && (
                 <div className="space-y-2">
                   <span className="text-muted-foreground text-xs font-semibold">
-                    FAQ Accordion Items
+                    <T k="fixes.faq_accordion_items" />
                   </span>
                   <div className="border-border divide-border divide-y rounded-md border">
                     {Array.isArray(fix.payload["faqs"]) ? (
@@ -361,7 +362,7 @@ export function FixesPage() {
                     {t("fixes.rendered")}
                   </span>
                   <div
-                    className="border-border bg-muted/20 rounded-md border p-3 text-xs leading-relaxed"
+                    className="fix-preview border-border bg-muted/20 rounded-md border p-3 text-xs leading-relaxed"
                     dir={fix.language === "ar" ? "rtl" : "ltr"}
                     dangerouslySetInnerHTML={{ __html: String(fix.payload["html"] ?? "") }}
                   />
@@ -497,7 +498,9 @@ export function FixesPage() {
             </CardHeader>
             <CardContent className="space-y-4">
               <div>
-                <label className="text-muted-foreground text-xs font-semibold">Title</label>
+                <label className="text-muted-foreground text-xs font-semibold">
+                  <T k="fixes.title" />
+                </label>
                 <Input
                   value={editTitle}
                   onChange={(e) => setEditTitle(e.target.value)}
@@ -505,7 +508,9 @@ export function FixesPage() {
                 />
               </div>
               <div>
-                <label className="text-muted-foreground text-xs font-semibold">Payload JSON</label>
+                <label className="text-muted-foreground text-xs font-semibold">
+                  <T k="fixes.payload_json" />
+                </label>
                 <textarea
                   rows={8}
                   value={editPayloadJson}
@@ -515,7 +520,7 @@ export function FixesPage() {
               </div>
               <div className="flex justify-end gap-2 pt-2">
                 <Button variant="ghost" size="sm" onClick={() => setEditingFix(null)}>
-                  Cancel
+                  <T k="fixes.cancel" />
                 </Button>
                 <Button
                   variant="default"
@@ -523,7 +528,7 @@ export function FixesPage() {
                   onClick={handleSaveEdit}
                   disabled={updateFix.isPending}
                 >
-                  Save Changes
+                  <T k="fixes.save_changes" />
                 </Button>
               </div>
             </CardContent>

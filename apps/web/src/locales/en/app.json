@@ -193,7 +193,8 @@
     "webhookSecretNotice": "Copy this signing secret now. It won't be shown again. Use it to verify the signature header on every delivery.",
     "addingWebhook": "Adding…",
     "cancel": "Cancel",
-    "done": "Done"
+    "done": "Done",
+    "copyCode": "Copy"
   },
   "diagnosis": {
     "button": "Diagnose Gaps",

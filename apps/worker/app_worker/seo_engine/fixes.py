@@ -78,7 +78,7 @@ def generate_schema_fix(
         else "إضافة بيانات Schema.org المنظمة للمنشأة"
     )
     desc = (
-        "Injects structured JSON-LD into the page head to qualify for Google Knowledge Graph, rich snippets, and accurate AI entity indexing."
+        "Adds structured data (JSON-LD) that describes your business, so search engines and AI assistants can identify it accurately."
         if language == "en"
         else "يقوم بإدراج ترميز JSON-LD في ترويسة الصفحة لتمكين لوحة المعرفة في جوجل وتسهيل فهرسة المنشأة لدى نماذج الذكاء الاصطناعي."
     )
@@ -149,7 +149,7 @@ def generate_faq_fix(
     platform: str,
     language: str = "en",
 ) -> GeneratedFix:
-    """Generate FAQPage schema and semantic HTML accordion block."""
+    """Generate a Q&A content block (no FAQPage schema by default: decision D2)."""
     brand = site_name
 
     if language == "ar":
@@ -167,7 +167,7 @@ def generate_faq_fix(
                 "answer": "نعم، نقدم دعماً متواصلاً لضمان سير كافة العمليات بأعلى كفاءة وسرعة استجابة لاحتياجاتكم.",
             },
         ]
-        title = "إضافة قسم الأسئلة الشائعة مع ترميز FAQPage"
+        title = "إضافة قسم أسئلة وأجوبة"
         desc = "تضمين أسئلة وأجوبة مباشرة للإجابة على استفسارات العملاء والاستشهاد بها في ChatGPT و Google AI Overviews."
     else:
         faqs = [
@@ -184,22 +184,8 @@ def generate_faq_fix(
                 "answer": "Yes, we provide ongoing assistance and comprehensive documentation to ensure seamless implementation.",
             },
         ]
-        title = "Add FAQ Section with FAQPage Schema"
-        desc = "Adds high-intent Q&A section with FAQPage JSON-LD to capture Google FAQ rich results and AI conversational citations."
-
-    # JSON-LD Schema
-    faq_schema = {
-        "@context": "https://schema.org",
-        "@type": "FAQPage",
-        "mainEntity": [
-            {
-                "@type": "Question",
-                "name": item["question"],
-                "acceptedAnswer": {"@type": "Answer", "text": item["answer"]},
-            }
-            for item in faqs
-        ],
-    }
+        title = "Add a questions & answers section"
+        desc = "Adds short, direct answers to common customer questions. AI assistants often quote pages that answer questions plainly. (Google no longer shows FAQ rich results, so no FAQPage schema is added.)"
 
     # HTML markup
     items_html = "".join(f"""
@@ -216,7 +202,7 @@ def generate_faq_fix(
         title=title,
         description=desc,
         language=language,
-        payload={"faqs": faqs, "json_ld": faq_schema, "html": faq_html},
+        payload={"faqs": faqs, "html": faq_html},
         recommended_delivery=resolve_delivery_method(platform, "faq"),
     )
 

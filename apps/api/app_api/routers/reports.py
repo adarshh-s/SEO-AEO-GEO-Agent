@@ -217,7 +217,9 @@ def download_report_pdf(
     if not report or not report.pdf_bytes:
         raise not_found("report")
 
-    filename = f"quardlink-report-{site.domain}-{report.created_at.strftime('%Y%m%d')}.pdf"
+    filename = (
+        f"{BRAND['brand_slug']}-report-{site.domain}-{report.created_at.strftime('%Y%m%d')}.pdf"
+    )
     return Response(
         content=report.pdf_bytes,
         media_type="application/pdf",

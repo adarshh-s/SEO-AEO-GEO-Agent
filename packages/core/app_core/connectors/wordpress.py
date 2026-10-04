@@ -150,7 +150,7 @@ class {cls_name} {{
         }}
 
         $current_url = (is_ssl() ? 'https://' : 'http://') . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
-        $cache_key = 'quardlink_fixes_' . md5($current_url);
+        $cache_key = '{BRAND["wp_plugin_slug"]}_fixes_' . md5($current_url);
         $cached = get_transient($cache_key);
         if ($cached !== false) {{
             $fixes = $cached;

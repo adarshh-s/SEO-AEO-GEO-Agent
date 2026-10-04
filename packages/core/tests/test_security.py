@@ -66,7 +66,7 @@ def _fake_resolver(ip):
 def test_safe_request_blocks_hosts_resolving_to_private_ips(monkeypatch, ip):
     from app_core import net
 
-    monkeypatch.setattr(net.socket, "getaddrinfo", _fake_resolver(ip))
+    monkeypatch.setattr(net.socket, "getaddrinfo", _fake_resolver(ip))  # any private IP blocks
     with pytest.raises(net.UnsafeUrlError):
         net.safe_get("https://innocent-looking.example.com/")
 
@@ -138,3 +138,16 @@ def test_shopify_shop_domain_is_restricted():
     for bad in ("169.254.169.254", "evil.com", "my-store.myshopify.com.evil.com", "x.myshopify.co"):
         with pytest.raises(ValueError):
             shopify_shop_domain(bad)
+
+
+def test_resolve_prefers_ipv4_and_rejects_mixed(monkeypatch):
+    from app_core import net
+
+    infos = [(socket.AF_INET6, socket.SOCK_STREAM, 6, "", ("2606:4700::1", 443, 0, 0)),
+             (socket.AF_INET, socket.SOCK_STREAM, 6, "", ("93.184.215.14", 443))]  # fmt: skip
+    monkeypatch.setattr(net.socket, "getaddrinfo", lambda *a, **k: infos)
+    assert net.resolve_public("x.example", 443) == ["93.184.215.14", "2606:4700::1"]
+    mixed = infos + [(socket.AF_INET, socket.SOCK_STREAM, 6, "", ("10.0.0.1", 443))]
+    monkeypatch.setattr(net.socket, "getaddrinfo", lambda *a, **k: mixed)
+    with pytest.raises(net.UnsafeUrlError):
+        net.resolve_public("x.example", 443)

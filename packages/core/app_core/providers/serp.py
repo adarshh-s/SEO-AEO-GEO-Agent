@@ -4,10 +4,14 @@ import hashlib
 import urllib.parse
 from dataclasses import dataclass, field
 from decimal import Decimal
+from functools import lru_cache
 from typing import Any, Protocol
 
+from app_core.logging import get_logger
 from app_core.providers.ai_answer import ProviderNotConfigured
 from app_core.settings import get_settings
+
+log = get_logger(__name__)
 
 # ISO 3166-1 numeric codes. Google Ads / DataForSEO country location codes are 2000 + this.
 _ISO_NUMERIC = {
@@ -71,7 +75,35 @@ class SerpProvider(Protocol):
         country: str,
         language: str,
         device: str = "desktop",
+        city: str | None = None,
     ) -> SerpResult: ...
+
+
+@lru_cache(maxsize=64)
+def _city_codes(login: str, password: str, country: str) -> dict[str, int]:
+    """{city name (casefolded): location_code} for a country, from DataForSEO's free
+    locations endpoint. Cached per worker process; on failure the country code is used."""
+    import requests
+    from requests.auth import HTTPBasicAuth
+
+    try:
+        resp = requests.get(
+            f"https://api.dataforseo.com/v3/serp/google/locations/{country.lower()}",
+            auth=HTTPBasicAuth(login, password),
+            timeout=30,
+        )
+        resp.raise_for_status()
+        results = (resp.json().get("tasks") or [{}])[0].get("result") or []
+    except Exception as exc:  # network/API error: fall back to country-level tracking
+        log.warning("serp.locations_failed", country=country, error=str(exc)[:200])
+        _city_codes.cache_clear()
+        return {}
+    codes: dict[str, int] = {}
+    for loc in results:
+        if loc.get("location_type") == "City" and loc.get("location_name"):
+            name = loc["location_name"].split(",")[0].strip().casefold()
+            codes.setdefault(name, loc["location_code"])  # first (most prominent) wins
+    return codes
 
 
 class DataForSeoSerpProvider:
@@ -83,6 +115,14 @@ class DataForSeoSerpProvider:
         self.password = password or s.dataforseo_password
         self.base_url = "https://api.dataforseo.com/v3"
 
+    def location_code(self, country: str, city: str | None) -> int:
+        """City-level location when DataForSEO knows the city, else the country."""
+        if city:
+            code = _city_codes(self.login, self.password, country.upper()).get(city.casefold())
+            if code:
+                return code
+        return country_location_code(country)
+
     def check_ranking(
         self,
         *,
@@ -91,6 +131,7 @@ class DataForSeoSerpProvider:
         country: str,
         language: str,
         device: str = "desktop",
+        city: str | None = None,
     ) -> SerpResult:
         if not self.login or not self.password:
             raise ProviderNotConfigured("DataForSEO: set DATAFORSEO_LOGIN and DATAFORSEO_PASSWORD")
@@ -101,7 +142,7 @@ class DataForSeoSerpProvider:
         payload = [
             {
                 "keyword": keyword,
-                "location_code": country_location_code(country),
+                "location_code": self.location_code(country, city),
                 "language_code": language,
                 "device": device,
                 "depth": 100,
@@ -185,6 +226,7 @@ class MockSerpProvider:
         country: str,
         language: str,
         device: str = "desktop",
+        city: str | None = None,
     ) -> SerpResult:
         normalized_domain = domain.lower().replace("www.", "")
         kw_lower = keyword.lower()

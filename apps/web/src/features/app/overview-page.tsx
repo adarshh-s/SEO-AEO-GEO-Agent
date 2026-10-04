@@ -1,3 +1,4 @@
+import { T } from "@/components/ui/t";
 import { engineName } from "@/lib/engines";
 import {
   AlertTriangle,
@@ -95,7 +96,7 @@ export function OverviewPage() {
             <AlertTriangle className="size-4 shrink-0" aria-hidden />
             <span>
               {t("overviewDetails.ceilingWarning", { ratio: Math.round(ratio * 100) })}: $
-              {formatNumber(spend)} / ${formatNumber(ceiling)} USD
+              {formatNumber(spend)} / ${formatNumber(ceiling)} <T k="overview.usd" />
             </span>
           </div>
         </Alert>
@@ -127,7 +128,9 @@ export function OverviewPage() {
               <Sparkles className="size-4 text-purple-600" aria-hidden />
               {t("overviewDetails.engineBreakdown")}
             </CardTitle>
-            <CardDescription>Brand mention share by AI assistant</CardDescription>
+            <CardDescription>
+              <T k="overview.brand_mention_share_by_ai_assistant" />
+            </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             {["chatgpt", "gemini", "perplexity", "claude"].map((engine) => {
@@ -153,8 +156,12 @@ export function OverviewPage() {
         {/* Wins and Losses */}
         <Card className="lg:col-span-2">
           <CardHeader>
-            <CardTitle className="text-base font-semibold">Ranking Movements</CardTitle>
-            <CardDescription>Biggest keyword position gains and drops</CardDescription>
+            <CardTitle className="text-base font-semibold">
+              <T k="overview.ranking_movements" />
+            </CardTitle>
+            <CardDescription>
+              <T k="overview.biggest_keyword_position_gains_and_drops" />
+            </CardDescription>
           </CardHeader>
           <CardContent>
             {!overviewData?.ranking_wins.length && !overviewData?.ranking_losses.length ? (
@@ -224,10 +231,12 @@ export function OverviewPage() {
             <CardTitle className="text-base font-semibold">
               {t("overviewDetails.monthlyUsage")}
             </CardTitle>
-            <CardDescription>Real-time cost tracking against your monthly limit</CardDescription>
+            <CardDescription>
+              <T k="overview.real_time_cost_tracking_against_your_mon" />
+            </CardDescription>
           </div>
           <Badge variant={ratio >= 1.0 ? "warning" : ratio >= 0.8 ? "outline" : "muted"}>
-            ${formatNumber(spend)} / ${formatNumber(ceiling)} USD
+            ${formatNumber(spend)} / ${formatNumber(ceiling)} <T k="overview.usd" />
           </Badge>
         </CardHeader>
         <CardContent>

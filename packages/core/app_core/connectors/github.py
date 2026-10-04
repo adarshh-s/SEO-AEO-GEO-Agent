@@ -2,7 +2,7 @@
 
 Workflow:
 1. Verify repo access with contents:write + pull_requests:write scopes.
-2. Create dedicated branch: quardlink/fix-{short_id}.
+2. Create dedicated branch: <brand_slug>/fix-{short_id}.
 3. Locate relevant page/component file.
 4. Patch title, description, or JSON-LD schema into source code.
 5. Commit to branch and open a Pull Request with complete rationale.
@@ -68,7 +68,7 @@ class GithubConnector:
         return {
             "Accept": "application/vnd.github.v3+json",
             "Authorization": f"Bearer {token}",
-            "User-Agent": "QuardLink-Bot/1.0",
+            "User-Agent": f"{BRAND['product_name']}-Bot/1.0",
         }
 
     def test_connection(

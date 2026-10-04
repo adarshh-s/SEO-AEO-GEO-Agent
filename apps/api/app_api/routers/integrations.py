@@ -49,7 +49,7 @@ router = APIRouter(tags=["integrations"])
 
 
 PLATFORM_INSTRUCTIONS = {
-    "wordpress": "Install the QuardLink WordPress Plugin, or paste the script into your theme header or Header & Footer Code plugin.",
+    "wordpress": f"Install the {BRAND['product_name']} WordPress plugin, or paste the script into your theme header or Header & Footer Code plugin.",
     "shopify": "Paste the script tag in your theme.liquid file inside the <head> section right before </head>.",
     "nextjs": 'Add the script in your root layout or Next.js Script tag: <Script src="..." strategy="afterInteractive" data-site="..." />',
     "wix": "Go to Settings > Custom Code in your Wix dashboard, paste the snippet into Head, and apply to All Pages.",
@@ -255,7 +255,9 @@ def download_wordpress_plugin(
     return Response(
         content=zip_bytes,
         media_type="application/zip",
-        headers={"Content-Disposition": 'attachment; filename="quardlink-seo.zip"'},
+        headers={
+            "Content-Disposition": f'attachment; filename="{BRAND["wp_plugin_slug"]}-seo.zip"'
+        },
     )
 
 

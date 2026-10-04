@@ -1,3 +1,4 @@
+import { SUPPORTED_LANGUAGES } from "@/lib/i18n";
 import { useSelectedSite } from "@/lib/use-selected-site";
 import {
   AlertCircle,
@@ -106,8 +107,10 @@ export function ReportsPage() {
                 value={reportLang}
                 onChange={(e) => setReportLang(e.target.value)}
               >
-                <option value="en">English PDF</option>
-                <option value="ar">العربية PDF</option>
+                <option value="en">{t("reports.english_pdf", { ns: "ui" })}</option>
+                {SUPPORTED_LANGUAGES.includes("ar") && (
+                  <option value="ar">{t("reports.pdf", { ns: "ui" })}</option>
+                )}
               </select>
 
               <Button onClick={handleGenerateReport} disabled={generateReport.isPending}>
@@ -238,8 +241,10 @@ export function ReportsPage() {
                   value={digestLang}
                   onChange={(e) => setDigestLang(e.target.value)}
                 >
-                  <option value="en">English Digest</option>
-                  <option value="ar">الملخص بالعربية</option>
+                  <option value="en">{t("reports.english_digest", { ns: "ui" })}</option>
+                  {SUPPORTED_LANGUAGES.includes("ar") && (
+                    <option value="ar">الملخص بالعربية</option>
+                  )}
                 </select>
 
                 <Button

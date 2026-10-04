@@ -128,8 +128,9 @@ def test_generate_faq_fix():
     assert fix_faq.type == "faq"
     assert fix_faq.recommended_delivery == "sdk"
     assert len(fix_faq.payload["faqs"]) >= 2
-    assert "json_ld" in fix_faq.payload
-    assert fix_faq.payload["json_ld"]["@type"] == "FAQPage"
+    # Decision D2: FAQ content only; no FAQPage schema unless the user opts in.
+    assert "json_ld" not in fix_faq.payload
+    assert "rich result" not in fix_faq.title.lower()
 
 
 def test_generate_content_block_fix_arabic():
