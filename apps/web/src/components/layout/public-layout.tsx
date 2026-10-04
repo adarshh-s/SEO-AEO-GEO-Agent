@@ -13,7 +13,7 @@ export function PublicLayout() {
     <div className="bg-background flex min-h-screen flex-col">
       <header className="border-b">
         <div className="mx-auto flex h-16 max-w-6xl items-center gap-6 px-4">
-          <Link to="/" className="flex items-center gap-2 font-semibold">
+          <Link to="/home" className="flex items-center gap-2 font-semibold">
             <Logo />
             {PRODUCT_NAME}
           </Link>

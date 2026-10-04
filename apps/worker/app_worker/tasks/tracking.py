@@ -5,7 +5,7 @@ from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 
 import structlog
-from sqlalchemy import desc, select
+from sqlalchemy import desc, func, select
 
 from app_core.cost_guard import (
     CostCeilingExceeded,
@@ -104,6 +104,7 @@ def run_keyword_rank_check(keyword_id_str: str, is_scheduled: bool = False) -> d
             )
 
         db.commit()
+        schedule_score_rollup(site.id)
         return {
             "status": "success",
             "keyword_id": keyword_id_str,
@@ -202,6 +203,7 @@ def run_ai_prompt_check(prompt_id_str: str, is_scheduled: bool = False) -> dict:
                     )
 
         db.commit()
+        schedule_score_rollup(site.id)
         return {
             "status": "success",
             "prompt_id": prompt_id_str,
@@ -323,41 +325,77 @@ def rollup_visibility_scores(site_id_str: str) -> dict:
         return {"status": "success", "site_id": site_id_str}
 
 
+# How often each plan re-checks a keyword / AI prompt (CLAUDE.md §12).
+CHECK_INTERVALS = {
+    "daily": timedelta(days=1),
+    "twice_weekly": timedelta(days=3, hours=12),
+    "weekly": timedelta(days=7),
+}
+# Small grace so a check that ran slightly late doesn't push the next one a full period.
+DUE_GRACE = timedelta(hours=1)
+
+
+def schedule_score_rollup(site_id: uuid.UUID) -> None:
+    """Recompute the site's scores shortly after checks finish (many checks -> one recompute
+    is fine: the rollup is idempotent for the day)."""
+    rollup_visibility_scores.apply_async(args=[str(site_id)], countdown=30)
+
+
+def is_due(last_checked: datetime | None, frequency: str, now: datetime) -> bool:
+    if last_checked is None:
+        return True
+    interval = CHECK_INTERVALS.get(frequency, CHECK_INTERVALS["weekly"])
+    return now - last_checked >= interval - DUE_GRACE
+
+
 @app.task(name="app_worker.tasks.tracking.dispatch_scheduled_checks")
 def dispatch_scheduled_checks() -> dict:
-    """Periodic dispatcher that enqueues tracking tasks according to plan frequencies."""
+    """Enqueue only the keywords/prompts that are due under their org's plan frequency.
+
+    Runs every 30 minutes, but each item is checked at most once per plan period
+    (weekly / twice weekly / daily), so paid API calls follow the plan, not the beat.
+    """
     enqueued_kw = 0
     enqueued_pr = 0
+    now = datetime.now(UTC)
 
     with system_session() as db:
-        sites = db.scalars(select(Site)).all()
-        for site in sites:
+        for site in db.scalars(select(Site)).all():
             org = db.get(Organization, site.org_id)
             if not org:
                 continue
-
             try:
                 check_cost_guard(db, org.id, is_scheduled=True)
             except (CostCeilingExceeded, TrialExpired):
-                continue  # Skip paused orgs
+                continue  # paused orgs
+            frequency = org.plan.check_frequency
 
-            # Enqueue rank checks for active keywords
-            keywords = db.scalars(
-                select(Keyword).where(Keyword.site_id == site.id, Keyword.status == "active")
-            ).all()
-            for kw in keywords:
-                run_keyword_rank_check.delay(str(kw.id), is_scheduled=True)
-                enqueued_kw += 1
+            last_rank = dict(
+                db.execute(
+                    select(RankCheck.keyword_id, func.max(RankCheck.checked_at))
+                    .where(RankCheck.site_id == site.id)
+                    .group_by(RankCheck.keyword_id)
+                ).all()
+            )
+            for kw_id in db.scalars(
+                select(Keyword.id).where(Keyword.site_id == site.id, Keyword.status == "active")
+            ):
+                if is_due(last_rank.get(kw_id), frequency, now):
+                    run_keyword_rank_check.delay(str(kw_id), is_scheduled=True)
+                    enqueued_kw += 1
 
-            # Enqueue AI checks for active prompts
-            prompts = db.scalars(
-                select(AiPrompt).where(AiPrompt.site_id == site.id, AiPrompt.status == "active")
-            ).all()
-            for pr in prompts:
-                run_ai_prompt_check.delay(str(pr.id), is_scheduled=True)
-                enqueued_pr += 1
-
-            # Rollup visibility scores
-            rollup_visibility_scores.delay(str(site.id))
+            last_ai = dict(
+                db.execute(
+                    select(AiCheck.prompt_id, func.max(AiCheck.checked_at))
+                    .where(AiCheck.site_id == site.id)
+                    .group_by(AiCheck.prompt_id)
+                ).all()
+            )
+            for pr_id in db.scalars(
+                select(AiPrompt.id).where(AiPrompt.site_id == site.id, AiPrompt.status == "active")
+            ):
+                if is_due(last_ai.get(pr_id), frequency, now):
+                    run_ai_prompt_check.delay(str(pr_id), is_scheduled=True)
+                    enqueued_pr += 1
 
     return {"enqueued_keywords": enqueued_kw, "enqueued_prompts": enqueued_pr}

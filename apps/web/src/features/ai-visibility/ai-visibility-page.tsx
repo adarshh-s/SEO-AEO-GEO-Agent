@@ -1,3 +1,5 @@
+import { engineName } from "@/lib/engines";
+import { useSelectedSite } from "@/lib/use-selected-site";
 import {
   Bot,
   CheckCircle2,
@@ -31,11 +33,11 @@ export function AiVisibilityPage() {
   const tc = useTranslation().t;
   const sites = useSites();
 
-  const [selectedSiteId, setSelectedSiteId] = useState<string | null>(null);
+  const [selectedSiteId, setSelectedSiteId] = useSelectedSite();
   const [selectedLang, setSelectedLang] = useState<string>("all");
   const [inspectPrompt, setInspectPrompt] = useState<PromptVisibilityOut | null>(null);
 
-  const siteId = selectedSiteId ?? sites.data?.[0]?.id;
+  const siteId = selectedSiteId;
   const currentSite = sites.data?.find((s) => s.id === siteId);
 
   const aiVisibility = useAiVisibility(siteId);
@@ -192,8 +194,8 @@ export function AiVisibilityPage() {
                     <tr>
                       <th className="px-4 py-3 text-start">{t("aiVisibility.prompt")}</th>
                       {engines.map((e) => (
-                        <th key={e} className="px-3 py-3 text-center capitalize">
-                          {e}
+                        <th key={e} className="px-3 py-3 text-center">
+                          {engineName(e)}
                         </th>
                       ))}
                       <th className="px-4 py-3 text-end"></th>
@@ -370,9 +372,7 @@ function InspectAnswersDialog({
               <div key={r.id} className="border-muted bg-muted/20 space-y-2 rounded-md border p-4">
                 <div className="flex items-center justify-between text-xs">
                   <div className="flex items-center gap-2">
-                    <Badge variant="default" className="capitalize">
-                      {r.engine}
-                    </Badge>
+                    <Badge variant="default">{engineName(r.engine)}</Badge>
                     <span className="text-muted-foreground">{r.model}</span>
                   </div>
                   <Badge variant={r.brand_mentioned ? "default" : "outline"}>

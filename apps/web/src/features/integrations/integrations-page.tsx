@@ -1,3 +1,4 @@
+import { useSelectedSite } from "@/lib/use-selected-site";
 import {
   AlertTriangle,
   Check,
@@ -49,8 +50,8 @@ import {
 export function IntegrationsPage() {
   const { t } = useTranslation("app");
   const sites = useSites();
-  const [selectedSiteId, setSelectedSiteId] = useState<string | null>(null);
-  const siteId = selectedSiteId ?? sites.data?.[0]?.id;
+  const [selectedSiteId, setSelectedSiteId] = useSelectedSite();
+  const siteId = selectedSiteId;
 
   const [copiedKey, setCopiedKey] = useState<string | null>(null);
   const [selectedPlatform, setSelectedPlatform] = useState<string>("wordpress");

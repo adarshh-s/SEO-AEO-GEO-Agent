@@ -1,3 +1,4 @@
+import { useSelectedSite } from "@/lib/use-selected-site";
 import {
   Check,
   CheckCircle2,
@@ -41,8 +42,8 @@ export function FixesPage() {
   const isEmailVerified = user?.email_verified ?? false;
 
   const sites = useSites();
-  const [selectedSiteId, setSelectedSiteId] = useState<string | null>(null);
-  const siteId = selectedSiteId ?? sites.data?.[0]?.id;
+  const [selectedSiteId, setSelectedSiteId] = useSelectedSite();
+  const siteId = selectedSiteId;
 
   const [statusFilter, setStatusFilter] = useState<string>("proposed");
   const [typeFilter, setTypeFilter] = useState<string>("all");

@@ -33,7 +33,8 @@ export const routes = [
   {
     element: <PublicLayout />,
     children: [
-      { path: "/", element: <LandingPage /> },
+      // Marketing landing page; "/" opens the app directly (sign-in if signed out).
+      { path: "/home", element: <LandingPage /> },
       { path: "/pricing", element: <PricingPage /> },
       { path: "/integrations", element: <IntegrationsPage /> },
       { path: "/privacy", element: <LegalPage doc="privacy" /> },
@@ -80,7 +81,8 @@ export const routes = [
       },
     ],
   },
-  { path: "*", element: <Navigate to="/" replace /> },
+  { path: "/", element: <Navigate to="/app" replace /> },
+  { path: "*", element: <Navigate to="/app" replace /> },
 ];
 
 export const router = createBrowserRouter(routes);

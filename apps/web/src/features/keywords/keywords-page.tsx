@@ -1,3 +1,4 @@
+import { useSelectedSite } from "@/lib/use-selected-site";
 import {
   ArrowDown,
   ArrowUp,
@@ -31,11 +32,11 @@ export function KeywordsPage() {
   const tc = useTranslation().t;
   const sites = useSites();
 
-  const [selectedSiteId, setSelectedSiteId] = useState<string | null>(null);
+  const [selectedSiteId, setSelectedSiteId] = useSelectedSite();
   const [selectedLang, setSelectedLang] = useState<string>("all");
   const [diagnosingItem, setDiagnosingItem] = useState<RankedKeywordOut | null>(null);
 
-  const siteId = selectedSiteId ?? sites.data?.[0]?.id;
+  const siteId = selectedSiteId;
   const currentSite = sites.data?.find((s) => s.id === siteId);
 
   const rankings = useRankings(siteId);

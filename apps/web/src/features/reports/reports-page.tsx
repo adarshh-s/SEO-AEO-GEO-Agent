@@ -1,3 +1,4 @@
+import { useSelectedSite } from "@/lib/use-selected-site";
 import {
   AlertCircle,
   CheckCircle2,
@@ -29,8 +30,8 @@ export function ReportsPage() {
   const user = useSession((s) => s.user);
 
   const sites = useSites();
-  const [selectedSiteId, setSelectedSiteId] = useState<string | null>(null);
-  const siteId = selectedSiteId ?? sites.data?.[0]?.id;
+  const [selectedSiteId, setSelectedSiteId] = useSelectedSite();
+  const siteId = selectedSiteId;
 
   const [reportLang, setReportLang] = useState<string>(isAr ? "ar" : "en");
   const [digestLang, setDigestLang] = useState<string>(isAr ? "ar" : "en");

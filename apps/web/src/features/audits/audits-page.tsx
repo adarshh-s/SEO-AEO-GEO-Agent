@@ -1,3 +1,4 @@
+import { useSelectedSite } from "@/lib/use-selected-site";
 import {
   AlertCircle,
   AlertTriangle,
@@ -27,8 +28,8 @@ export function AuditsPage() {
   const isAr = i18n.language === "ar";
 
   const sites = useSites();
-  const [selectedSiteId, setSelectedSiteId] = useState<string | null>(null);
-  const siteId = selectedSiteId ?? sites.data?.[0]?.id;
+  const [selectedSiteId, setSelectedSiteId] = useSelectedSite();
+  const siteId = selectedSiteId;
 
   const [categoryFilter, setCategoryFilter] = useState<string>("all");
   const [severityFilter, setSeverityFilter] = useState<string>("all");

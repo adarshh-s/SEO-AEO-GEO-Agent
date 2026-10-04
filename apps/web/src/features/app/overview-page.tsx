@@ -1,3 +1,4 @@
+import { engineName } from "@/lib/engines";
 import {
   AlertTriangle,
   ArrowDown,
@@ -18,6 +19,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Jargon } from "@/components/ui/jargon";
 import { PageLoader } from "@/components/ui/spinner";
+import { SitePicker } from "@/components/site-picker";
+import { useSelectedSite } from "@/lib/use-selected-site";
 import { ErrorState, PageHeader } from "@/components/ui/states";
 import { formatNumber } from "@/lib/i18n";
 import { useOrg, useSiteOverview, useSites } from "@/lib/queries";
@@ -27,8 +30,8 @@ export function OverviewPage() {
   const sites = useSites();
   const org = useOrg();
 
-  const firstSiteId = sites.data?.[0]?.id;
-  const overview = useSiteOverview(firstSiteId);
+  const [siteId] = useSelectedSite();
+  const overview = useSiteOverview(siteId);
 
   if (sites.isPending || org.isPending) return <PageLoader />;
   if (sites.isError) return <ErrorState error={sites.error} onRetry={() => void sites.refetch()} />;
@@ -76,9 +79,12 @@ export function OverviewPage() {
         title={t("overview.title")}
         description={t("overview.description")}
         actions={
-          <Button asChild variant="outline">
-            <Link to="/app/onboarding">{t("overview.addSite")}</Link>
-          </Button>
+          <div className="flex flex-wrap items-center gap-3">
+            <SitePicker />
+            <Button asChild variant="outline">
+              <Link to="/app/onboarding">{t("overview.addSite")}</Link>
+            </Button>
+          </div>
         }
       />
 
@@ -129,7 +135,7 @@ export function OverviewPage() {
               return (
                 <div key={engine} className="space-y-1.5">
                   <div className="flex items-center justify-between text-xs font-medium">
-                    <span className="capitalize">{engine}</span>
+                    <span>{engineName(engine)}</span>
                     <span className="text-muted-foreground">{formatNumber(pct)}%</span>
                   </div>
                   <div className="bg-muted h-2 w-full overflow-hidden rounded-full">
