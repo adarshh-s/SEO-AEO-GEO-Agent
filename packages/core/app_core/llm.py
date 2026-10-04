@@ -22,7 +22,7 @@ import anthropic
 from pydantic import BaseModel
 
 from app_core.logging import get_logger
-from app_core.providers.ai_answer import ProviderNotConfigured
+from app_core.provider_errors import ProviderNotConfigured
 from app_core.settings import get_settings
 
 log = get_logger(__name__)

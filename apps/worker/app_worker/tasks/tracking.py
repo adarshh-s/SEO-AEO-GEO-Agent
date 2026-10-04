@@ -163,6 +163,8 @@ def run_ai_prompt_check(prompt_id_str: str, is_scheduled: bool = False) -> dict:
                         target_domain=site.domain,
                         competitors=site.competitor_domains,
                         language=prompt.language,
+                        country=prompt.country,
+                        city=site.default_city,
                     )
                     ai_check = AiCheck(
                         org_id=prompt.org_id,

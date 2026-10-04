@@ -80,6 +80,8 @@ class Settings(BaseSettings):
     anthropic_api_key: str | None = None
     claude_model_main: str | None = None  # diagnosis, content
     claude_model_fast: str | None = None  # parsing, extraction, classification
+    claude_model_answer: str | None = None  # the "Claude" engine users see; defaults to MAIN
+    ai_engine_prices: str | None = None  # JSON override of engine cost estimates
     openai_api_key: str | None = None
     openai_model: str | None = None
     perplexity_api_key: str | None = None
