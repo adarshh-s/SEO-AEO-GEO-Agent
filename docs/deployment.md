@@ -1,6 +1,6 @@
 # OmniRank Production Deployment Guide
 
-This guide describes how to deploy and operate OmniRank in production. It covers both the primary PaaS architecture (**Railway + Vercel**, per architecture decision [D10](file:///Users/adarsh/Desktop/Projects/SEO%20agent/docs/decisions.md#L19)) and a self-hosted **Docker Compose** option for bare metal / VPS environments.
+This guide describes how to deploy and operate OmniRank in production. It covers both the primary PaaS architecture (**Railway + Vercel**, per architecture decision [D10](decisions.md)) and a self-hosted **Docker Compose** option for bare metal / VPS environments.
 
 ---
 
@@ -60,7 +60,7 @@ Store these variables in your production secrets manager (Railway/Vercel dashboa
 | Variable             | Description                                                | Example / Default         |
 | -------------------- | ---------------------------------------------------------- | ------------------------- |
 | `JWT_SECRET`         | 32+ character random secret for JWT access tokens          | `openssl rand -hex 32`    |
-| `APP_ENCRYPTION_KEY` | 32-byte key for AES encryption of customer API credentials | `openssl rand -base64 32` |
+| `APP_ENCRYPTION_KEY` | Fernet key(s) encrypting stored platform credentials and webhook secrets; comma-separate to rotate (first encrypts) | `python -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"` |
 | `SEED_DEMO`          | Must be `false` in production                              | `false`                   |
 | `SECURE_COOKIES`     | Set to `true` to require HTTPS cookies                     | `true`                    |
 | `ENVIRONMENT`        | Environment tag                                            | `production`              |
@@ -90,6 +90,10 @@ Store these variables in your production secrets manager (Railway/Vercel dashboa
 | `PERPLEXITY_API_KEY`  | Perplexity API key                                         | Optional if not using Perplexity |
 | `DATAFORSEO_LOGIN`    | DataForSEO login email for rank tracking & SERPs           | Required for Google tracking     |
 | `DATAFORSEO_PASSWORD` | DataForSEO password / API secret                           | Required for Google tracking     |
+| `OPENAI_MODEL`, `GEMINI_MODEL`, `PERPLEXITY_MODEL`, `CLAUDE_MODEL_FAST`, `CLAUDE_MODEL_MAIN` | Model IDs (never hard-coded) | Each engine needs its key **and** model, otherwise it is skipped |
+
+Outside local/test, an engine or DataForSEO without credentials is **skipped** (logged), never
+replaced by sample data. `USE_MOCK_PROVIDERS=true` is refused in production.
 
 ### Email Service
 
@@ -210,7 +214,7 @@ For deploying on a single VPS or dedicated Linux server (Ubuntu 22.04+ / Debian 
    SEED_DEMO=false
    SECURE_COOKIES=true
    JWT_SECRET=<generated-32-byte-hex>
-   APP_ENCRYPTION_KEY=<generated-32-byte-base64>
+   APP_ENCRYPTION_KEY=<Fernet key, see table above>
    POSTGRES_PASSWORD=<strong-db-password>
    DATABASE_URL=postgresql://app:${POSTGRES_PASSWORD}@postgres:5432/app
    REDIS_URL=redis://redis:6379/0

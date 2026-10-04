@@ -74,8 +74,8 @@ parsing; the overview redirected back to onboarding right after finishing (stale
 ## Phase 3: Diagnose & fix (done)
 
 - Deterministic diff diagnostics comparing target pages with top competitor pages.
-- AI fix generator for schema (JSON-LD), meta tags, headings, content, and FAQ blocks in the target page's language.
-- Secure HTML & JSON sanitization pipeline (`nh3` allowlist, script escaping).
+- Template-based fix generator for schema (JSON-LD), meta tags, headings, content and FAQ blocks in the target page's language. **No LLM is called yet** (diagnosis and fixes are deterministic).
+- HTML/JSON-LD sanitization: claimed here originally, but only a bypassable regex existed. Real `nh3` allowlist sanitizer added in the 2026-10-04 review (see below).
 - Fix lifecycle and review inbox (`draft -> approved -> deploying -> deployed | failed -> rolled_back`).
 - Universal JavaScript snippet with AI crawler visit analytics and edge caching.
 - Site ownership verification (meta tag, file placement, DNS TXT) and public API / webhooks.
@@ -99,6 +99,49 @@ parsing; the overview redirected back to onboarding right after finishing (stale
 - Production deployment setup: `docker-compose.prod.yml`, `infra/docker/web.Dockerfile`, `infra/nginx/spa.conf`, `infra/nginx/nginx.conf`.
 - Pre-flight validation script: `scripts/verify_prod_env.py` checking secrets, DB connectivity, PostgreSQL `app_tenant` RLS role, Redis, email providers, and production domain compliance.
 - Complete production deployment guide in `docs/deployment.md`.
+
+## Review & security fixes (2026-10-04)
+
+Phases 2–6 and the OmniRank rename were reviewed against CLAUDE.md. An uncommitted, half-finished
+revert that broke imports was found in the working tree and stashed (`git stash list`), not deleted.
+
+**Fixed**
+- **Remote code execution**: the worker's HTTP `/tasks/{module.function}` endpoint (added for a
+  Vercel serverless setup) imported and ran any Python function with caller-supplied args, with no
+  auth. Removed, together with `vercel.json` services for api/worker; workers are Celery
+  containers again (spec §3, D10). Vercel remains the frontend host.
+- **Stored XSS on customers' sites**: fix HTML went into `innerHTML` unsanitized; JSON-LD was
+  written into `<script>` unescaped (Cloudflare worker, SDK). Now: `app_core/sanitize.py` (nh3
+  allowlist, JSON-LD validation, `<`/`>`/`&` escaping), enforced on every write via the `Fix`
+  model and again when serving; approved fixes can't be edited without re-review.
+- **Wrong schema output**: Cloudflare worker, WordPress plugin and SDK emitted the whole payload
+  (`{"json_ld": …}`) instead of the JSON-LD; WordPress printed schema twice with Yoast/Rank Math.
+- **SSRF**: webhooks, ownership verification (in the API), the WordPress connector and the
+  Shopify connector (any domain with a dot received the admin token) fetched customer URLs
+  unprotected; Playwright had no route guard; the claude-seo wrapper silently fell back to a weak
+  check. Now: claude-seo's guard in workers (fail-closed, route handler for Chromium),
+  `app_core/net.py` thread-safe pinned-IP guard for the API, Shopify restricted to `*.myshopify.com`.
+- **Credentials in plaintext**: platform tokens and webhook secrets are now Fernet-encrypted at
+  rest (`APP_ENCRYPTION_KEY`, rotation supported, migration `0007`); webhook secrets are shown once.
+- **Fake data in production**: missing API keys made every provider silently return random mock
+  answers/rankings. Mocks are now local/test only; production skips unconfigured providers.
+- **Real providers could never run**: their settings fields didn't exist (AttributeError). Added.
+  Model IDs are env-only (hard-coded `gpt-4o` / `claude-3-5-haiku-latest` fallbacks removed).
+- **Rank tracking used Saudi Arabia for every non-US country**; now a proper country → location map.
+- **Worker image** had no Chromium and no claude-seo, so JS-only detection could never work and
+  rendering failed silently. Image now ships both (verified: real crawl + render in the container).
+- Public endpoints: rate limits, exact page matching (an empty URL used to match every fix).
+- Brand: "OmniRank" was hard-coded in ~20 files; now only in `config/brand.json` (snippet is
+  templated at serve time, SDK has neutral exports `getSeoMetadata` / `StructuredData`).
+- `.env.example` inline comments were parsed as values (Phase 1 bug); fixed, tests ignore `.env`.
+
+**Still open (not fixed in this review)**
+- AI checks don't use web search for ChatGPT/Claude (only Gemini grounding) — spec §8.
+- No LLM is used for diagnosis/fix generation or for parsing answers (spec §8: fast Claude model).
+- Cost guard only covers tracking; will need to cover LLM diagnosis once that exists.
+- ~50 hard-coded English UI strings (mostly the Integrations page) — not translated to Arabic.
+- City-level rank tracking (`keyword.city`) is ignored by the SERP request.
+- WordPress plugin file/option names still hard-code the old "quardlink" slug.
 
 ## Phase 7: Billing & payments (not started)
 
