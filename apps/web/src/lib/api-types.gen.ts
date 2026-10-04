@@ -453,7 +453,10 @@ export interface paths {
     };
     get?: never;
     put?: never;
-    /** Analyze */
+    /**
+     * Analyze
+     * @description Fetch the real homepage and identify platform, brand, languages, market, competitors.
+     */
     post: operations["analyze_onboarding_analyze_post"];
     delete?: never;
     options?: never;
@@ -470,7 +473,10 @@ export interface paths {
     };
     get?: never;
     put?: never;
-    /** Suggestions */
+    /**
+     * Suggestions
+     * @description Keywords and AI questions written from the real site, only in enabled languages.
+     */
     post: operations["suggestions_onboarding_suggestions_post"];
     delete?: never;
     options?: never;
@@ -1693,6 +1699,10 @@ export interface components {
       country: string;
       /** Competitors */
       competitors: string[];
+      /** Summary */
+      summary?: string | null;
+      /** Notice */
+      notice?: string | null;
     };
     /** ApiKeyCreateIn */
     ApiKeyCreateIn: {
@@ -2827,6 +2837,10 @@ export interface components {
       industry: string;
       /** City */
       city?: string | null;
+      /** Country */
+      country?: string | null;
+      /** Site Summary */
+      site_summary?: string | null;
       /** Languages */
       languages: string[];
     };

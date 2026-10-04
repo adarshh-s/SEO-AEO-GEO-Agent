@@ -1,4 +1,6 @@
-"""Onboarding wizard backend. Detection/suggestions are mocks in Phase 1 (see services/onboarding.py)."""
+"""Onboarding wizard backend: real website analysis + AI suggestions (services/onboarding.py)."""
+
+from decimal import Decimal
 
 from fastapi import APIRouter, Request
 
@@ -17,15 +19,34 @@ from app_api.schemas.sites import SiteOut
 from app_api.services import audit, onboarding
 from app_api.services import sites as site_service
 from app_api.services.urls import normalize_site_url
+from app_core.cost_guard import CostCeilingExceeded, TrialExpired, check_cost_guard, record_usage
 from app_core.models import Site
 
 router = APIRouter(prefix="/onboarding", tags=["onboarding"])
 
 
+def _ai_allowed(db: TenantDb, ctx: Tenant) -> bool:
+    """Claude calls are paid: respect the org's monthly cost ceiling (C4/D7)."""
+    try:
+        check_cost_guard(db, ctx.org_id, is_scheduled=False)
+        return True
+    except (CostCeilingExceeded, TrialExpired):
+        return False
+
+
+def _record_ai_cost(db: TenantDb, ctx: Tenant, cost: Decimal) -> None:
+    if cost > 0:
+        record_usage(db, org_id=ctx.org_id, category="llm", provider="anthropic", cost_usd=cost)
+        db.commit()
+
+
 @router.post("/analyze", response_model=AnalyzeOut)
-def analyze(body: AnalyzeIn, ctx: Tenant) -> AnalyzeOut:
+def analyze(body: AnalyzeIn, ctx: Tenant, db: TenantDb) -> AnalyzeOut:
+    """Fetch the real homepage and identify platform, brand, languages, market, competitors."""
     homepage_url, domain = normalize_site_url(body.url)
-    d = onboarding.get_site_analyzer().analyze(homepage_url, domain)
+    use_ai = _ai_allowed(db, ctx)
+    d = onboarding.analyze_site(homepage_url, domain, use_ai=use_ai)
+    _record_ai_cost(db, ctx, d.cost_usd)
     return AnalyzeOut(
         source=d.source,
         homepage_url=homepage_url,
@@ -37,25 +58,32 @@ def analyze(body: AnalyzeIn, ctx: Tenant) -> AnalyzeOut:
         city=d.city,
         country=d.country,
         competitors=d.competitors,
+        summary=d.summary,
+        notice=d.notice if use_ai else "budget",
     )
 
 
 @router.post("/suggestions", response_model=SuggestOut)
-def suggestions(body: SuggestIn, ctx: Tenant) -> SuggestOut:
-    provider = onboarding.get_suggestion_provider()
-    args = dict(
-        brand=body.brand_name, industry=body.industry, city=body.city, languages=body.languages
+def suggestions(body: SuggestIn, ctx: Tenant, db: TenantDb) -> SuggestOut:
+    """Keywords and AI questions written from the real site, only in enabled languages."""
+    result = onboarding.suggest(
+        brand=body.brand_name,
+        industry=body.industry,
+        city=body.city,
+        country=body.country,
+        languages=body.languages,
+        summary=body.site_summary,
+        use_ai=_ai_allowed(db, ctx),
     )
+    _record_ai_cost(db, ctx, result.cost_usd)
     return SuggestOut(
-        source="mock",
-        keywords=[
-            SuggestedKeyword(keyword=s.text, language=s.language) for s in provider.keywords(**args)
-        ],
+        source=result.source,
+        keywords=[SuggestedKeyword(keyword=s.text, language=s.language) for s in result.keywords],
         prompts=[
             SuggestedPrompt(
                 prompt_text=s.text, language=s.language, intent=(s.intent or "informational")
             )
-            for s in provider.prompts(**args)
+            for s in result.prompts
         ],
     )
 

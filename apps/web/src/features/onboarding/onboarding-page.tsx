@@ -62,9 +62,13 @@ function Stepper({ current }: { current: Step }) {
   );
 }
 
-function MockNotice() {
+/** Explains why some detected fields may be empty ("unreachable", "ai_unavailable", …). */
+function AnalysisNotice({ notice }: { notice: string | null | undefined }) {
   const { t } = useTranslation("onboarding");
-  return <Alert tone="info">{t("mockNotice")}</Alert>;
+  if (!notice) return null;
+  return (
+    <Alert tone={notice === "unreachable" ? "warning" : "info"}>{t(`notices.${notice}`)}</Alert>
+  );
 }
 
 export function OnboardingPage() {
@@ -81,6 +85,7 @@ export function OnboardingPage() {
   const [addArabic, setAddArabic] = useState(false); // Arabic is opt-in, never preselected
   const [keywords, setKeywords] = useState<Item[]>([]);
   const [prompts, setPrompts] = useState<Item[]>([]);
+  const [suggestionSource, setSuggestionSource] = useState<string | null>(null);
   const [site, setSite] = useState<SiteOut | null>(null);
 
   const languages = useMemo(() => (addArabic ? ["en", "ar"] : ["en"]), [addArabic]);
@@ -124,9 +129,12 @@ export function OnboardingPage() {
           brand_name: details.brand_en || details.name,
           industry: details.industry,
           city: details.city || null,
+          country: details.country || null,
+          site_summary: analysis?.summary ?? null,
           languages,
         },
       });
+      setSuggestionSource(s.source);
       setKeywords(
         s.keywords.map((k) => ({ text: k.keyword, language: k.language, selected: true })),
       );
@@ -286,7 +294,7 @@ export function OnboardingPage() {
 
       {step === "tracking" && (
         <div className="space-y-4">
-          <MockNotice />
+          {suggestionSource === "template" && <Alert tone="info">{t("notices.template")}</Alert>}
           <ItemList
             title={t("tracking.keywordsTitle")}
             description={t("tracking.keywordsDescription")}
@@ -380,7 +388,7 @@ export function DetailsStep({
         <CardDescription>{t("details.description", { domain: analysis.domain })}</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
-        {analysis.source === "mock" && <MockNotice />}
+        <AnalysisNotice notice={analysis.notice} />
         <div className="grid gap-4 sm:grid-cols-2">
           <Field label={t("details.name")}>
             <Input value={details.name} onChange={set("name")} />

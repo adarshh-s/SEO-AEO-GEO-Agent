@@ -19,12 +19,17 @@ class AnalyzeOut(ApiModel):
     city: str | None
     country: str
     competitors: list[str]
+    summary: str | None = None
+    # "unreachable" | "ai_unavailable" | "ai_failed" | "budget" — why some fields are empty
+    notice: str | None = None
 
 
 class SuggestIn(ApiModel):
     brand_name: str = Field(min_length=1, max_length=120)
     industry: str = Field(min_length=1, max_length=120)
     city: str | None = Field(default=None, max_length=120)
+    country: str | None = Field(default=None, max_length=2)
+    site_summary: str | None = Field(default=None, max_length=2000)
     languages: list[str] = Field(min_length=1, max_length=6)
 
     @field_validator("languages")

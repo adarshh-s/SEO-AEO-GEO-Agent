@@ -13,6 +13,8 @@ dependencies = [
     "nh3>=0.2.18",
     "requests>=2.32",
     "httpx>=0.28",
+    "anthropic>=1.0",
+    "beautifulsoup4>=4.12",
     "cryptography>=43.0",
     "reportlab>=5.0.1",
 ]

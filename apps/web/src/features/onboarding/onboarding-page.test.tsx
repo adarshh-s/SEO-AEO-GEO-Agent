@@ -6,7 +6,9 @@ import type { CompleteIn } from "@/lib/api-types";
 import { OnboardingPage } from "./onboarding-page";
 
 const analysis = {
-  source: "mock",
+  source: "live",
+  notice: "ai_unavailable",
+  summary: null,
   homepage_url: "https://smile.sa/",
   domain: "smile.sa",
   platform: "salla",
@@ -61,7 +63,7 @@ describe("OnboardingPage", () => {
 
     await userEvent.type(screen.getByLabelText("Website address"), "smile.sa");
     await userEvent.click(screen.getByRole("button", { name: "Analyze" }));
-    expect(await screen.findByText(/Sample data/)).toBeInTheDocument();
+    expect(await screen.findByText(/AI analysis isn't switched on yet/)).toBeInTheDocument();
 
     await userEvent.type(screen.getByLabelText("Industry"), "dentist");
     await userEvent.click(screen.getByRole("button", { name: "Next" }));

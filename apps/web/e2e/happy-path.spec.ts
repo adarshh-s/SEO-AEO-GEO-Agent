@@ -14,7 +14,7 @@ test("sign up, onboard a website, see it listed", async ({ page }) => {
   await expect(page).toHaveURL(/\/app\/onboarding/);
   await page.getByLabel("Website address").fill(domain);
   await page.getByRole("button", { name: "Analyze" }).click();
-  await expect(page.getByText(/Sample data/)).toBeVisible();
+  await expect(page.getByLabel("Industry")).toBeVisible();
   await page.getByLabel("Industry").fill("dental clinic");
   await page.getByRole("button", { name: "Next" }).click();
 

@@ -1882,6 +1882,7 @@
           "onboarding"
         ],
         "summary": "Analyze",
+        "description": "Fetch the real homepage and identify platform, brand, languages, market, competitors.",
         "operationId": "analyze_onboarding_analyze_post",
         "parameters": [
           {
@@ -1941,6 +1942,7 @@
           "onboarding"
         ],
         "summary": "Suggestions",
+        "description": "Keywords and AI questions written from the real site, only in enabled languages.",
         "operationId": "suggestions_onboarding_suggestions_post",
         "parameters": [
           {
@@ -6477,6 +6479,28 @@
             },
             "type": "array",
             "title": "Competitors"
+          },
+          "summary": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Summary"
+          },
+          "notice": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Notice"
           }
         },
         "type": "object",
@@ -9273,6 +9297,30 @@
               }
             ],
             "title": "City"
+          },
+          "country": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 2
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Country"
+          },
+          "site_summary": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 2000
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Site Summary"
           },
           "languages": {
             "items": {

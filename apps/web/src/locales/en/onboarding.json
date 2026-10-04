@@ -10,7 +10,6 @@
     "connect": "Connect",
     "plan": "Plan"
   },
-  "mockNotice": "Sample data: automatic detection and suggestions are not connected yet, so these values are examples. Please check and edit them.",
   "website": {
     "title": "What's your website?",
     "description": "We'll look at it to detect the platform, your brand and your languages.",
@@ -125,5 +124,12 @@
     "upgrade": "Need more? Contact us:",
     "seePlans": "See plans",
     "finish": "Go to dashboard"
+  },
+  "notices": {
+    "unreachable": "We couldn't open your website (it may be down, slow or blocking bots), so please fill in the details yourself.",
+    "ai_unavailable": "We read your website, but AI analysis isn't switched on yet, so industry, city and competitors may be empty. Please fill them in.",
+    "ai_failed": "We read your website, but the AI analysis didn't finish. Please check and complete the details.",
+    "budget": "Your monthly AI budget is used up, so we only read the basics from your website. Please complete the details.",
+    "template": "These are example suggestions (AI suggestions aren't available right now). Edit them so they match how your customers search."
   }
 }
