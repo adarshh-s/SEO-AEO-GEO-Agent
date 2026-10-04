@@ -200,10 +200,13 @@
     "diagnosing": "Diagnosing...",
     "title": "On-Page Gap Diagnosis",
     "subtitle": "Comparing your page signals with top-ranking competitors and AI crawler guidelines.",
-    "competitorsAnalyzed": "{{count}} competitors analyzed",
+    "competitorsAnalyzed": "Pages compared with yours",
     "detectedGaps": "Identified Optimization Opportunities",
     "viewFixes": "View Recommended Fixes in Inbox",
-    "noGaps": "No critical optimization gaps detected for this query."
+    "noGaps": "No critical optimization gaps detected for this query.",
+    "rulesOnly": "These results come from automatic checks only (AI diagnosis isn't available right now), so the fixes are general templates.",
+    "words_one": "{{count}} word",
+    "words_other": "{{count}} words"
   },
   "audits": {
     "title": "Website Audits",

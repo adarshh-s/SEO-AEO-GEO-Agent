@@ -129,11 +129,21 @@ export function DiagnosisModal({
                 </Button>
               </div>
 
+              {/* Plain-English explanation from the AI diagnosis */}
+              {typeof activeDiagnosis?.findings?.summary === "string" && (
+                <div className="bg-accent text-accent-foreground rounded-md p-3 text-sm">
+                  {activeDiagnosis.findings.summary}
+                </div>
+              )}
+              {activeDiagnosis?.findings?.source === "rules" && (
+                <p className="text-muted-foreground text-xs">{t("diagnosis.rulesOnly")}</p>
+              )}
+
               {/* Competitors summary if available */}
               {competitors.length > 0 && (
                 <div className="space-y-2">
                   <span className="text-muted-foreground text-xs font-semibold">
-                    Top Competitors Analyzed
+                    {t("diagnosis.competitorsAnalyzed")}
                   </span>
                   <div className="grid grid-cols-1 gap-2 text-xs sm:grid-cols-2">
                     {competitors.slice(0, 4).map((c, i) => (
@@ -143,7 +153,7 @@ export function DiagnosisModal({
                       >
                         <span className="text-foreground truncate font-medium">{c.domain}</span>
                         <Badge variant="outline" className="ms-2 shrink-0 text-[10px]">
-                          {c.word_count} words
+                          {t("diagnosis.words", { count: c.word_count })}
                         </Badge>
                       </div>
                     ))}

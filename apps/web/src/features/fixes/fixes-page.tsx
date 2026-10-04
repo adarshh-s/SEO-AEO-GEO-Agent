@@ -266,7 +266,9 @@ export function FixesPage() {
 
               <CardTitle className="mt-2 text-base font-semibold">{fix.title}</CardTitle>
               {fix.description && (
-                <CardDescription className="text-xs">{fix.description}</CardDescription>
+                <CardDescription className="text-xs whitespace-pre-line">
+                  {fix.description}
+                </CardDescription>
               )}
             </CardHeader>
 

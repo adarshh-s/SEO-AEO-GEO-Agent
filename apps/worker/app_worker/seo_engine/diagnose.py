@@ -90,6 +90,7 @@ def analyze_target_and_competitors(
     target_language: str,
     competitor_urls: list[str],
     robots_txt_status: dict[str, bool] | None = None,
+    competitor_fetches: list[FetchResult] | None = None,
 ) -> DiagnosisResult:
     """Compare the target page with competitor pages to identify gaps."""
     # Analyze target page
@@ -99,9 +100,15 @@ def analyze_target_and_competitors(
 
     # Fetch and analyze competitor pages safely
     competitor_analyses: list[CompetitorPageAnalysis] = []
-    for c_url in competitor_urls[:3]:  # Top 3 competitors
+    fetched = list(competitor_fetches or [])
+    if competitor_fetches is None:
+        for c_url in competitor_urls[:3]:  # Top 3 competitors
+            try:
+                fetched.append(fetch_page(c_url, timeout=10))
+            except Exception:  # noqa: S112
+                continue
+    for cf in fetched[:3]:
         try:
-            cf = fetch_page(c_url, timeout=10)
             if cf.status_code == 200:
                 cw, ch, cs = _extract_page_signals(cf.raw_html)
                 from urllib.parse import urlparse
