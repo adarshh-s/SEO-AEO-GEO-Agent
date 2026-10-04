@@ -23,6 +23,7 @@
 | D14 | Per-plan cost ceilings set after measuring real costs in Phase 2 (placeholders until then). |
 | D15 | Snippet content blocks off by default and render only inside a customer-placed container. Schema and meta injection stay on. |
 | D16 | Shopify app backend on FastAPI (no Remix server); `packages/shopify-app` holds the theme app extension + thin embedded page. |
+| D21 | **Product name is OmniRank** (confirmed 2026-10-04). Lives only in `config/brand.json`. |
 | D17 | Brand/company name **QuardLink** (test name; legal entity not registered). No registrations are assumed to exist; see `docs/registrations-checklist.md`. |
 | D18 | Webflow schema: manual paste as primary (server-side), Custom Code API as the automatic client-side option, with the trade-off shown in the UI. *(Recommendation accepted by default; not explicitly answered.)* |
 | D19 | Resend in production, SMTP adapter as an option, Mailpit locally. |
