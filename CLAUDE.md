@@ -455,3 +455,6 @@ Until this phase: no Stripe/Moyasar/Tap code, no checkout, no billing webhooks.
    until then.
 7. **No registrations exist yet** (QuardLink is a test name, entity not
    registered). `docs/registrations-checklist.md` lists what each needs.
+8. **English-only interface for now (D22, 2026-10-04).** Keep all strings in i18n, but only
+   English is offered (`VITE_UI_LANGUAGES=en`). Don't build new Arabic UI work unless asked.
+   Product name is **OmniRank** (D21).

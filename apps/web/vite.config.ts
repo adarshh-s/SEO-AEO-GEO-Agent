@@ -16,5 +16,7 @@ export default defineConfig({
     include: ["src/**/*.test.{ts,tsx}"],
     css: false,
     globals: true,
+    // Tests keep exercising the Arabic/RTL machinery even though production is English-only.
+    env: { VITE_UI_LANGUAGES: "en,ar" },
   },
 });

@@ -89,27 +89,29 @@ function ProfileTab() {
           </div>
         </CardContent>
       </Card>
-      <Card>
-        <CardHeader>
-          <CardTitle>{t("profile.languageTitle")}</CardTitle>
-          <CardDescription>{t("profile.languageDescription")}</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Field label={t("profile.language")}>
-            <Select
-              value={i18n.language}
-              onChange={(e) => void changeLanguage(e.target.value)}
-              className="max-w-xs"
-            >
-              {SUPPORTED_LANGUAGES.map((l) => (
-                <option key={l} value={l}>
-                  {tc("language.name", { lng: l })}
-                </option>
-              ))}
-            </Select>
-          </Field>
-        </CardContent>
-      </Card>
+      {SUPPORTED_LANGUAGES.length > 1 && (
+        <Card>
+          <CardHeader>
+            <CardTitle>{t("profile.languageTitle")}</CardTitle>
+            <CardDescription>{t("profile.languageDescription")}</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Field label={t("profile.language")}>
+              <Select
+                value={i18n.language}
+                onChange={(e) => void changeLanguage(e.target.value)}
+                className="max-w-xs"
+              >
+                {SUPPORTED_LANGUAGES.map((l) => (
+                  <option key={l} value={l}>
+                    {tc("language.name", { lng: l })}
+                  </option>
+                ))}
+              </Select>
+            </Field>
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 }

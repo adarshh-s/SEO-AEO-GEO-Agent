@@ -23,6 +23,8 @@ export function LanguageToggle() {
     }
   }
 
+  if (SUPPORTED_LANGUAGES.length < 2) return null; // English-only: no switch
+
   if (SUPPORTED_LANGUAGES.length > 2) {
     return (
       <label className="inline-flex items-center gap-2 text-sm">

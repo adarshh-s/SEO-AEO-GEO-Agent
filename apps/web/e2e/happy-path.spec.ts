@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 
-test("sign up, onboard a website, see it listed, switch to Arabic", async ({ page }) => {
+test("sign up, onboard a website, see it listed", async ({ page }) => {
   const email = `e2e-${Date.now()}@example.com`;
   const domain = `e2e-${Date.now()}.example.com`;
 
@@ -32,11 +32,7 @@ test("sign up, onboard a website, see it listed, switch to Arabic", async ({ pag
   await page.getByRole("link", { name: "Websites" }).first().click();
   await expect(page.getByText(domain)).toBeVisible();
 
-  await page.getByRole("button", { name: /العربية/ }).click();
-  await expect(page.locator("html")).toHaveAttribute("dir", "rtl");
-  await expect(page.getByRole("heading", { name: "المواقع" })).toBeVisible();
-
-  // The choice is saved per user: still Arabic after a reload.
-  await page.reload();
-  await expect(page.locator("html")).toHaveAttribute("dir", "rtl");
+  // English-only interface (D22): no language switch, always left-to-right.
+  await expect(page.getByRole("button", { name: /العربية/ })).toHaveCount(0);
+  await expect(page.locator("html")).toHaveAttribute("dir", "ltr");
 });

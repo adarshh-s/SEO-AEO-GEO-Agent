@@ -19,9 +19,15 @@ for (const [path, mod] of Object.entries(files)) {
 }
 
 export const DEFAULT_LANGUAGE = "en";
-export const SUPPORTED_LANGUAGES = Object.keys(resources).sort((a, b) =>
-  a === DEFAULT_LANGUAGE ? -1 : b === DEFAULT_LANGUAGE ? 1 : a.localeCompare(b),
-);
+// Interface languages offered to users (decision D22: English only for now). Comma-separated
+// VITE_UI_LANGUAGES re-enables others, e.g. "en,ar" — no code changes needed.
+const ENABLED = (import.meta.env.VITE_UI_LANGUAGES ?? DEFAULT_LANGUAGE)
+  .split(",")
+  .map((l: string) => l.trim())
+  .filter(Boolean);
+export const SUPPORTED_LANGUAGES = Object.keys(resources)
+  .filter((l) => l === DEFAULT_LANGUAGE || ENABLED.includes(l))
+  .sort((a, b) => (a === DEFAULT_LANGUAGE ? -1 : b === DEFAULT_LANGUAGE ? 1 : a.localeCompare(b)));
 const RTL = new Set(["ar", "he", "fa", "ur"]);
 const STORAGE_KEY = "app.uiLanguage";
 
