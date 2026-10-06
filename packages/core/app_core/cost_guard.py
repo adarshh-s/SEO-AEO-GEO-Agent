@@ -8,8 +8,8 @@ import structlog
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
+from app_core.alerts import maybe_send_cost_alert
 from app_core.models import Organization, UsageCounter
-from app_core.settings import get_settings
 
 logger = structlog.get_logger(__name__)
 
@@ -79,23 +79,29 @@ def check_cost_guard(db: Session, org_id: uuid.UUID, *, is_scheduled: bool = Fal
     current_spend = get_monthly_spend(db, org_id)
     ratio = float(current_spend / ceiling)
 
-    if ratio >= 1.20:
-        raise CostCeilingExceeded(f"Hard spending limit exceeded ({ratio:.0%}).", ratio)
-
-    if is_scheduled and ratio >= 1.00:
-        raise CostCeilingExceeded(
-            f"Monthly ceiling reached ({ratio:.0%}). Scheduled checks paused.", ratio
-        )
-
+    # Alerts first, so the 100% email still goes out when work is refused below.
     if ratio >= 0.80:
-        s = get_settings()
         logger.warning(
             "org_cost_ceiling_warning",
             org_id=str(org_id),
             spend=str(current_spend),
             ceiling=str(ceiling),
             ratio=f"{ratio:.1%}",
-            alert_email=s.ops_alert_email,
+        )
+        period_start, _ = get_current_period()
+        for level in (80, 100):
+            if ratio >= level / 100:
+                maybe_send_cost_alert(
+                    db, org, level=level, spend=current_spend, ceiling=Decimal(ceiling),
+                    period_start=period_start,
+                )  # fmt: skip
+
+    if ratio >= 1.20:
+        raise CostCeilingExceeded(f"Hard spending limit exceeded ({ratio:.0%}).", ratio)
+
+    if is_scheduled and ratio >= 1.00:
+        raise CostCeilingExceeded(
+            f"Monthly ceiling reached ({ratio:.0%}). Scheduled checks paused.", ratio
         )
 
 

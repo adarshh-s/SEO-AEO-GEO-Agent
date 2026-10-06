@@ -15,6 +15,7 @@ dependencies = [
     "httpx>=0.28",
     "anthropic>=1.0",
     "beautifulsoup4>=4.12",
+    "redis>=5.2",
     "cryptography>=43.0",
     "reportlab>=5.0.1",
 ]

@@ -8,5 +8,9 @@
   "role.owner": "owner",
   "role.admin": "admin",
   "role.member": "member",
-  "role.viewer": "viewer"
+  "role.viewer": "viewer",
+  "email.cost80.subject": "{org}: 80% of this month's {product} usage limit reached",
+  "email.cost80.body": "Hi,\n\n{org} has used ${spend} of its ${ceiling} monthly limit for automatic checks and AI analysis on {product}.\n\nEverything keeps running for now. At 100%, scheduled checks pause until next month or until the limit is raised. To raise it, reply to this email or contact us.",
+  "email.cost100.subject": "{org}: monthly {product} usage limit reached, scheduled checks paused",
+  "email.cost100.body": "Hi,\n\n{org} has used ${spend} of its ${ceiling} monthly limit on {product}.\n\nScheduled ranking and AI checks are paused until next month. Actions you start yourself (like a diagnosis) still work up to 120% of the limit. To raise the limit, reply to this email or contact us."
 }

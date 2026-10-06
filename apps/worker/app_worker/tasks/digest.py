@@ -122,7 +122,7 @@ def dispatch_weekly_digests() -> dict:
         processed = 0
         for site in sites:
             try:
-                lang = site.primary_language if site.primary_language in ["en", "ar"] else "en"
+                lang = "en"  # English-only interface (D22); emails follow the UI language
                 send_site_weekly_digest.delay(str(site.id), None, lang)
                 processed += 1
             except Exception as e:
