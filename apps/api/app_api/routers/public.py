@@ -10,12 +10,12 @@ from typing import Annotated, Any, Literal
 from urllib.parse import urlsplit
 
 from fastapi import APIRouter, Depends, Query, Request, Response
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, ValidationError
 from redis import Redis
 from sqlalchemy import select
 
 from app_api.deps import SystemDb
-from app_api.errors import not_found
+from app_api.errors import ApiError, not_found
 from app_api.ratelimit import client_ip, enforce, get_redis
 from app_core.brand import BRAND
 from app_core.logging import get_logger
@@ -121,10 +121,22 @@ def get_public_fixes(
     return PublicFixesResponse(site_key=site_key, url=url, fixes=items)
 
 
+async def telemetry_body(request: Request) -> TelemetryReferralIn:
+    """The snippet uses navigator.sendBeacon, which posts JSON as text/plain (a JSON
+    content type would need a CORS preflight that beacons can't do). Accept both."""
+    raw = await request.body()
+    if len(raw) > 8_000:
+        raise ApiError(413, "too_large", "Payload too large.")
+    try:
+        return TelemetryReferralIn.model_validate_json(raw)
+    except ValidationError:
+        raise ApiError(422, "validation_error", "Invalid telemetry payload.") from None
+
+
 @router.post("/telemetry/referral")
 def record_ai_referral(
-    body: TelemetryReferralIn,
     request: Request,
+    body: Annotated[TelemetryReferralIn, Depends(telemetry_body)],
     redis: RedisDep,
     db: SystemDb,
 ) -> dict[str, bool]:

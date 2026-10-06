@@ -1,5 +1,6 @@
 """API-level regression tests for the 2026-10-04 security review."""
 
+import json
 import uuid
 
 from sqlalchemy import text
@@ -153,3 +154,24 @@ def test_credentials_and_webhook_secrets_are_encrypted_at_rest(app):
     with system_session() as db:
         assert db.query(SiteIntegration).one().credentials == {"token": "ghp_supersecret"}
         assert db.query(Webhook).one().secret == "whsec_plain"
+
+
+def test_referral_ping_accepts_text_plain_beacons(app):
+    from sqlalchemy import func, select
+
+    from app_core.models import AiReferralEvent
+
+    _, site = _site(app)
+    body = json.dumps(
+        {"site_key": site["site_key"], "url": "https://example.com/p", "referrer_engine": "chatgpt"}
+    )
+    r = make_client(app).post(
+        "/public/v1/telemetry/referral", content=body,
+        headers={"Content-Type": "text/plain;charset=UTF-8"},
+    )  # fmt: skip
+    assert r.status_code == 200
+    with system_session() as db:
+        assert db.scalar(select(func.count()).select_from(AiReferralEvent)) == 1
+    bad = make_client(app).post("/public/v1/telemetry/referral", content="nope",
+                                headers={"Content-Type": "text/plain"})  # fmt: skip
+    assert bad.status_code == 422
