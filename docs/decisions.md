@@ -23,6 +23,7 @@
 | D14 | Per-plan cost ceilings set after measuring real costs in Phase 2 (placeholders until then). |
 | D15 | Snippet content blocks off by default and render only inside a customer-placed container. Schema and meta injection stay on. |
 | D16 | Shopify app backend on FastAPI (no Remix server); `packages/shopify-app` holds the theme app extension + thin embedded page. |
+| D25 | **Gemini can run the AI features** (2026-10-06). `LLM_PROVIDER=auto|gemini|anthropic` picks the AI for website analysis, suggestions, answer reading and diagnosis; with only a Gemini key the whole product works. Claude stays available. |
 | D22 | **English-only interface** (2026-10-04). The Arabic UI is switched off via `VITE_UI_LANGUAGES` (default `en`); the i18n/RTL code and Arabic locale files stay, so setting `VITE_UI_LANGUAGES=en,ar` turns it back on. Arabic *search tracking* for a website (keywords/prompts in Arabic) is a separate feature and is unchanged. |
 | D21 | **Product name is OmniRank** (confirmed 2026-10-04). Lives only in `config/brand.json`. |
 | D17 | Brand/company name **QuardLink** (test name; legal entity not registered). No registrations are assumed to exist; see `docs/registrations-checklist.md`. |

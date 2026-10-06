@@ -255,7 +255,7 @@ def _try_agent(session, diag, site, target_text, target_lang, target_url, target
     except Exception as exc:  # API error / refusal: rules-based result is still useful
         logger.warning("Diagnosis agent failed for %s: %s", diag.id, exc)
         return None
-    record_usage(session, org_id=site.org_id, category="llm", provider="anthropic",
+    record_usage(session, org_id=site.org_id, category="llm", provider=result.provider or "llm",
                  cost_usd=result.cost_usd)  # fmt: skip
     return result
 

@@ -1,6 +1,12 @@
-"""Claude calls for analysis, answer parsing, diagnosis and fix generation.
+"""The AI used for analysis, answer reading, diagnosis and fix generation.
 
-- Official Anthropic SDK; model IDs come only from env (CLAUDE_MODEL_MAIN / _FAST).
+Two providers, chosen with LLM_PROVIDER (auto | gemini | anthropic; auto = Claude if
+configured, else Gemini):
+- Gemini: Interactions API with response_format JSON schema (GEMINI_MODEL_MAIN / _FAST,
+  falling back to GEMINI_MODEL).
+- Claude: official Anthropic SDK (CLAUDE_MODEL_MAIN / _FAST).
+
+- Model IDs come only from env.
 - Structured output: every call returns a validated Pydantic object (`messages.parse`).
 - Refusal fallback (`fallbacks: "default"`) is enabled on models that support it.
 - Each call returns its USD cost so callers can log it against the org's monthly ceiling.
@@ -19,7 +25,8 @@ from functools import lru_cache
 from typing import Literal
 
 import anthropic
-from pydantic import BaseModel
+import requests
+from pydantic import BaseModel, ValidationError
 
 from app_core.logging import get_logger
 from app_core.provider_errors import ProviderNotConfigured
@@ -27,6 +34,11 @@ from app_core.settings import get_settings
 
 log = get_logger(__name__)
 Role = Literal["main", "fast"]
+Provider = Literal["anthropic", "gemini"]
+GEMINI_URL = "https://generativelanguage.googleapis.com/v1beta/interactions"
+# Gemini prices (USD per 1M tokens in/out) for cost tracking; override via AI_ENGINE_PRICES
+# key "gemini_llm": [in, out]. Conservative estimates.
+GEMINI_DEFAULT_PRICE = (Decimal("2"), Decimal("12"))
 
 # USD per million tokens (input, output). Used for cost tracking only.
 MODEL_PRICES: dict[str, tuple[Decimal, Decimal]] = {
@@ -52,6 +64,7 @@ class LlmResult[T]:
     value: T
     model: str
     cost_usd: Decimal
+    provider: Provider = "anthropic"
 
 
 def cost_of(model: str, usage: object, web_searches: int = 0) -> Decimal:
@@ -69,19 +82,37 @@ def cost_of(model: str, usage: object, web_searches: int = 0) -> Decimal:
     return (cost + WEB_SEARCH_PRICE * web_searches).quantize(Decimal("0.000001"))
 
 
-def model_for(role: Role) -> str:
+def resolve(role: Role) -> tuple[Provider, str]:
+    """(provider, model) for a role, per LLM_PROVIDER. Raises ProviderNotConfigured."""
     s = get_settings()
-    model = s.claude_model_main if role == "main" else s.claude_model_fast
-    if not s.anthropic_api_key or not model:
-        raise ProviderNotConfigured(
-            f"Claude ({role}): set ANTHROPIC_API_KEY and CLAUDE_MODEL_{role.upper()}"
-        )
-    return model
+    claude_model = s.claude_model_main if role == "main" else s.claude_model_fast
+    gemini_model = (
+        s.gemini_model_main if role == "main" else s.gemini_model_fast
+    ) or s.gemini_model
+    options: dict[Provider, tuple[bool, str | None]] = {
+        "anthropic": (bool(s.anthropic_api_key and claude_model), claude_model),
+        "gemini": (bool(s.gemini_api_key and gemini_model), gemini_model),
+    }
+    order: list[Provider] = (
+        ["anthropic", "gemini"] if s.llm_provider == "auto" else [s.llm_provider]
+    )
+    for provider in order:
+        ok, model = options[provider]
+        if ok and model:
+            return provider, model
+    raise ProviderNotConfigured(
+        f"AI ({role}): set GEMINI_API_KEY + GEMINI_MODEL (or ANTHROPIC_API_KEY + "
+        f"CLAUDE_MODEL_{role.upper()}); LLM_PROVIDER={s.llm_provider}"
+    )
+
+
+def model_for(role: Role) -> str:
+    return resolve(role)[1]
 
 
 def is_configured(role: Role) -> bool:
     try:
-        model_for(role)
+        resolve(role)
         return True
     except ProviderNotConfigured:
         return False
@@ -112,8 +143,10 @@ def parse[T: BaseModel](
     max_tokens: int = 16000,
     effort: Literal["low", "medium", "high"] | None = None,
 ) -> LlmResult[T]:
-    """One structured Claude call. Raises ProviderNotConfigured / LlmRefusal / anthropic errors."""
-    model = model_for(role)
+    """One structured AI call. Raises ProviderNotConfigured / LlmRefusal / provider errors."""
+    provider, model = resolve(role)
+    if provider == "gemini":
+        return _gemini_parse(model, role, system, user, output, max_tokens)
     kwargs: dict = {
         "model": model,
         "max_tokens": max_tokens,
@@ -130,8 +163,75 @@ def parse[T: BaseModel](
     if response.parsed_output is None:
         raise LlmRefusal(f"no structured output (stop_reason={response.stop_reason})")
     cost = cost_of(response.model, response.usage)
-    log.info("llm.call", role=role, model=response.model, cost_usd=str(cost))
-    return LlmResult(value=response.parsed_output, model=response.model, cost_usd=cost)
+    log.info("llm.call", provider="anthropic", role=role, model=response.model, cost_usd=str(cost))
+    return LlmResult(response.parsed_output, response.model, cost, "anthropic")
+
+
+def _gemini_price() -> tuple[Decimal, Decimal]:
+    raw = get_settings().ai_engine_prices
+    if raw:
+        try:
+            import json
+
+            p = json.loads(raw).get("gemini_llm")
+            if p:
+                return Decimal(str(p[0])), Decimal(str(p[1]))
+        except (ValueError, TypeError, AttributeError):
+            pass
+    return GEMINI_DEFAULT_PRICE
+
+
+def _gemini_text(data: dict) -> str:
+    text = data.get("output_text") or data.get("outputText")
+    if text:
+        return text
+    return "".join(
+        c.get("text", "")
+        for step in data.get("steps", [])
+        if step.get("type") == "model_output"
+        for c in step.get("content") or []
+        if isinstance(c, dict)
+    )
+
+
+def _gemini_parse[T: BaseModel](
+    model: str, role: Role, system: str, user: str, output: type[T], max_tokens: int
+) -> LlmResult[T]:
+    s = get_settings()
+    resp = requests.post(
+        GEMINI_URL,
+        headers={"x-goog-api-key": s.gemini_api_key or "", "Content-Type": "application/json"},
+        json={
+            "model": model,
+            "system_instruction": f"{system}\n\n{UNTRUSTED_NOTE}",
+            "input": user,
+            "response_format": {
+                "type": "text",
+                "mime_type": "application/json",
+                "schema": output.model_json_schema(),
+            },
+            "generation_config": {"max_output_tokens": max_tokens},
+            "store": False,  # don't keep customer data on Google's side
+        },
+        timeout=120,
+    )
+    if resp.status_code >= 400:
+        raise RuntimeError(f"Gemini HTTP {resp.status_code}: {resp.text[:300]}")
+    data = resp.json()
+    text = _gemini_text(data).strip()
+    try:
+        value = output.model_validate_json(text)
+    except ValidationError as exc:
+        raise LlmRefusal(f"Gemini returned invalid structured output: {str(exc)[:200]}") from exc
+    usage = data.get("usage") or {}
+    price_in, price_out = _gemini_price()
+    tokens_out = (usage.get("total_output_tokens") or 0) + (usage.get("total_thought_tokens") or 0)
+    cost = (
+        (Decimal(usage.get("total_input_tokens") or 0) * price_in + Decimal(tokens_out) * price_out)
+        / Decimal(1_000_000)
+    ).quantize(Decimal("0.000001"))
+    log.info("llm.call", provider="gemini", role=role, model=model, cost_usd=str(cost))
+    return LlmResult(value, model, cost, "gemini")
 
 
 def untrusted(label: str, text: str, limit: int = 40_000) -> str:

@@ -87,7 +87,11 @@ class Settings(BaseSettings):
     perplexity_api_key: str | None = None
     perplexity_model: str | None = None
     gemini_api_key: str | None = None
-    gemini_model: str | None = None
+    gemini_model: str | None = None  # the "Gemini" engine we track; default for the two below
+    gemini_model_main: str | None = None  # analysis/diagnosis when LLM_PROVIDER uses Gemini
+    gemini_model_fast: str | None = None
+    # Which AI does analysis, suggestions, answer reading and diagnosis (D25).
+    llm_provider: Literal["auto", "gemini", "anthropic"] = "auto"
     dataforseo_login: str | None = None
     dataforseo_password: str | None = None
     google_api_key: str | None = None  # PageSpeed Insights + CrUX

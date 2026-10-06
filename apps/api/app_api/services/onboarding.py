@@ -67,6 +67,7 @@ class Detection:
     summary: str | None = None
     notice: str | None = None
     cost_usd: Decimal = Decimal(0)
+    ai_provider: str = ""
 
 
 class SiteProfile(BaseModel):
@@ -176,6 +177,7 @@ def analyze_site(homepage_url: str, domain: str, *, use_ai: bool) -> Detection:
     detection.summary = p.summary
     detection.competitors = [d.lower().removeprefix("www.") for d in p.competitor_domains][:5]
     detection.cost_usd = result.cost_usd
+    detection.ai_provider = result.provider
     return detection
 
 
@@ -211,6 +213,7 @@ class Suggestions:
     keywords: list[Suggestion]
     prompts: list[Suggestion]
     cost_usd: Decimal = Decimal(0)
+    ai_provider: str = ""
 
 
 def suggest(
@@ -267,7 +270,7 @@ def _ai_suggestions(
            if k.language in allowed and k.keyword.strip()]  # fmt: skip
     prs = [Suggestion(p.prompt_text.strip(), p.language, PromptIntent(p.intent))
            for p in result.value.prompts if p.language in allowed and p.prompt_text.strip()]  # fmt: skip
-    return Suggestions("ai", _dedupe(kws), _dedupe(prs), result.cost_usd)
+    return Suggestions("ai", _dedupe(kws), _dedupe(prs), result.cost_usd, result.provider)
 
 
 def _dedupe(items: list[Suggestion]) -> list[Suggestion]:

@@ -34,9 +34,11 @@ def _ai_allowed(db: TenantDb, ctx: Tenant) -> bool:
         return False
 
 
-def _record_ai_cost(db: TenantDb, ctx: Tenant, cost: Decimal) -> None:
+def _record_ai_cost(db: TenantDb, ctx: Tenant, cost: Decimal, provider: str) -> None:
     if cost > 0:
-        record_usage(db, org_id=ctx.org_id, category="llm", provider="anthropic", cost_usd=cost)
+        record_usage(
+            db, org_id=ctx.org_id, category="llm", provider=provider or "llm", cost_usd=cost
+        )
         db.commit()
 
 
@@ -46,7 +48,7 @@ def analyze(body: AnalyzeIn, ctx: Tenant, db: TenantDb) -> AnalyzeOut:
     homepage_url, domain = normalize_site_url(body.url)
     use_ai = _ai_allowed(db, ctx)
     d = onboarding.analyze_site(homepage_url, domain, use_ai=use_ai)
-    _record_ai_cost(db, ctx, d.cost_usd)
+    _record_ai_cost(db, ctx, d.cost_usd, d.ai_provider)
     return AnalyzeOut(
         source=d.source,
         homepage_url=homepage_url,
@@ -75,7 +77,7 @@ def suggestions(body: SuggestIn, ctx: Tenant, db: TenantDb) -> SuggestOut:
         summary=body.site_summary,
         use_ai=_ai_allowed(db, ctx),
     )
-    _record_ai_cost(db, ctx, result.cost_usd)
+    _record_ai_cost(db, ctx, result.cost_usd, result.ai_provider)
     return SuggestOut(
         source=result.source,
         keywords=[SuggestedKeyword(keyword=s.text, language=s.language) for s in result.keywords],

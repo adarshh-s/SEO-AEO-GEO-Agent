@@ -101,6 +101,7 @@ class AgentResult:
     fixes: list[AgentFix]
     cost_usd: Decimal
     model: str
+    provider: str = ""
 
 
 def _payload(fix: ProposedFix) -> dict | None:
@@ -195,5 +196,6 @@ def run_diagnosis_agent(
         ],
         fixes=fixes,
         cost_usd=result.cost_usd,
+        provider=result.provider,
         model=result.model,
     )
