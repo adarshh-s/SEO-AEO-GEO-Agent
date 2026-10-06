@@ -178,8 +178,12 @@ class {cls_name} {{
     public function render_head_fixes() {{
         $fixes = $this->get_current_fixes();
         foreach ($fixes as $fix) {{
-            if ($fix['type'] === 'schema' && !empty($fix['payload'])) {{
-                echo '<script type="application/ld+json">' . wp_json_encode($fix['payload']) . '</script>' . "\\n";
+            // With Yoast / Rank Math active the schema is merged into their graph instead
+            // (filters below), so it is never printed twice.
+            if (!empty($fix['payload']['json_ld']) && !defined('WPSEO_VERSION') && !defined('RANK_MATH_VERSION')) {{
+                echo '<script type="application/ld+json">'
+                    . wp_json_encode($fix['payload']['json_ld'], JSON_HEX_TAG | JSON_HEX_AMP | JSON_UNESCAPED_UNICODE)
+                    . '</script>' . "\\n";
             }}
             if ($fix['type'] === 'meta' && !empty($fix['payload']['meta_description'])) {{
                 // Only output if Yoast / RankMath are not active
@@ -224,8 +228,8 @@ class {cls_name} {{
     public function filter_yoast_schema($graph) {{
         $fixes = $this->get_current_fixes();
         foreach ($fixes as $fix) {{
-            if ($fix['type'] === 'schema' && !empty($fix['payload'])) {{
-                $graph[] = $fix['payload'];
+            if (!empty($fix['payload']['json_ld'])) {{
+                $graph[] = $fix['payload']['json_ld'];
             }}
         }}
         return $graph;
@@ -242,8 +246,8 @@ class {cls_name} {{
     public function filter_rankmath_schema($data) {{
         $fixes = $this->get_current_fixes();
         foreach ($fixes as $fix) {{
-            if ($fix['type'] === 'schema' && !empty($fix['payload'])) {{
-                $data['{slug}_schema'] = $fix['payload'];
+            if (!empty($fix['payload']['json_ld'])) {{
+                $data['{slug}_fix_' . $fix['id']] = $fix['payload']['json_ld'];
             }}
         }}
         return $data;

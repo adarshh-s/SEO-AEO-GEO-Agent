@@ -151,3 +151,14 @@ def test_resolve_prefers_ipv4_and_rejects_mixed(monkeypatch):
     monkeypatch.setattr(net.socket, "getaddrinfo", lambda *a, **k: mixed)
     with pytest.raises(net.UnsafeUrlError):
         net.resolve_public("x.example", 443)
+
+
+def test_generated_wordpress_plugin_outputs_safe_json_ld_once():
+    from app_core.brand import BRAND
+    from app_core.connectors.wordpress import generate_wordpress_plugin_php
+
+    php = generate_wordpress_plugin_php("site_key", "https://api.example.com")
+    assert "quardlink" not in php.lower() or BRAND["brand_slug"] == "quardlink"
+    assert "wp_json_encode($fix['payload'])" not in php  # never the whole payload
+    assert "JSON_HEX_TAG" in php  # cannot close the <script> element
+    assert "!defined('WPSEO_VERSION') && !defined('RANK_MATH_VERSION')" in php
