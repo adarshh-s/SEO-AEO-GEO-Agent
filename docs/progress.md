@@ -164,3 +164,20 @@ revert that broke imports was found in the working tree and stashed (`git stash 
 - Moyasar & Tap payment integrations for Saudi Arabia (SAR, mada, Apple Pay).
 - Stripe integration for international payments.
 - Subscription billing, webhooks, checkout flows, and self-serve plan upgrades.
+
+## Pre-testing completion (2026-10-06)
+
+- **Gemini runs the AI features** (D25): `LLM_PROVIDER=auto|gemini|anthropic`; Gemini via the
+  Interactions API with JSON-schema output. With only a Gemini key everything works.
+- **Cost alerts** at 80% / 100% are emailed to org owners/admins + `OPS_ALERT_EMAIL`, once per
+  level per month (they only logged before).
+- **Worker task registration**: audit and digest tasks were never registered, so "Run audit"
+  and digests silently did nothing. Fixed + test that every enqueued task is registered.
+- **Weekly digest** scheduled Mondays 08:00 UTC.
+- **WordPress plugin**: the downloadable (generated) plugin now outputs safe JSON-LD once; the
+  unused static copy with the old name was deleted.
+- **Snippet tests** on static / SPA / Wix-like / Shopify-like pages (12 tests); fixed AI-referral
+  beacons being rejected by the API (text/plain body).
+- **API no longer runs worker code**: test digest is queued; reports require a finished audit;
+  guard test prevents app_api importing app_worker.
+- Tests: 190 pytest, 38 Vitest, 1 Playwright E2E — all passing.
