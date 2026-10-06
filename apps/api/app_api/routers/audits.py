@@ -1,5 +1,4 @@
 import uuid
-from datetime import UTC, datetime
 
 from fastapi import APIRouter, Request
 from sqlalchemy import select
@@ -11,6 +10,7 @@ from app_api.routers.sites import get_site
 from app_api.schemas.audits import AuditListItemOut, AuditOut
 from app_api.services import audit as audit_service
 from app_api.services.quota import check_audits
+from app_api.task_dispatcher import dispatch_task
 from app_core.models import Audit
 from app_core.tenancy import scoped
 
@@ -50,46 +50,10 @@ def trigger_audit(
     )
     db.commit()
 
-    from app_core.settings import get_settings
-
-    if get_settings().env == "test":
-        from app_worker.tasks.audit import run_site_audit
-
-        run_site_audit(str(audit_entry.id))
-        db.refresh(audit_entry)
-        return audit_entry
-
-    # Attempt to dispatch asynchronously via HTTP worker or Celery; fallback to inline execution
-    try:
-        from app_api.task_dispatcher import dispatch_task
-
-        dispatch_task(
-            "app_worker.tasks.audit.run_site_audit",
-            args=[str(audit_entry.id)],
-            queue="default",
-        )
-    except Exception:
-        # Inline fallback for tests / environments without a live celery broker
-        try:
-            from app_worker.seo_engine.audit import run_comprehensive_audit
-
-            audit_entry.status = "running"
-            audit_entry.started_at = datetime.now(UTC)
-            res = run_comprehensive_audit(site.homepage_url)
-            audit_entry.score = res.overall_score
-            audit_entry.category_scores = res.category_scores
-            audit_entry.issues = res.issues
-            audit_entry.summary = res.summary
-            audit_entry.pages_crawled = res.pages_crawled
-            audit_entry.status = "completed"
-            audit_entry.completed_at = datetime.now(UTC)
-            db.commit()
-        except Exception as e:
-            audit_entry.status = "failed"
-            audit_entry.error_message = str(e)
-            audit_entry.completed_at = datetime.now(UTC)
-            db.commit()
-
+    # Crawling happens only in the worker (SSRF protection is process-isolated there).
+    dispatch_task(
+        "app_worker.tasks.audit.run_site_audit", args=[str(audit_entry.id)], queue="crawl"
+    )
     return audit_entry
 
 

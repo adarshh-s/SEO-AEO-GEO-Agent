@@ -12,7 +12,7 @@ SITE_DATA = {
 }
 
 
-def test_audit_lifecycle_and_reporting(app, outbox):
+def test_audit_lifecycle_and_reporting(app, outbox, monkeypatch):
     # 1. Signup and set up growth plan
     user = signup(app, email="owner@audit-test.com", org_name="Audit Org")
     set_plan(user.org_id, "growth")
@@ -27,10 +27,12 @@ def test_audit_lifecycle_and_reporting(app, outbox):
     audit_res = user.client.post(f"/sites/{site_id}/audits", json={})
     assert audit_res.status_code == 201
     audit = audit_res.json()
-    assert audit["status"] in ["completed", "running", "pending"]
-    assert "category_scores" in audit
-    assert "issues" in audit
+    assert audit["status"] == "pending"  # queued for the worker
     audit_id = audit["id"]
+    # The worker runs the audit (crawling never happens inside the API).
+    from app_worker.tasks.audit import run_site_audit
+
+    run_site_audit(audit_id)
 
     # 4. List audits
     list_res = user.client.get(f"/sites/{site_id}/audits")
@@ -89,11 +91,13 @@ def test_audit_lifecycle_and_reporting(app, outbox):
         json={"language": "en"},
     )
     assert digest_res.status_code == 200
-    assert digest_res.json()["status"] == "sent"
-    from app_api.providers.email import get_email_provider
+    assert digest_res.json()["status"] == "queued"
+    # The worker builds and sends it.
+    import app_worker.tasks.digest as digest_task
 
-    sent_emails = outbox.outbox + getattr(get_email_provider(), "outbox", [])
-    assert any("Weekly Performance Digest" in m.subject for m in sent_emails)
+    monkeypatch.setattr(digest_task, "get_email_provider", lambda: outbox)
+    digest_task.send_site_weekly_digest(site_id, user.email, "en")
+    assert any("Weekly Performance Digest" in m.subject for m in outbox.outbox)
 
 
 def test_audit_quota_limit(app):

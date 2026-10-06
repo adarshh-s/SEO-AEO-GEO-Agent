@@ -85,6 +85,7 @@
     "invalid_url": "Enter a valid public website address, like example.com.",
     "language_not_enabled": "This language isn't enabled for the website. Add it in the website settings first.",
     "google_not_configured": "Google sign-in isn't available right now.",
-    "unknown_plan": "That plan doesn't exist."
+    "unknown_plan": "That plan doesn't exist.",
+    "audit_required": "Run an audit for this website first (Audits page), then generate the report."
   }
 }

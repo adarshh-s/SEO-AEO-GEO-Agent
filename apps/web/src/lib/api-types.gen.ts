@@ -2869,18 +2869,6 @@ export interface components {
       /** Intent */
       intent: string;
     };
-    /** TelemetryReferralIn */
-    TelemetryReferralIn: {
-      /** Site Key */
-      site_key: string;
-      /** Url */
-      url: string;
-      /**
-       * Referrer Engine
-       * @enum {string}
-       */
-      referrer_engine: "chatgpt" | "perplexity" | "gemini" | "claude" | "copilot" | "other_ai";
-    };
     /** TestConnectionOut */
     TestConnectionOut: {
       /** Ok */
@@ -6300,11 +6288,7 @@ export interface operations {
       path?: never;
       cookie?: never;
     };
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["TelemetryReferralIn"];
-      };
-    };
+    requestBody?: never;
     responses: {
       /** @description Successful Response */
       200: {
@@ -6315,15 +6299,6 @@ export interface operations {
           "application/json": {
             [key: string]: boolean;
           };
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["HTTPValidationError"];
         };
       };
     };

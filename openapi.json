@@ -5683,16 +5683,6 @@
         "summary": "Record Ai Referral",
         "description": "Cookieless endpoint recording traffic referred by AI answer engines. No personal data.",
         "operationId": "record_ai_referral_public_v1_telemetry_referral_post",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/TelemetryReferralIn"
-              }
-            }
-          },
-          "required": true
-        },
         "responses": {
           "200": {
             "description": "Successful Response",
@@ -5704,16 +5694,6 @@
                   },
                   "type": "object",
                   "title": "Response Record Ai Referral Public V1 Telemetry Referral Post"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
                 }
               }
             }
@@ -9409,39 +9389,6 @@
           "intent"
         ],
         "title": "SuggestedPrompt"
-      },
-      "TelemetryReferralIn": {
-        "properties": {
-          "site_key": {
-            "type": "string",
-            "maxLength": 64,
-            "title": "Site Key"
-          },
-          "url": {
-            "type": "string",
-            "maxLength": 2000,
-            "title": "Url"
-          },
-          "referrer_engine": {
-            "type": "string",
-            "enum": [
-              "chatgpt",
-              "perplexity",
-              "gemini",
-              "claude",
-              "copilot",
-              "other_ai"
-            ],
-            "title": "Referrer Engine"
-          }
-        },
-        "type": "object",
-        "required": [
-          "site_key",
-          "url",
-          "referrer_engine"
-        ],
-        "title": "TelemetryReferralIn"
       },
       "TestConnectionOut": {
         "properties": {

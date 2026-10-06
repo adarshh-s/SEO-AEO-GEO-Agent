@@ -156,6 +156,9 @@ def world(app, outbox):
     ).json()
 
     audit_resp = a.client.post(f"/sites/{site['id']}/audits", json={}).json()
+    from app_worker.tasks.audit import run_site_audit
+
+    run_site_audit(audit_resp["id"])  # the worker completes it; reports need a finished audit
     report_resp = a.client.post(
         f"/sites/{site['id']}/reports", json={"language": "en", "report_type": "audit"}
     ).json()

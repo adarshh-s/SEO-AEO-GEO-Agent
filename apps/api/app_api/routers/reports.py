@@ -5,7 +5,7 @@ from fastapi import APIRouter, Request, Response
 from sqlalchemy import func, select
 
 from app_api.deps import Member, Tenant, TenantDb
-from app_api.errors import not_found
+from app_api.errors import ApiError, not_found
 from app_api.ratelimit import client_ip
 from app_api.routers.sites import get_site
 from app_api.schemas.reports import (
@@ -15,6 +15,7 @@ from app_api.schemas.reports import (
     SendTestDigestOut,
 )
 from app_api.services import audit as audit_service
+from app_api.task_dispatcher import dispatch_task
 from app_core.brand import BRAND
 from app_core.models import (
     AiCheck,
@@ -61,26 +62,12 @@ def generate_report(
             .order_by(Audit.created_at.desc())
         )
 
-    # If no completed audit exists, run a quick baseline audit so the report is fully populated
+    # Reports are built from a completed audit; audits crawl the site, which only the worker
+    # does (process-isolated SSRF protection), so don't crawl inside an API request.
     if not audit_entry or audit_entry.status != "completed":
-        from app_worker.seo_engine.audit import run_comprehensive_audit
-
-        res = run_comprehensive_audit(site.homepage_url)
-        audit_entry = Audit(
-            id=uuid.uuid4(),
-            org_id=ctx.org_id,
-            site_id=site.id,
-            status="completed",
-            score=res.overall_score,
-            category_scores=res.category_scores,
-            issues=res.issues,
-            summary=res.summary,
-            pages_crawled=1,
-            started_at=datetime.now(UTC),
-            completed_at=datetime.now(UTC),
+        raise ApiError(
+            409, "audit_required", "Run an audit for this website first, then generate the report."
         )
-        db.add(audit_entry)
-        db.commit()
 
     # Compile metrics
     keywords_count = (
@@ -246,15 +233,15 @@ def send_test_digest(
         recipient = user.email if user else None
 
     if not recipient:
-        from app_api.errors import ApiError
-
         raise ApiError(400, "recipient_required", "Recipient email is required.")
 
-    from app_worker.tasks.digest import send_site_weekly_digest
-
-    res = send_site_weekly_digest(str(site.id), recipient, payload.language)
+    dispatch_task(
+        "app_worker.tasks.digest.send_site_weekly_digest",
+        args=[str(site.id), recipient, payload.language],
+        queue="default",
+    )
     return SendTestDigestOut(
-        status="sent",
-        message=f"Weekly performance digest sent to {recipient}",
-        emails_sent=res.get("emails_sent", 1),
+        status="queued",
+        message=f"Test digest is on its way to {recipient}",
+        emails_sent=0,
     )
