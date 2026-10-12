@@ -189,6 +189,8 @@ health check, restart policy), so the Railway dashboard only needs a path and en
 
 ## 4. Self-Hosted Deployment: Docker Compose
 
+> **Free option:** [deployment-oracle.md](deployment-oracle.md) walks through this on an Oracle Cloud Always Free ARM server, with Caddy providing automatic HTTPS.
+
 For deploying on a single VPS or dedicated Linux server (Ubuntu 22.04+ / Debian 12):
 
 ### Step 4.1: Host Prerequisites
@@ -254,7 +256,7 @@ Ensure all checks pass with: `🎉 PRE-FLIGHT CHECK PASSED! System is ready for 
 docker compose -f docker-compose.prod.yml up -d
 ```
 
-Verify all 7 containers are healthy:
+Verify all 8 containers are healthy (Caddy on ports 80/443 serves HTTPS for `SITE_DOMAIN`):
 
 ```bash
 docker compose -f docker-compose.prod.yml ps

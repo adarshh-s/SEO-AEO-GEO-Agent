@@ -1,0 +1,7 @@
+# Public entry point for docker-compose.prod.yml.
+# SITE_DOMAIN set (e.g. omnirank.duckdns.org): Caddy gets a free Let's Encrypt certificate
+# and redirects HTTP to HTTPS. Unset: plain HTTP on port 80 (login needs HTTPS in production).
+{$SITE_DOMAIN::80} {
+	encode gzip
+	reverse_proxy nginx:80
+}
