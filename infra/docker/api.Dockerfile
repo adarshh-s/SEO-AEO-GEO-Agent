@@ -13,6 +13,7 @@ RUN uv sync --frozen --no-dev --package app-api --no-install-workspace
 COPY config config
 COPY packages/core packages/core
 COPY apps/api apps/api
+COPY scripts/verify_prod_env.py scripts/verify_prod_env.py
 RUN uv sync --frozen --no-dev --package app-api
 WORKDIR /repo/apps/api
 

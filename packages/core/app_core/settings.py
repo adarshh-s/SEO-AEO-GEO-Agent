@@ -110,6 +110,17 @@ class Settings(BaseSettings):
         # staging/production check below rejects.
         return v if isinstance(v, str) and v.strip() else DEV_ENCRYPTION_KEY
 
+    @field_validator("database_url", mode="before")
+    @classmethod
+    def _psycopg_driver(cls, v: object) -> object:
+        # Hosted Postgres (Railway, Render, Heroku) hands out postgres:// or postgresql://;
+        # SQLAlchemy would pick psycopg2 for those, but we ship psycopg 3.
+        if isinstance(v, str):
+            for prefix in ("postgres://", "postgresql://"):
+                if v.startswith(prefix):
+                    return "postgresql+psycopg://" + v[len(prefix) :]
+        return v
+
     @field_validator("cors_origins", mode="before")
     @classmethod
     def _split_origins(cls, v: object) -> object:

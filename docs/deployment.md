@@ -62,8 +62,8 @@ Store these variables in your production secrets manager (Railway/Vercel dashboa
 | `JWT_SECRET`         | 32+ character random secret for JWT access tokens          | `openssl rand -hex 32`    |
 | `APP_ENCRYPTION_KEY` | Fernet key(s) encrypting stored platform credentials and webhook secrets; comma-separate to rotate (first encrypts) | `python -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"` |
 | `SEED_DEMO`          | Must be `false` in production                              | `false`                   |
-| `SECURE_COOKIES`     | Set to `true` to require HTTPS cookies                     | `true`                    |
-| `ENVIRONMENT`        | Environment tag                                            | `production`              |
+| `COOKIE_SECURE`      | Must be `true` in production (HTTPS-only cookies)          | `true`                    |
+| `ENV`                | `production` (anything else allows dev secrets and mocks)  | `production`              |
 
 ### Networking & Domains
 
@@ -101,7 +101,7 @@ replaced by sample data. `USE_MOCK_PROVIDERS=true` is refused in production.
 | ----------------- | ------------------------------------------------------------------------------------------------------------------------ | ------------------------ |
 | `EMAIL_PROVIDER`  | Provider adapter (`resend` or `smtp`)                                                                                    | `resend`                 |
 | `RESEND_API_KEY`  | Resend API key (if `EMAIL_PROVIDER=resend`)                                                                              | `re_123456789...`        |
-| `EMAIL_FROM`      | Sender address                                                                                                           | `noreply@omnirank.com`  |
+| `EMAIL_FROM_ADDRESS` | Sender address                                                                                                           | `noreply@omnirank.com`  |
 | `OPS_ALERT_EMAIL` | Operator address for cost ceiling alerts ([D8](file:///Users/adarsh/Desktop/Projects/SEO%20agent/docs/decisions.md#L17)) | `adarshs18400@gmail.com` |
 
 ### Frontend Build Arguments / Environment Variables
@@ -118,54 +118,55 @@ replaced by sample data. `USE_MOCK_PROVIDERS=true` is refused in production.
 
 ### Step 3.1: Railway Setup (Backend, Worker, DB, Redis)
 
-1. **Create a Railway Project**:
-   - In Railway, create a new project.
-   - Provision a **PostgreSQL** plugin.
-   - Provision a **Redis** plugin.
+Each backend service has a config file in `infra/railway/` (Dockerfile, start command,
+health check, restart policy), so the Railway dashboard only needs a path and env vars.
 
-2. **Initialize Database & RLS Role**:
-   Before running Alembic migrations, PostgreSQL requires the unprivileged `app_tenant` role for multi-tenant Row-Level Security:
+1. **Create a Railway project** and add **PostgreSQL** and **Redis** from "+ New → Database".
 
-   ```sql
-   -- Connect via Railway DB query tool or psql
-   DO $$
-   BEGIN
-     IF NOT EXISTS (SELECT FROM pg_roles WHERE rolname = 'app_tenant') THEN
-       CREATE ROLE app_tenant NOLOGIN;
-     END IF;
-   END
-   $$;
+2. **Add three services from the GitHub repo** (`+ New → GitHub Repo`, same repo each time).
+   Leave the root directory empty (the Dockerfiles build from the repo root). Rename them and
+   set **Settings → Config-as-code → Railway config file**:
+
+   | Service  | Config file                 | Public domain        |
+   | -------- | --------------------------- | -------------------- |
+   | `api`    | `/infra/railway/api.toml`    | yes (port 8000/`$PORT`) |
+   | `worker` | `/infra/railway/worker.toml` | no                   |
+   | `beat`   | `/infra/railway/beat.toml`   | no (keep 1 replica)  |
+
+3. **Set variables** (Section 2) on the `api` service, then share them with `worker` and
+   `beat` (Railway "Shared Variables" on the project is easiest). Use references for the
+   datastores so passwords never get copied by hand:
+
+   ```ini
+   DATABASE_URL=${{Postgres.DATABASE_URL}}   # postgresql:// is converted to psycopg 3 automatically
+   REDIS_URL=${{Redis.REDIS_URL}}
+   ENV=production
+   COOKIE_SECURE=true
+   SEED_DEMO=false
+   JWT_SECRET=<openssl rand -hex 32>
+   APP_ENCRYPTION_KEY=<Fernet key>
+   APP_URL=https://app.omnirank.com
+   API_URL=https://api.omnirank.com
+   CORS_ORIGINS=https://app.omnirank.com,https://omnirank.com
    ```
 
-3. **Deploy Backend API Service**:
-   - Add a GitHub repo service pointing to your repository.
-   - Build using Dockerfile: `infra/docker/api.Dockerfile` (target: `prod`).
-   - Set environment variables as listed in Section 2.
-   - Expose port `8000`.
-   - Add custom domain: `api.omnirank.com`.
+   The app refuses to start with `ENV=production` and a dev `JWT_SECRET`, a missing
+   `APP_ENCRYPTION_KEY` or `COOKIE_SECURE=false`, so a bad config fails loudly at deploy.
 
-4. **Deploy Celery Worker Service**:
-   - Add a second service from the same repo.
-   - Build using Dockerfile: `infra/docker/worker.Dockerfile` (target: `prod` with Playwright browsers).
-   - Override start command:
-     ```bash
-     celery -A app_worker.celery_app worker -Q default,crawl,tracking,agents,deploy --pool=prefork --concurrency=4 --loglevel=INFO
-     ```
-   - Share all environment variables with the API service.
+4. **Migrations run automatically**: the API image runs `alembic upgrade head` before starting.
+   The first migration creates the `app_tenant` RLS role (Railway's `postgres` user may create
+   roles), so there is no manual SQL step.
 
-5. **Deploy Celery Beat (Scheduler)**:
-   - Add a third service from the same repo.
-   - Build using Dockerfile: `infra/docker/worker.Dockerfile`.
-   - Override start command:
-     ```bash
-     celery -A app_worker.celery_app beat --loglevel=INFO --schedule=/tmp/celerybeat-schedule
-     ```
+5. **Check it**: open `https://<api-domain>/healthz`, then run the pre-flight check from the
+   `api` service shell: `python /repo/scripts/verify_prod_env.py` (or locally with
+   `railway run`).
 
-6. **Run Alembic Database Migrations**:
-   Run a one-off task on Railway or from the API console:
-   ```bash
-   uv run alembic upgrade head
-   ```
+> **Domains and login cookies.** The refresh cookie is `SameSite=Lax`, so the web app and the
+> API must be on the **same site**: `app.omnirank.com` + `api.omnirank.com` works, but the
+> default `*.vercel.app` + `*.up.railway.app` domains do not (login won't stick). Either add
+> custom domains on both before testing login, or proxy the API through Vercel: add
+> `{ "source": "/api/:path*", "destination": "https://<api-domain>/api/:path*" }` as the
+> first rewrite in `apps/web/vercel.json` and set `VITE_API_URL=/api`.
 
 ### Step 3.2: Vercel Setup (Frontend)
 
@@ -176,6 +177,7 @@ replaced by sample data. `USE_MOCK_PROVIDERS=true` is refused in production.
    - **Build Command**: `pnpm build`
    - **Output Directory**: `dist`
    - **Install Command**: `pnpm install`
+   - `apps/web/vercel.json` already sends every route to `index.html` (client-side routing).
 3. Configure Environment Variables:
    - `VITE_API_URL` = `https://api.omnirank.com/api`
    - `VITE_CONTACT_EMAIL` = `adarshs18400@gmail.com`
@@ -210,9 +212,9 @@ For deploying on a single VPS or dedicated Linux server (Ubuntu 22.04+ / Debian 
    ```
 3. Update `.env` with production values:
    ```ini
-   ENVIRONMENT=production
+   ENV=production
    SEED_DEMO=false
-   SECURE_COOKIES=true
+   COOKIE_SECURE=true
    JWT_SECRET=<generated-32-byte-hex>
    APP_ENCRYPTION_KEY=<Fernet key, see table above>
    POSTGRES_PASSWORD=<strong-db-password>
@@ -284,7 +286,7 @@ Configure the following DNS records at your registrar or Cloudflare:
 
 - Access tokens are short-lived JWTs (15 min).
 - Refresh tokens are stored in `httpOnly`, `Secure`, `SameSite=Lax` cookies.
-- When `SECURE_COOKIES=true` is enabled, cookies are only transmitted over HTTPS.
+- When `COOKIE_SECURE=true` is enabled, cookies are only transmitted over HTTPS.
 - CSRF protection uses double-submit tokens returned in JSON responses and validated via the `X-CSRF-Token` request header.
 
 ---

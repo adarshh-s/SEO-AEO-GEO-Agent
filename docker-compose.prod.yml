@@ -6,9 +6,10 @@ x-python-prod-env: &python-prod-env
     - path: .env
       required: true
   environment:
+    ENV: production
     SEED_DEMO: "false"
     EMAIL_PROVIDER: ${EMAIL_PROVIDER:-resend}
-    SECURE_COOKIES: "true"
+    COOKIE_SECURE: "true"
 
 services:
   postgres:

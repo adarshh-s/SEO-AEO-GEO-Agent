@@ -1,0 +1,12 @@
+# Railway config-as-code for Celery Beat. Keep this service at exactly ONE replica,
+# or every scheduled job runs more than once.
+# In the service's Settings → Config-as-code, set the path to /infra/railway/beat.toml.
+[build]
+builder = "DOCKERFILE"
+dockerfilePath = "infra/docker/worker.Dockerfile"
+watchPatterns = ["apps/worker/**", "packages/core/**", "config/**", "uv.lock", "infra/docker/worker.Dockerfile"]
+
+[deploy]
+startCommand = "celery -A app_worker.celery_app beat --loglevel=INFO --schedule=/tmp/celerybeat-schedule"
+numReplicas = 1
+restartPolicyType = "ALWAYS"

@@ -63,3 +63,13 @@ def test_cors_origins_accepts_comma_separated_env(monkeypatch):
 
     monkeypatch.setenv("CORS_ORIGINS", "http://localhost:5273, https://app.omnirank.com")
     assert Settings().cors_origins == ["http://localhost:5273", "https://app.omnirank.com"]
+
+
+def test_database_url_uses_psycopg3_for_hosted_postgres_urls(monkeypatch):
+    from app_core.settings import Settings
+
+    for given in ("postgres://u:p@h:5432/db", "postgresql://u:p@h:5432/db"):
+        monkeypatch.setenv("DATABASE_URL", given)
+        assert Settings().database_url == "postgresql+psycopg://u:p@h:5432/db"
+    monkeypatch.setenv("DATABASE_URL", "postgresql+psycopg://u:p@h:5432/db")
+    assert Settings().database_url == "postgresql+psycopg://u:p@h:5432/db"

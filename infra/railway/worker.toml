@@ -1,0 +1,10 @@
+# Railway config-as-code for the Celery worker (long-running; needs Chromium).
+# In the service's Settings → Config-as-code, set the path to /infra/railway/worker.toml.
+[build]
+builder = "DOCKERFILE"
+dockerfilePath = "infra/docker/worker.Dockerfile"
+watchPatterns = ["apps/worker/**", "packages/core/**", "config/**", "vendor/claude-seo/scripts/**", "uv.lock", "infra/docker/worker.Dockerfile"]
+
+[deploy]
+startCommand = "celery -A app_worker.celery_app worker -Q default,crawl,tracking,agents,deploy --pool=prefork --concurrency=2 --loglevel=INFO"
+restartPolicyType = "ALWAYS"

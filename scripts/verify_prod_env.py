@@ -17,13 +17,16 @@ import os
 import sys
 
 from app_core.brand import BRAND
-from app_core.settings import get_settings
+from app_core.settings import DEV_JWT_SECRET, get_settings
 
 
 def check_secrets(settings) -> list[str]:
     errors = []
-    # In development, the default secret is 'dev-insecure-jwt-secret-do-not-use-in-production'
-    if "dev-insecure" in settings.jwt_secret.lower() or settings.jwt_secret.lower() == "secret":
+    if settings.env != "production":
+        errors.append(
+            f"ENV is '{settings.env}'. Set ENV=production (otherwise dev secrets and mocks are allowed)."
+        )
+    if settings.jwt_secret == DEV_JWT_SECRET or settings.jwt_secret.lower() == "secret":
         errors.append(
             "JWT_SECRET is using the insecure development default! Generate a 32+ byte random string."
         )
